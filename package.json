@@ -27,6 +27,7 @@
     "typescript": "5.1.6"
   },
   "devDependencies": {
-    "gh-pages": "^5.0.0"
+    "gh-pages": "^5.0.0",
+    "serve": "^14.2.0"
   }
 }
