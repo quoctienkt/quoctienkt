@@ -95,5 +95,4 @@ jobs:
         # https://github.com/JamesIves/github-pages-deploy-action
         uses: JamesIves/github-pages-deploy-action@v4.4.0
         with:
-          branch: gh-pages
           folder: out
