@@ -5,11 +5,10 @@
   "private": true,
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d ./",
+    "deploy": "npm run predeploy && gh-pages -d out -b main",
     "build": "next build",
-    "export": "next export -o ./",
     "dev": "next dev",
-    "start": "npx serve ./",
+    "start": "npx serve out",
     "lint": "next lint"
   },
   "dependencies": {
