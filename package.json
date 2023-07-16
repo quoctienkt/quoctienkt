@@ -4,10 +4,9 @@
   "homepage": "https://quoctienkt.github.io/quoctienkt",
   "private": true,
   "scripts": {
-    "predeploy": "npm run build && npm run export",
-    "deploy": "gh-pages -d out -b main",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "next build",
-    "export": "next export",
     "dev": "next dev",
     "start": "next start",
     "lint": "next lint"
