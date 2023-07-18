@@ -3,6 +3,8 @@
 var mousePressed = false;
 var lastX, lastY;
 var ctx;
+var chartColor = "white";
+var chartWidth = 11;
 
 function InitThis() {
   ctx = document.getElementById("myCanvas").getContext("2d");
@@ -36,8 +38,8 @@ function InitThis() {
 function Draw(x, y, isDown) {
   if (isDown) {
     ctx.beginPath();
-    ctx.strokeStyle = $("#selColor").val();
-    ctx.lineWidth = $("#selWidth").val();
+    ctx.strokeStyle = chartColor;
+    ctx.lineWidth = chartWidth;
     ctx.lineJoin = "round";
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);

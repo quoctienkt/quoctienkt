@@ -143,7 +143,7 @@ async function setupApp() {
 
   var canvas = document.getElementById("myCanvas");
   var submit = document.getElementById("submit");
-  var load = document.getElementById("load");
+  var load = document.getElementById("notification_container");
 
   var model;
 
