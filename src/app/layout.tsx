@@ -1,4 +1,4 @@
-import Sidebar from '@/components/Sidebar'
+import Sidebar from '@/components/Sidebar/Sidebar'
 import Image from "next/image"
 import './globals.css'
 import type { Metadata } from 'next'
@@ -43,7 +43,7 @@ export default function RootLayout({
             <main>
               {children}
             </main>
-            <footer className="bg-black w-full h-9">Footer</footer>
+            <footer className="bg-amber-900 color-white w-full h-9">TienDang Apps</footer>
           </div>
         </div>
       </body>
