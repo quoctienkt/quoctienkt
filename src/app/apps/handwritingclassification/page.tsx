@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import Head from "next/head";
 import Script from "next/script";
@@ -6,7 +6,14 @@ import Image from "next/image";
 import { getAssetPath } from "@/utils/AssetUtil";
 import "./style.css";
 
+
 export default function Page() {
+  const paintJsPath = getAssetPath(
+    "apps/handwritingclassification/js/paint.js"
+  );
+  const indexJsPath = getAssetPath(
+    "apps/handwritingclassification/js/index.js"
+  );
   return (
     <>
       <Head>
@@ -15,12 +22,8 @@ export default function Page() {
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></Script>
       <Script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></Script>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></Script>
-      <Script
-        src={getAssetPath("apps/handwritingclassification/js/paint.js")}
-      ></Script>
-      <Script
-        src={getAssetPath("apps/handwritingclassification/js/index.js")}
-      ></Script>
+      <Script src={paintJsPath}></Script>
+      <Script src={indexJsPath}></Script>
 
       <section className="app_handwritingclassfication">
         <div id="notification_container"></div>
@@ -77,7 +80,7 @@ export default function Page() {
               </div>
               <div className="modal-footer">
                 <h3>
-                  <span>Source code:  </span>
+                  <span>Source code: </span>
                   <a
                     href="https://gitlab.com/17521121/handwritingclassification"
                     target="_blank"
