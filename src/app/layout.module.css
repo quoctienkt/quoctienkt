@@ -1,0 +1,38 @@
+.appWrapper {
+  @apply bg-sky-950 h-full w-full flex;
+
+  .sidebar {
+    @apply bg-gray-800;
+    flex: 0 0 300px;
+    border: none;
+    border-right: 1px solid white;
+
+    & > img {
+      @apply mt-8;
+    }
+  }
+
+  .mainPage {
+    @apply flex flex-col h-full w-full;
+
+    & > header {
+      @apply bg-gray-800;
+      flex: 0 0 35px;
+      padding: 5px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    & > main {
+      flex: 1 1 100%;
+      padding: 5px;
+    }
+
+    & > footer {
+      flex: 0 0 50px;
+      padding: 5px;
+      text-align: center;
+      font-size: 18px;
+    }
+  }
+}

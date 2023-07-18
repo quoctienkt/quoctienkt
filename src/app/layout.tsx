@@ -1,7 +1,10 @@
-import Sidebar from '@/components/sidebar'
+import Sidebar from '@/components/Sidebar'
+import Image from "next/image"
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { getAssetPath } from '@/utils/AssetUtil'
+import styles from "./layout.module.css"
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,20 +21,30 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* left page */}
-        <div>
-          {/* page icon */}
+        <div className={styles.appWrapper}>
+          {/* left page */}
+          <div className={styles.sidebar}>
+            {/* page icon */}
+            <Image
+              src={getAssetPath("vercel.svg")}
+              alt="App Logo"
+              className="dark:invert m-auto"
+              width={200}
+              height={24}
+              priority />
+              <hr className="mt-8" />
+            <Sidebar />
+          </div>
 
-          <Sidebar />
-        </div>
-
-        {/* right page */}
-        <div>
-          <header>Main page title</header>
-          {/* main page */}
-          <main>
-            {children}
-          </main>
+          {/* right page */}
+          <div className={styles.mainPage}>
+            <header>Main page header</header>
+            {/* main page */}
+            <main>
+              {children}
+            </main>
+            <footer className="bg-black w-full h-9">Footer</footer>
+          </div>
         </div>
       </body>
     </html>
