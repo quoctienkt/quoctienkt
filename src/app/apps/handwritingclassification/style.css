@@ -23,16 +23,16 @@
     justify-content: center;
     align-items: center;
   }
-  
+
   #myCanvas {
     background: black;
     margin: 10px;
   }
-  
+
   canvas {
     border: 2px solid green;
   }
-  
+
   #chart-container,
   #chart_box,
   #new_chart_box {
@@ -40,7 +40,7 @@
     width: 400px !important;
     height: 400px !important;
   }
-  
+
   button {
     -moz-box-shadow: inset 0px 1px 0px 0px #d9fbbe;
     -webkit-box-shadow: inset 0px 1px 0px 0px #d9fbbe;
@@ -95,13 +95,13 @@
     position: relative;
     top: 1px;
   }
-  
+
   .alert-warning {
     color: #8a6d3b;
     background-color: #fcf8e3;
     border-color: #faebcc;
   }
-  
+
   .alert {
     padding: 15px;
     margin-bottom: 20px;
@@ -109,13 +109,13 @@
     border-radius: 4px;
     font-size: 30px;
   }
-  
+
   .alert-success {
     color: #3c763d;
     background-color: #dff0d8;
     border-color: #d6e9c6;
   }
-  
+
   /* The Modal (background) */
   .modal {
     display: none; /* Hidden by default */
@@ -130,7 +130,7 @@
     background-color: rgb(0, 0, 0); /* Fallback color */
     background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
   }
-  
+
   /* Modal Content */
   .modal-content {
     position: relative;
@@ -145,11 +145,11 @@
     animation-name: animatetop;
     animation-duration: 0.4s;
   }
-  
+
   .modal-content .modal-body {
     color: black;
   }
-  
+
   /* Add Animation */
   @-webkit-keyframes animatetop {
     from {
@@ -161,7 +161,7 @@
       opacity: 1;
     }
   }
-  
+
   @keyframes animatetop {
     from {
       right: -300px;
@@ -172,7 +172,7 @@
       opacity: 1;
     }
   }
-  
+
   /* The Close Button */
   .close {
     color: white;
@@ -180,30 +180,30 @@
     font-size: 28px;
     font-weight: bold;
   }
-  
+
   .close:hover,
   .close:focus {
     color: #000;
     text-decoration: none;
     cursor: pointer;
   }
-  
+
   .modal-header {
     padding: 2px 10px;
     background-color: #5cb85c;
     color: white;
   }
-  
+
   .modal-body {
     padding: 2px 10px;
   }
-  
+
   .modal-footer {
     padding: 2px 16px;
     background-color: #5cb85c;
     color: white;
   }
-  
+
   .information {
     position: absolute;
     top: 50%;
@@ -244,6 +244,4 @@
     opacity: 1;
     right: 0;
   }
-  
-
 }
