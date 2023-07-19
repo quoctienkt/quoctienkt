@@ -1,15 +1,17 @@
-import Head from "next/head";
+import { Metadata } from "next";
 import Script from "next/script";
 import Image from "next/image";
 import { getAssetPath } from "@/utils/AssetUtil";
 import "./style.css";
 
+export const metadata: Metadata = {
+  title: "Hand writing classification",
+  description: "Hand writing classification",
+};
+
 function Page() {
   return (
     <>
-      <Head>
-        <title>Hand writing classification</title>
-      </Head>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></Script>
       <Script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></Script>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></Script>

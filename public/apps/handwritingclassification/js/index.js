@@ -150,15 +150,18 @@ async function setupApp() {
 
   $clearChart.off("click").on("click", (ev) => {
     clearArea();
-  })
+  });
 
-  async function loadModel() {
+  window.loadDLModel = async function () {
     load.className = "alert alert-warning";
     load.innerHTML = "Please wait for loading model!";
     submit.disabled = true;
-    model = await tf.loadLayersModel(
-      "/apps/handwritingclassification/dl_model/model.json"
+
+    dl_model_path = await window.getAssetPath(
+      "apps/handwritingclassification/dl_model/model.json"
     );
+    model = await tf.loadLayersModel(dl_model_path);
+
     console.log("Load dl_modal finished");
     load.className = "alert alert-success";
     load.innerHTML = "Load finish, use model to guess hand writing number";
@@ -212,7 +215,7 @@ async function setupApp() {
     }
   };
 
-  loadModel()
+  loadDLModel();
 }
 
 let setupAppInternal = setInterval(async () => {
