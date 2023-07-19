@@ -20,7 +20,7 @@ function Page() {
         src={getAssetPath("apps/handwritingclassification/js/index.js")}
       ></Script>
 
-      <section className="app_handwritingclassfication">
+      <section className="app_handwritingclassification">
         <div id="notification_container"></div>
         <div className="container">
           <canvas id="myCanvas" width="300" height="350"></canvas>

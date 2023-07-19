@@ -13,7 +13,7 @@ async function setupApp() {
   var modal = document.getElementById("myModal");
   var btn = document.getElementsByClassName("information")[0];
   var closeModalBtn = document.getElementsByClassName("close")[0];
-  var $clearChart = $(".app_handwritingclassification .clearArea");
+  var $clearChart = $(".app_handwritingclassification .clear-area");
   var model;
 
   window.loadChart = function (label, data) {
