@@ -1,6 +1,6 @@
 // by Chtiwi Malek on CODICODE.COM
 
-var mousePressed = false;
+var pointerPressed = false;
 var lastX, lastY;
 var ctx;
 var chartColor = "white";
@@ -9,29 +9,29 @@ var chartWidth = 11;
 function InitThis() {
   ctx = document.getElementById("myCanvas").getContext("2d");
 
-  $("#myCanvas").mousedown(function(e) {
-    mousePressed = true;
+  $("#myCanvas").off("pointerdown").on("pointerdown", function(e) {
+    pointerPressed = true;
     Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
   });
 
-  $("#myCanvas").mousemove(function(e) {
-    if (mousePressed) {
+  $("#myCanvas").off("pointermove").on("pointermove", function(e) {
+    if (pointerPressed) {
       Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
     }
   });
 
-  $("#myCanvas").mouseover(function(e) {
-    if (mousePressed) {
+  $("#myCanvas").off("pointerover").on("pointerover", function(e) {
+    if (pointerPressed) {
       Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
     }
   });
 
-  $("body").mousedown(function(e) {
-    mousePressed = true;
+  $("body").off("pointerdown").on("pointerdown", function(e) {
+    pointerPressed = true;
   });
 
-  $("body").mouseup(function(e) {
-    mousePressed = false;
+  $("body").off("pointerup").on("pointerup", function(e) {
+    pointerPressed = false;
   });
 }
 

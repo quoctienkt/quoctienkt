@@ -1,0 +1,17 @@
+.navbar {
+  @apply lg:h-full w-full hidden lg:block;
+
+  /* navitem */
+  & > * {
+    @apply hover:bg-sky-700 p-2 border-amber-500 lg:block flex w-full;
+
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+  }
+
+  &::active {
+    & > * {
+      @apply block;
+    }
+  }
+}
