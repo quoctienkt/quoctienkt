@@ -1,19 +1,10 @@
-"use client"
-
 import Head from "next/head";
 import Script from "next/script";
 import Image from "next/image";
 import { getAssetPath } from "@/utils/AssetUtil";
 import "./style.css";
 
-
-export default function Page() {
-  const paintJsPath = getAssetPath(
-    "apps/handwritingclassification/js/paint.js"
-  );
-  const indexJsPath = getAssetPath(
-    "apps/handwritingclassification/js/index.js"
-  );
+function Page() {
   return (
     <>
       <Head>
@@ -22,8 +13,12 @@ export default function Page() {
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></Script>
       <Script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></Script>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></Script>
-      <Script src={paintJsPath}></Script>
-      <Script src={indexJsPath}></Script>
+      <Script
+        src={getAssetPath("apps/handwritingclassification/js/paint.js")}
+      ></Script>
+      <Script
+        src={getAssetPath("apps/handwritingclassification/js/index.js")}
+      ></Script>
 
       <section className="app_handwritingclassfication">
         <div id="notification_container"></div>
@@ -43,10 +38,7 @@ export default function Page() {
           >
             Predict
           </button>
-          <button
-            className="action-btn bg-slate-400 hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
-            onClick={() => (window as any).clearArea()}
-          >
+          <button className="clear-area action-btn bg-slate-400 hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
             Clear
           </button>
         </div>
@@ -96,3 +88,5 @@ export default function Page() {
     </>
   );
 }
+
+export default Page;

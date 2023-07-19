@@ -1,4 +1,3 @@
-
 async function setupApp() {
   InitThis();
 
@@ -8,6 +7,14 @@ async function setupApp() {
   var chart = "";
   var firstTime = 0;
   var chart_box = document.getElementById("chart_box");
+  var canvas = document.getElementById("myCanvas");
+  var submit = document.getElementById("submit");
+  var load = document.getElementById("notification_container");
+  var modal = document.getElementById("myModal");
+  var btn = document.getElementsByClassName("information")[0];
+  var closeModalBtn = document.getElementsByClassName("close")[0];
+  var $clearChart = $(".app_handwritingclassification .clearArea");
+  var model;
 
   window.loadChart = function (label, data) {
     let ctx = chart_box.getContext("2d");
@@ -32,7 +39,7 @@ async function setupApp() {
       // Configuration options go here
       options: {},
     });
-  }
+  };
 
   window.displayChart = function (data) {
     label = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
@@ -43,7 +50,7 @@ async function setupApp() {
       chart.destroy();
       loadChart(label, data);
     }
-  }
+  };
 
   window.crop_top_bottom = function (flat_color, width, height) {
     let result = [];
@@ -78,7 +85,7 @@ async function setupApp() {
       itRow += 1;
     }
     return result;
-  }
+  };
 
   window.crop_left_right = function (pixel) {
     let width = pixel[0].length;
@@ -139,26 +146,24 @@ async function setupApp() {
     }
 
     return pixel;
-  }
+  };
 
-  var canvas = document.getElementById("myCanvas");
-  var submit = document.getElementById("submit");
-  var load = document.getElementById("notification_container");
+  $clearChart.off("click").on("click", (ev) => {
+    clearArea();
+  })
 
-  var model;
-
-  (async function loadModel() {
+  async function loadModel() {
     load.className = "alert alert-warning";
     load.innerHTML = "Please wait for loading model!";
     submit.disabled = true;
     model = await tf.loadLayersModel(
       "/apps/handwritingclassification/dl_model/model.json"
     );
-    console.log("load finished");
+    console.log("Load dl_modal finished");
     load.className = "alert alert-success";
     load.innerHTML = "Load finish, use model to guess hand writing number";
     submit.disabled = false;
-  })();
+  };
 
   submit.onclick = async function () {
     let result;
@@ -192,31 +197,22 @@ async function setupApp() {
     result = await model.predict(newImg).data();
     await displayChart(result, chart_box);
   };
-  // information
-  var modal = document.getElementById("myModal");
 
-  // Get the button that opens the modal
-  var btn = document.getElementsByClassName("information")[0];
-
-  // Get the <span> element that closes the modal
-  var span = document.getElementsByClassName("close")[0];
-
-  // When the user clicks the button, open the modal
   btn.onclick = function () {
     modal.style.display = "block";
   };
 
-  // When the user clicks on <span> (x), close the modal
-  span.onclick = function () {
+  closeModalBtn.onclick = function () {
     modal.style.display = "none";
   };
 
-  // When the user clicks anywhere outside of the modal, close it
   window.onclick = function (event) {
     if (event.target == modal) {
       modal.style.display = "none";
     }
   };
+
+  loadModel()
 }
 
 let setupAppInternal = setInterval(async () => {

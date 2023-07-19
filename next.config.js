@@ -18,6 +18,14 @@ const nextConfig = {
     assetPrefix: assetPrefix,
     basePath: basePath,
     output: outputMode,
+    // serverRuntimeConfig: {
+    //   // Will only be available on the server side
+    // },
+    // publicRuntimeConfig: {
+    //   // Will be available on both server and client
+    //   assetPrefix: assetPrefix,
+    //   basePath: basePath,
+    // },
 }
 
 module.exports = nextConfig
