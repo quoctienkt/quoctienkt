@@ -2,8 +2,8 @@
 
 const isGithubActions = process.env.GITHUB_ACTIONS || false
 
-let assetPrefix = ""
-let basePath = ""
+let assetPrefix = "/test"
+let basePath = "/test"
 let outputMode = undefined
 
 if (isGithubActions) {
