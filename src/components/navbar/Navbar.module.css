@@ -1,39 +1,24 @@
 .navbar {
-  @apply flex flex-col w-full gap-2 shadow-lg lg:h-full;
-  /* @apply fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full; */
-  flex: 0 0 300px;
+  @apply relative flex flex-row flex-wrap items-center w-full max-lg:px-[15px] max-lg:justify-between lg:flex-[0_0_300px] lg:gap-2 shadow-lg lg:flex-col lg:h-full max-lg:py-[8px];
   border: none;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 
   .logo {
-    @apply mt-1 dark:invert lg:mt-8 lg:mb-8 lg:m-auto;
+    @apply mt-1 dark:invert lg:mt-8 lg:mb-8 lg:m-auto max-lg:w-[100px];
   }
 
   .nav_links {
-    @apply flex flex-row flex-wrap items-center justify-between bg-gray-800 lg:block lg:flex-col lg:justify-center;
+    @apply flex flex-col w-full bg-gray-800 lg:block max-lg:hidden;
 
-    /* lg */
-    @media only screen and (max-width: 1024px) {
-      & {
-        flex-basis: 25px;
-        padding-top: 8px;
-        padding-bottom: 8px;
-        padding-left: 10px;
-        padding-right: 10px;
-      }
+    &.active {
+      @apply p-2 mt-3 max-lg:flex bg-slate-300;
     }
 
     & > * {
-      @apply flex w-full p-2 hover:bg-sky-700 border-amber-500 lg:block;
+      @apply flex w-full p-2 hover:bg-sky-700 border-amber-500 lg:block max-lg:bg-[#f8f9fa] max-lg:text-stone-900;
 
       border-top: 1px solid white;
       border-bottom: 1px solid white;
-    }
-
-    &::active {
-      & > * {
-        @apply block;
-      }
     }
   }
 }

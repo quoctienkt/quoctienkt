@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Script from "next/script";
 import Image from "next/image";
-import { getAssetPath } from "@/utils/AssetUtil";
+import { getAssetPath } from "@/utils/assetUtil";
 import "./style.css";
 
 export const metadata: Metadata = {
@@ -35,12 +35,12 @@ function Page() {
 
         <div className="actions">
           <button
-            className="action-btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-600 rounded mr-1"
+            className="px-4 py-2 mr-1 font-bold text-white bg-blue-500 border border-blue-600 rounded action-btn hover:bg-blue-700"
             id="submit"
           >
             Predict
           </button>
-          <button className="clear-area action-btn bg-slate-400 hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+          <button className="px-4 py-2 font-semibold text-blue-700 border border-blue-500 rounded clear-area action-btn bg-slate-400 hover:bg-blue-500 hover:text-white hover:border-transparent">
             Clear
           </button>
         </div>
@@ -48,7 +48,7 @@ function Page() {
         <>
           <div className="information">
             <Image
-              src={getAssetPath("img/information.png")}
+              src="/img/information.png"
               alt="Author info icon"
               className="h-auto max-w-lg transition-all duration-300 rounded-lg cursor-pointer filter hover:grayscale grayscale-0"
               width={50}

@@ -1,5 +1,3 @@
-import Image from 'next/image'
-import { getAssetPath } from "../utils/AssetUtil"
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

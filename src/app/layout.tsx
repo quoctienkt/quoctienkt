@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { basePath, getAssetPath } from "@/utils/AssetUtil";
+import { basePath, getAssetPath } from "@/utils/assetUtil";
 import Script from "next/script";
 import Layout from "@/components/layout/Layout";
 

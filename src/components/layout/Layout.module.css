@@ -2,9 +2,11 @@
   @apply flex flex-col w-full h-full bg-sky-950 lg:flex-row;
 
   .mainPage {
-    @apply relative flex flex-col w-full h-full;
-    overflow-y: auto;
-    overflow-x: auto;
+    @apply relative flex flex-col w-full h-full max-lg:overflow-x-hidden;
+
+    & > * {
+      z-index: 1;
+    }
 
     & > header {
       @apply bg-gray-800;
@@ -15,13 +17,14 @@
     }
 
     & > main {
-      @apply flex items-center justify-center;
+      @apply flex items-center justify-center overflow-auto;
       flex: 1 1 100%;
       padding: 5px;
       position: relative;
     }
 
     & > footer {
+      @apply max-lg:hidden;
       flex: 0 0 50px;
       padding: 5px;
       text-align: center;
