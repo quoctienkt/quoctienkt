@@ -1,11 +1,10 @@
 "use client";
 
 import Script from "next/script";
-import { getAssetPath } from "@/utils/assetUtil";
 import { useEffect } from "react";
 import { AppImage } from "@/components/core_components/image/Image";
+import { AppScript } from "@/components/core_components/script/Script";
 import "./style.css";
-import Head from "next/head";
 
 function Page() {
   useEffect(() => {
@@ -27,12 +26,8 @@ function Page() {
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></Script>
       <Script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></Script>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></Script>
-      <Script
-        src={getAssetPath("apps/handwritingclassification/js/paint.js")}
-      ></Script>
-      <Script
-        src={getAssetPath("apps/handwritingclassification/js/index.js")}
-      ></Script>
+      <AppScript src="/apps/handwritingclassification/js/paint.js"></AppScript>
+      <AppScript src="/apps/handwritingclassification/js/index.js"></AppScript>
 
       <section className="app_handwritingclassification">
         <div id="notification_container"></div>
