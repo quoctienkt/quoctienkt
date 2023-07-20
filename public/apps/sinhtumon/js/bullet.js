@@ -23,7 +23,7 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
 
       // this.type = "";
       this.speed = 200;
-      this.damage = 50;
+      this.damage = 100;
 
       // this.setTint('0xffffff');
       // this.setDisplaySize(30, 30);
@@ -32,7 +32,7 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
       this.setCircle(5, 4, -2);
 
       this.speed = 240;
-      this.damage = 55;
+      this.damage = 150;
 
       // this.setTint('0xffffff');
       // this.setDisplaySize(30, 30);
@@ -40,8 +40,8 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
     } else if (this.getName() == "bullet3") {
       // this.setCircle(5, 4, -2);
 
-      this.speed = 260;
-      this.damage = 60;
+      this.speed = 280;
+      this.damage = 200;
 
       // this.setTint('0xffffff');
       // this.setDisplaySize(30, 30);
@@ -49,8 +49,8 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
     } else if (this.getName() == "bullet4") {
       // this.setCircle(5, 4, -2);
 
-      this.speed = 280;
-      this.damage = 70;
+      this.speed = 320;
+      this.damage = 240;
 
       this.setTint("0xffa500");
       this.setDisplaySize(20, 15);
@@ -58,8 +58,8 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
     } else if (this.getName() == "bullet5") {
       // this.setCircle(5, 4, -2);
 
-      this.speed = 300;
-      this.damage = 80;
+      this.speed = 400;
+      this.damage = 300;
 
       this.setTint("0xffa500");
       this.setDisplaySize(20, 15);
