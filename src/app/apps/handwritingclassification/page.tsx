@@ -9,6 +9,8 @@ import Head from "next/head";
 
 function Page() {
   useEffect(() => {
+    document.title = "Hand writing classification";
+
     let setupAppInternal = setInterval(async () => {
       // wait for $ loaded
       if ($ === undefined) {
@@ -22,10 +24,6 @@ function Page() {
 
   return (
     <>
-      <Head>
-        <title>Hand writing classification</title>
-      </Head>
-
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></Script>
       <Script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></Script>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></Script>
