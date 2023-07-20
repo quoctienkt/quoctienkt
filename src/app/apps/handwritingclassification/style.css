@@ -1,7 +1,7 @@
 .app_handwritingclassification {
   color: black;
   position: relative;
-  width: 100%;
+  max-width: 1000px;
   margin: 0;
   padding: 0;
   text-align: center;

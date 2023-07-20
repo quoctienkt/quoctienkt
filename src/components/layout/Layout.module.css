@@ -1,8 +1,8 @@
 .appWrapper {
-  @apply bg-sky-950 h-full w-full flex lg:flex-row flex-col;
+  @apply flex flex-col w-full h-full bg-sky-950 lg:flex-row;
 
   .mainPage {
-    @apply flex flex-col h-full w-full;
+    @apply relative flex flex-col w-full h-full;
     overflow-y: auto;
     overflow-x: auto;
 
@@ -15,6 +15,7 @@
     }
 
     & > main {
+      @apply flex items-center justify-center;
       flex: 1 1 100%;
       padding: 5px;
       position: relative;
