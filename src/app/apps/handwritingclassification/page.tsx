@@ -6,19 +6,15 @@ import { AppImage } from "@/components/core_components/image/Image";
 import { AppScript } from "@/components/core_components/script/Script";
 import "./style.css";
 
+const appPrefix = "/apps/handwritingclassification";
+
 function Page() {
   useEffect(() => {
     document.title = "Hand writing classification";
 
-    let setupAppInternal = setInterval(async () => {
-      // wait for $ loaded
-      if ($ === undefined) {
-        return;
-      }
-
-      (window as any).setupApp(); // async
-      clearInterval(setupAppInternal);
-    }, 500);
+    setTimeout(async () => {
+      (window as any).setupApp(appPrefix); // async
+    }, 3000);
   }, []);
 
   return (
@@ -26,8 +22,8 @@ function Page() {
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></Script>
       <Script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></Script>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></Script>
-      <AppScript src="/apps/handwritingclassification/js/paint.js"></AppScript>
-      <AppScript src="/apps/handwritingclassification/js/index.js"></AppScript>
+      <AppScript src={`${appPrefix}/js/paint.js`}></AppScript>
+      <AppScript src={`${appPrefix}/js/main.js`}></AppScript>
 
       <section className="app_handwritingclassification">
         <div id="notification_container"></div>

@@ -1,4 +1,4 @@
-async function setupApp() {
+async function setupApp(appPrefix) {
   InitThis();
 
   //------------------------------
@@ -158,7 +158,7 @@ async function setupApp() {
     submit.disabled = true;
 
     dl_model_path = await window.getAssetPath(
-      "/apps/handwritingclassification/dl_model/model.json"
+      `${appPrefix}/dl_model/model.json`
     );
     model = await tf.loadLayersModel(dl_model_path);
 
