@@ -11,14 +11,16 @@ export default function Navbar() {
 
   return (
     <div className={styles.navbar}>
-      <AppImage
-        src="/vercel.svg"
-        alt="App Logo"
-        className={styles.logo}
-        width={200}
-        height={50}
-        priority
-      />
+      <Link href="https://github.com/quoctienkt/quoctienkt" target="_blank">
+        <AppImage
+          src="/img/next.svg"
+          alt="App Logo"
+          className={styles.logo}
+          width={200}
+          height={50}
+          priority
+        />
+      </Link>
 
       <button
         data-collapse-toggle="navbar-default"
@@ -47,10 +49,7 @@ export default function Navbar() {
       </button>
 
       <div
-        className={classes(
-          styles.nav_links,
-          toggle(navbarOpen, styles.active)
-        )}
+        className={classes(styles.nav_links, toggle(navbarOpen, styles.active))}
       >
         <Link href="/apps/handwritingclassification">
           Hand-writing classification

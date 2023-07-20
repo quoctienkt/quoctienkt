@@ -79,7 +79,7 @@ function Page() {
                 <h3>
                   <span>Source code: </span>
                   <a
-                    href="https://gitlab.com/17521121/handwritingclassification"
+                    href="https://github.com/quoctienkt/quoctienkt/blob/main/src/app/apps/handwritingclassification/page.tsx"
                     target="_blank"
                   >
                     Here

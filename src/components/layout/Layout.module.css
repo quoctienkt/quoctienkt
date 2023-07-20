@@ -24,11 +24,7 @@
     }
 
     & > footer {
-      @apply max-lg:hidden;
-      flex: 0 0 50px;
-      padding: 5px;
-      text-align: center;
-      font-size: 18px;
+      @apply max-lg:hidden flex flex-row items-center justify-between w-full bg-amber-900 h-9 flex-[0_0_50px] px-5;
     }
   }
 }
