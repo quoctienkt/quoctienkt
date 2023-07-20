@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./Layout.module.css";
-import Navbar from "@/components/Navbar/Navbar";
+import Navbar from "@/components/navbar/Navbar";
 import React from "react";
 
 export default function Page({ children }: { children: React.ReactNode }) {
