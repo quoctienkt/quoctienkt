@@ -217,13 +217,3 @@ async function setupApp() {
 
   loadDLModel();
 }
-
-let setupAppInternal = setInterval(async () => {
-  // wait for $ loaded
-  if ($ === undefined) {
-    return;
-  }
-
-  setupApp(); // async
-  clearInterval(setupAppInternal);
-}, 500);

@@ -1,17 +1,31 @@
-import { Metadata } from "next";
-import Script from "next/script";
-import Image from "next/image";
-import { getAssetPath } from "@/utils/assetUtil";
-import "./style.css";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Hand writing classification",
-  description: "Hand writing classification",
-};
+import Script from "next/script";
+import { getAssetPath } from "@/utils/assetUtil";
+import { useEffect } from "react";
+import { AppImage } from "@/components/core_components/image/Image";
+import "./style.css";
+import Head from "next/head";
 
 function Page() {
+  useEffect(() => {
+    let setupAppInternal = setInterval(async () => {
+      // wait for $ loaded
+      if ($ === undefined) {
+        return;
+      }
+
+      (window as any).setupApp(); // async
+      clearInterval(setupAppInternal);
+    }, 500);
+  }, []);
+
   return (
     <>
+      <Head>
+        <title>Hand writing classification</title>
+      </Head>
+
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></Script>
       <Script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></Script>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></Script>
@@ -47,7 +61,7 @@ function Page() {
 
         <>
           <div className="information">
-            <Image
+            <AppImage
               src="/img/information.png"
               alt="Author info icon"
               className="h-auto max-w-lg transition-all duration-300 rounded-lg cursor-pointer filter hover:grayscale grayscale-0"
