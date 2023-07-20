@@ -1,5 +1,29 @@
 .navbar {
   @apply lg:h-full w-full hidden lg:block;
+  /* @apply fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full; */
+
+  .navbar {
+    @apply bg-gray-800 lg:block flex lg:flex-col lg:justify-center
+      flex-row flex-wrap justify-between items-center;
+    flex: 0 0 300px;
+    border: none;
+    border-right: 1px solid white;
+
+    /* lg */
+    @media only screen and (max-width: 1024px) {
+      & {
+        flex-basis: 25px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+    }
+
+    & > img {
+      @apply lg:mt-8 mt-1 lg:m-auto;
+    }
+  }
 
   /* navitem */
   & > * {
