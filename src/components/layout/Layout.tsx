@@ -7,7 +7,11 @@ import BackgroundBubble from "./w_background/BackgroundBubble";
 import Link from "next/link";
 import { AppImage } from "../core_components/image/Image";
 
-export default function Page({ children }: { children: React.ReactNode }) {
+interface LayoutProps {
+  children: React.ReactNode,
+}
+
+export default function Page({ children }: LayoutProps) {
   return (
     <>
       <div className={styles.appWrapper}>

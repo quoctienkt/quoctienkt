@@ -1,6 +1,11 @@
 window.setupGame = (appPrefix) => {
+  window.setupBullet();
+  window.setupTower();
+  window.setupSquare();
+  window.setupMonster();
+
   window.mazePuzzle = null;
-  window.graphics = null;
+  window.graphics = undefined;
 
   window.towers = [];
   window.bullets = [];
@@ -16,7 +21,7 @@ window.setupGame = (appPrefix) => {
   window.lifeText = null;
   window.wave = null;
   window.waveText = null;
-  window.nextWave = null;
+  window.nextWave = undefined;
   window.waveDelay = 15000;
   window.gold = null;
   window.goldText = null;
