@@ -33,7 +33,12 @@ export default function View({ basePath }: ViewProps) {
   );
 
   useEffect(() => {
-    const allScriptsReady = mainScriptStatus === "ready";
+    const allScriptsReady =
+      jqueryScriptStatus === "ready" &&
+      tensorflowScriptStatus === "ready" &&
+      chartScriptStatus === "ready" &&
+      painScriptStatus === "ready" &&
+      mainScriptStatus === "ready";
     if (allScriptsReady) {
       (window as any).setupApp(appPrefix);
     }
