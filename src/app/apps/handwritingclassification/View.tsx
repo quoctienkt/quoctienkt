@@ -54,13 +54,13 @@ export default function View({ basePath }: ViewProps) {
       <section className="app_handwritingclassification">
         <div id="notification_container"></div>
         <div className="container">
-          <canvas id="myCanvas" width="300" height="350"></canvas>
+          <canvas id="myCanvas" className="active" width="300" height="350"></canvas>
           <div className="chart-container">
             <canvas id="chart_box" width="400" height="350"></canvas>
           </div>
         </div>
 
-        <hr />
+        <hr className="hr_footer" />
 
         <div className="actions">
           <button

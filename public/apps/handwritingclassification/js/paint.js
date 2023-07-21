@@ -1,4 +1,4 @@
-// by Chtiwi Malek on CODICODE.COM
+// Reference: https://usefulangle.com/post/27/javascript-advantage-of-using-pointer-events-over-mouse-touch-events
 
 var pointerPressed = false;
 var lastX, lastY;
@@ -9,34 +9,37 @@ var chartWidth = 11;
 function InitThis() {
   ctx = document.getElementById("myCanvas").getContext("2d");
 
-  $("#myCanvas").off("pointerdown").on("pointerdown", function(e) {
-    pointerPressed = true;
-    Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
-  });
+  $("#myCanvas")
+    .off("pointerdown")
+    .on("pointerdown", function (e) {
+      pointerPressed = true;
+      lastX = e.pageX - $(this).offset().left;
+      lastY = e.pageY - $(this).offset().top;
+    });
 
-  $("#myCanvas").off("pointermove").on("pointermove", function(e) {
-    if (pointerPressed) {
-      Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
-    }
-  });
+  $("#myCanvas")
+    .off("pointerup")
+    .on("pointerup", function (e) {
+      pointerPressed = false;
+    });
 
-  $("#myCanvas").off("pointerover").on("pointerover", function(e) {
-    if (pointerPressed) {
-      Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
-    }
-  });
+  // $("#myCanvas")
+  //   .off("pointerout")
+  //   .on("pointerout", function (e) {
+  //     pointerPressed = false;
+  //   });
 
-  $("body").off("pointerdown").on("pointerdown", function(e) {
-    pointerPressed = true;
-  });
-
-  $("body").off("pointerup").on("pointerup", function(e) {
-    pointerPressed = false;
-  });
+  $("#myCanvas")
+    .off("pointermove")
+    .on("pointermove", function (e) {
+      if (pointerPressed) {
+        Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top);
+      }
+    });
 }
 
-function Draw(x, y, isDown) {
-  if (isDown) {
+function Draw(x, y) {
+  if (pointerPressed) {
     ctx.beginPath();
     ctx.strokeStyle = chartColor;
     ctx.lineWidth = chartWidth;
@@ -46,6 +49,7 @@ function Draw(x, y, isDown) {
     ctx.closePath();
     ctx.stroke();
   }
+
   lastX = x;
   lastY = y;
 }

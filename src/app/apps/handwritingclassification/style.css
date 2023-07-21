@@ -1,4 +1,27 @@
 .app_handwritingclassification {
+  /* Add Animation */
+  @-webkit-keyframes animatetop {
+    from {
+      right: -300px;
+      opacity: 0;
+    }
+    to {
+      right: 0;
+      opacity: 1;
+    }
+  }
+
+  @keyframes animatetop {
+    from {
+      right: -300px;
+      opacity: 0;
+    }
+    to {
+      right: 0;
+      opacity: 1;
+    }
+  }
+
   color: black;
   position: relative;
   max-width: 1000px;
@@ -64,11 +87,11 @@
 
   canvas {
     border: 2px solid green;
+    /* very important */
+    touch-action: none;
   }
 
-  #chart-container,
-  #chart_box,
-  #new_chart_box {
+  #chart-container {
     border-radius: 5px;
   }
 
@@ -139,29 +162,6 @@
     }
   }
 
-  /* Add Animation */
-  @-webkit-keyframes animatetop {
-    from {
-      right: -300px;
-      opacity: 0;
-    }
-    to {
-      right: 0;
-      opacity: 1;
-    }
-  }
-
-  @keyframes animatetop {
-    from {
-      right: -300px;
-      opacity: 0;
-    }
-    to {
-      right: 0;
-      opacity: 1;
-    }
-  }
-
   .actions {
     margin-top: 10px;
   }
@@ -171,5 +171,33 @@
     top: 10px;
     right: 10px;
     background-color: #3c763d;
+  }
+
+  @apply w-full max-lg:overflow-hidden;
+
+  .hr_footer {
+    @apply max-lg:hidden;
+  }
+
+  .information {
+    @apply max-lg:hidden;
+  }
+
+  .container {
+    @apply max-lg:h-[370px];
+  }
+
+  #myCanvas {
+    @apply max-lg:hidden;
+    &.active {
+      @apply max-lg:block;
+    }
+  }
+
+  .chart-container {
+    @apply max-lg:hidden;
+    &.active {
+      @apply max-lg:block;
+    }
   }
 }

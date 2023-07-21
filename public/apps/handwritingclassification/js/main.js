@@ -149,6 +149,8 @@ async function setupApp(appPrefix) {
   };
 
   $clearChart.off("click").on("click", (ev) => {
+    $(canvas).addClass("active");
+    $(".chart-container").removeClass("active");
     clearArea();
   });
 
@@ -169,6 +171,9 @@ async function setupApp(appPrefix) {
   };
 
   submit.onclick = async function () {
+    $(canvas).removeClass("active");
+    $(".chart-container").addClass("active");
+
     let result;
 
     //preprocess image
