@@ -14,7 +14,6 @@ Open [http://localhost:3000/test](http://localhost:3000) with your browser to se
 ### Hand-writing Number Prediction
 Predict hand-writing number in the range of 0 to 9.
 
-TODO: Need to fix bugs `UI responsive` and `pain.js` to support Mobile usage.
 ### Game: Sinh tử môn
 Resurrects `Sinh tử môn` zingplay game in Web stack version using `Phaser v3`.
 
