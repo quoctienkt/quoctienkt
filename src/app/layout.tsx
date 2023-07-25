@@ -14,14 +14,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <Layout>{children}</Layout>
         <>
           <div id="basePath" className="hidden">
             {basePath}
           </div>
           <Script src={getAssetPath("js/utils.js")}></Script>
         </>
-
-        <Layout>{children}</Layout>
       </body>
     </html>
   );
