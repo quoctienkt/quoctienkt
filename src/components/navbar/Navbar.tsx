@@ -55,6 +55,7 @@ export default function Navbar() {
           Hand-writing classification
         </Link>
         <Link href="/apps/sinhtumon">Sinh tử môn</Link>
+        <Link href="/apps/single-price-grid">Single Price Grid</Link>
       </div>
     </div>
   );

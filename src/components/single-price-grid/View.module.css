@@ -1,0 +1,70 @@
+@tailwind components;
+
+@layer components {
+  .outer {
+    @apply rounded shadow-lg;
+  }
+}
+
+.wrapper {
+  --px: 35px;
+  --py: 35px;
+
+  @apply flex flex-col w-full overflow-hidden text-black bg-white outer;
+
+  .overview {
+    @apply flex-auto basis-48 px-[var(--px)] py-[var(--py)];
+    .title {
+      @apply text-[#3cb2ac] font-bold text-3xl mb-3;
+    }
+
+    .subTitle {
+      @apply text-[#c1d275] font-bold text-xl mb-2;
+    }
+
+    .desc {
+      @apply text-[#adb0b6] flex flex-col leading-7;
+    }
+  }
+
+  .footer {
+    @apply flex flex-row flex-auto text-[#e9ffff] basis-56;
+
+    .header2 {
+      @apply mb-5 text-xl font-bold text-white;
+    }
+
+    .subscription {
+      @apply bg-[#2ab1b5] flex-1 basis-1/2 px-[var(--px)] py-[var(--py)];
+
+      .prices {
+        @apply flex flex-row items-center mb-4;
+
+        .number {
+          @apply mr-4 text-3xl font-bold;
+        }
+
+        .annual {
+          @apply text-[#90dadd];
+        }
+      }
+
+      .signUp {
+        @apply bg-[#bfdf32] w-full p-3 mt-10 font-bold text-center text-white outer cursor-pointer hover:bg-[#a4bd36];
+      }
+    }
+
+    .whyUs {
+      @apply bg-[#4abebd] flex-auto basis-1/2 px-[var(--px)] py-[var(--py)];
+
+      & > ul li {
+        @apply hover:text-[#409997] cursor-pointer;
+      }
+    }
+  }
+
+  /* responsive */
+  .footer {
+    @apply max-sm:flex-col;
+  }
+}
