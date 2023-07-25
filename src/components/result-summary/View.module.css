@@ -1,0 +1,57 @@
+@tailwind components;
+
+@layer components {
+  .outer {
+    @apply rounded-3xl max-sm:rounded-none;
+  }
+}
+
+.wrapper {
+  @apply relative flex flex-row overflow-hidden text-black bg-white outer;
+
+  .result {
+    @apply flex-1 basis-60 bg-[#5c3dfa] outer text-white max-sm:rounded-b-3xl
+    flex flex-col text-center justify-center items-center;
+
+    .title {
+      @apply my-8 text-2xl;
+    }
+
+    .score {
+      @apply w-40 h-40 rounded-full bg-[#4925cf] p-8;
+      .amount {
+        @apply text-7xl;
+      }
+      .percent {
+      }
+    }
+
+    .desc {
+      @apply flex flex-col items-center pt-6 pb-8;
+      .header {
+        @apply py-3 text-3xl;
+      }
+
+      .detail {
+        @apply w-2/3;
+      }
+    }
+  }
+
+  .summary {
+    @apply relative flex flex-col justify-center flex-1 px-10 basis-60;
+
+    .summaryTitle {
+      @apply self-start py-4 text-2xl font-bold;
+    }
+    .summaryDetail {
+      @apply flex flex-col;
+    }
+    .continueBtn {
+      @apply bg-[#303b59] text-white p-4 rounded-full text-center my-5 hover:bg-[#4032ef] cursor-pointer;
+    }
+  }
+
+  /* responsive */
+  @apply max-sm:flex-col;
+}

@@ -1,0 +1,41 @@
+.item {
+  @apply flex flex-row items-center p-3 mt-3 rounded-lg;
+
+  &.red {
+    @apply bg-[#fff6f5];
+  }
+
+  &.yellow {
+    @apply bg-[#fffbf2];
+  }
+
+  &.green {
+    @apply bg-[#f2fafa];
+  }
+
+  &.blue {
+    @apply bg-[#f3f3fd];
+  }
+
+  .itemIcon {
+    @apply w-8;
+  }
+  .itemTitle {
+    @apply flex-1 px-3 basis-full;
+  }
+}
+
+.itemPercent {
+  @apply flex flex-row;
+
+  .itemPercentValue {
+    @apply font-bold;
+  }
+  .itemPercentSeparate {
+    @apply px-2 text-[#bdc0cf];
+  }
+
+  .itemPercent100 {
+    @apply text-[#bdc0cf];
+  }
+}
