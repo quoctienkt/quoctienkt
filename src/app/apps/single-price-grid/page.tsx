@@ -19,7 +19,9 @@ export default function Page() {
   return (
     <>
       {/* <DesignPreview designImgSrc={desktopDesign}> */}
-      <SinglePriceGrid></SinglePriceGrid>
+      <section className="w-[750px]">
+        <SinglePriceGrid></SinglePriceGrid>
+      </section>
       {/* </DesignPreview> */}
     </>
   );
