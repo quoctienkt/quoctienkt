@@ -1,3 +1,5 @@
+import { SpaceTourismLayout } from "./SpaceTourismLayout";
+
 export default function Page() {
-  return <>Space tourism</>;
+  return <SpaceTourismLayout></SpaceTourismLayout>;
 }
