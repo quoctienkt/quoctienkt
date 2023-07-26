@@ -1,6 +1,6 @@
 import Script from "next/script";
 import type { ScriptProps } from "next/script";
-import { basePath } from "../../../../next.config";
+import { basePath } from "@/utils/assetUtil";
 
 export function AppScript(props: ScriptProps) {
   const localProps = {
