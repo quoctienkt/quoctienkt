@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <section className="w-[721px] h-[444px]">
-      <ResultSummary basePath={basePath} appPrefix={appPrefix}></ResultSummary>;
+      <ResultSummary basePath={basePath} appPrefix={appPrefix}></ResultSummary>
     </section>
   );
 }

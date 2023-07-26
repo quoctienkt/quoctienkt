@@ -10,7 +10,7 @@
   @apply relative flex flex-row overflow-hidden text-black bg-white outer;
 
   .result {
-    @apply flex-1 basis-60 bg-[#5c3dfa] outer text-white max-sm:rounded-b-3xl
+    @apply flex-1 basis-60 outer text-white max-sm:rounded-b-3xl bg-[#5c3dfa]
     flex flex-col text-center justify-center items-center;
 
     .title {
@@ -27,7 +27,14 @@
     }
 
     .desc {
-      @apply flex flex-col items-center pt-6 pb-8;
+      @apply relative flex flex-col items-center pt-6 pb-8;
+      @apply before:content-[''] before:absolute before:block before:left-0 before:right-0 before:h-16 before:bottom-full;
+
+      &::before {
+        background: rgb(92,61,250);
+        background: linear-gradient(0deg, rgba(92,61,250,0.9051995798319328) 35%, rgba(89,61,249,0.40379901960784315) 71%, rgba(87,61,248,0.20211834733893552) 80%, rgba(87,61,248,0) 100%);
+      }
+
       .header {
         @apply py-3 text-3xl;
       }
