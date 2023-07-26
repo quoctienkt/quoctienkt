@@ -3,9 +3,9 @@
 import styles from "./Layout.module.css";
 import Navbar from "@/components/navbar/Navbar";
 import React from "react";
-import BackgroundBubble from "./w_background/BackgroundBubble";
+import BackgroundBubble from "../w_background/BackgroundBubble";
 import Link from "next/link";
-import { AppImage } from "../core_components/image/Image";
+import { AppImage } from "../../core_components/image/Image";
 
 interface LayoutProps {
   children: React.ReactNode,

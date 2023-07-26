@@ -11,7 +11,7 @@ export default function Navbar() {
 
   return (
     <div className={styles.navbar}>
-      <Link href="https://github.com/quoctienkt/quoctienkt" target="_blank">
+      <Link href="https://quoctienkt.github.io/quoctienkt" target="_blank">
         <AppImage
           src="/img/next.svg"
           alt="App Logo"
