@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "./Layout.module.css";
+import styles from "./DefaultLayout.module.css";
 import Navbar from "@/components/navbar/Navbar";
 import React from "react";
 import BackgroundBubble from "../w_background/BackgroundBubble";
@@ -9,13 +9,14 @@ import { AppImage } from "../../core_components/image/Image";
 
 interface LayoutProps {
   children: React.ReactNode,
+  basePath: string;
 }
 
-export default function Page({ children }: LayoutProps) {
+export function DefaultLayout({ children, basePath }: LayoutProps) {
   return (
     <>
       <div className={styles.appWrapper}>
-        <Navbar />
+        <Navbar basePath={basePath} />
 
         <div className={styles.mainPage}>
           <BackgroundBubble>
@@ -28,7 +29,7 @@ export default function Page({ children }: LayoutProps) {
                 href="https://github.com/quoctienkt/quoctienkt/"
                 target="_blank"
               >
-                Xin một star nếu thấy hay :)
+                Give me a star
                 <AppImage
                   src="/img/github-6980894_1280.png"
                   alt="Github Icon"

@@ -1,4 +1,6 @@
-import { Metadata } from 'next';
+import { DefaultLayout } from "@/components/layout/defaultLayout/DefaultLayout";
+import { basePath } from "@/utils/assetUtil";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Tiến Đặng collection",
@@ -8,7 +10,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      Index page
+      <DefaultLayout basePath={basePath}>Index page</DefaultLayout>
     </>
-  )
+  );
 }

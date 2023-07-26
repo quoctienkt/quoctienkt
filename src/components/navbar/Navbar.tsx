@@ -6,12 +6,16 @@ import { AppImage } from "../core_components/image/Image";
 import { useState } from "react";
 import { classes, toggle } from "@/utils/toggle";
 
-export default function Navbar() {
+type NavbarProps = {
+  basePath: string;
+}
+
+export default function Navbar(props: NavbarProps) {
   const [navbarOpen, setNavbarOpen] = useState(false);
 
   return (
     <div className={styles.navbar}>
-      <Link href="https://quoctienkt.github.io/quoctienkt" target="_blank">
+      <Link href="/">
         <AppImage
           src="/img/next.svg"
           alt="App Logo"
@@ -55,8 +59,9 @@ export default function Navbar() {
           Hand-writing classification
         </Link>
         <Link href="/apps/sinhtumon">Sinh tử môn</Link>
-        <Link href="/apps/single-price-grid">Single Price Grid</Link>
-        <Link href="/apps/result-summary">Result summary</Link>
+        <Link href="/previews/single-price-grid" target="_blank">Single Price Grid</Link>
+        <Link href="/previews/result-summary" target="_blank">Result summary</Link>
+        <Link href="/previews/space-tourism-layout" target="_blank">Space Tourism Layout</Link>
       </div>
     </div>
   );
