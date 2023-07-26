@@ -1,14 +1,16 @@
 import styles from "./View.module.css";
 import { SummaryItem } from "./SummaryItem";
+import { classes } from "@/utils/toggle";
 
 type ResultSummaryProps = {
   basePath: string;
   appPrefix: string;
+  className: string;
 };
 
-export function ResultSummary({ basePath, appPrefix }: ResultSummaryProps) {
+export function ResultSummary({ basePath, appPrefix, className }: ResultSummaryProps) {
   return (
-    <div className={styles.wrapper}>
+    <div className={classes(styles.wrapper, className)}>
       <div className={styles.result}>
         <div className={styles.title}>Your Result</div>
         <div className={styles.score}>

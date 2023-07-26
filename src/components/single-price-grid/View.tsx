@@ -1,8 +1,13 @@
+import { classes } from "@/utils/toggle";
 import styles from "./View.module.css";
 
-export function SinglePriceGrid() {
+type SinglePriceGridProps = {
+  className: string;
+};
+
+export function SinglePriceGrid(props: SinglePriceGridProps) {
   return (
-    <div className={styles.wrapper}>
+    <div className={classes(styles.wrapper, props.className)}>
       <div className={styles.overview}>
         <div className={styles.title}>Join our community</div>
         <div className={styles.subTitle}>

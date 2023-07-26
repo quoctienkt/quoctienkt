@@ -18,11 +18,13 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <>
-      {/* <DesignPreview designImgSrc={desktopDesign}> */}
-      <section className="w-[750px]">
-        <SinglePriceGrid></SinglePriceGrid>
+      <section className="flex justify-center items-center w-full h-full bg-[#ffffff]">
+        <div className="w-[750px]">
+          <SinglePriceGrid
+            className="shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]"
+          ></SinglePriceGrid>
+        </div>
       </section>
-      {/* </DesignPreview> */}
     </>
   );
 }
