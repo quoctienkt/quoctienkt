@@ -1,0 +1,3 @@
+.wrapper {
+  @apply w-full h-full bg-black bg-[url('/previews/space-tourism-layout/assets/home/background-home-desktop.jpg')];
+}

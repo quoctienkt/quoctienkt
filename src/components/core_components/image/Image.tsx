@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { ImageProps } from "next/image";
-import { basePath } from "../../../../next.config";
+import { basePath } from "@/utils/assetUtil";
 
 export function AppImage(props: ImageProps) {
   const localProps = {
