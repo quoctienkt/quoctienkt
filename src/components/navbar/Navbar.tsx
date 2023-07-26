@@ -56,6 +56,7 @@ export default function Navbar() {
         </Link>
         <Link href="/apps/sinhtumon">Sinh tử môn</Link>
         <Link href="/apps/single-price-grid">Single Price Grid</Link>
+        <Link href="/apps/result-summary">Result summary</Link>
       </div>
     </div>
   );
