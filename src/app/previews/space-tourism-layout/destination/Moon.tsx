@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { navItemActiveAtom } from "../SpaceTourismLayout";
 import { useAtom } from "jotai";
 import styles from "./Moon.module.css";
+import { AppImage } from "@/components/core_components/image/Image";
 
 export function Moon() {
   const [navItemActive, setNavItemActive] = useAtom(navItemActiveAtom);
@@ -14,19 +15,45 @@ export function Moon() {
   return (
     <>
       <main className={styles.main}>
-        <section className={styles.content}>
-          <div className={styles.leadingText}>So, you want to travel to</div>
-          <div className={styles.mainText}>Space</div>
-          <div className={styles.desc}>
-            Let’s face it; if you want to go to space, you might as well
-            genuinely go to outer space and not hover kind of on the edge of it.
-            Well sit back, and relax because we’ll give you a truly out of this
-            world experience!
+        <header>Pick your destination</header>
+        <section className={styles.contentWrapper}>
+          <div className={styles.demoImg}>
+            <AppImage
+              src="/previews/space-tourism-layout/assets/destination/image-moon.png"
+              alt="Moon image"
+              width="430"
+              height="430"
+            ></AppImage>
           </div>
-        </section>
-        <section className={"invisible h-full w-0"}></section>
-        <section className={styles.exploreSection}>
-          <div className={styles.explore}>Explore</div>
+          <div className={styles.content}>
+            <div className={styles.tabs}>
+              <div>Moon</div>
+              <div>Mars</div>
+              <div>Europa</div>
+              <div>Titan</div>
+            </div>
+            <div className={styles.tabContent}>
+              <div className={styles.largeText}>Moon</div>
+              <div className={styles.desc}>
+                See our planet as you’ve never seen it before. A perfect
+                relaxing trip away to help regain perspective and come back
+                refreshed. While you’re there, take in some history by visiting
+                the Luna 2 and Apollo 11 landing sites.
+              </div>
+              <div className={styles.hr}></div>
+              <div className={styles.statistic}>
+                <div>
+                  <div>AVG. DISTANCE</div>
+                  <div>384,400 km</div>
+                </div>
+                <div>
+                  <div>Est. travel time</div>
+                  <div>3 days</div>
+                </div>
+              </div>
+            </div>
+            <div></div>
+          </div>
         </section>
       </main>
     </>
