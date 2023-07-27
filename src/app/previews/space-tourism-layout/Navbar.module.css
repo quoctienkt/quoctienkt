@@ -1,0 +1,60 @@
+.navbar {
+  @apply basis-24 flex-none;
+  @apply flex flex-row w-full justify-between pt-6 items-center;
+
+  .appLogo {
+    @apply px-12 cursor-pointer;
+    @apply basis-[144px] flex-none;
+
+    & > * {
+      @apply w-12;
+    }
+  }
+
+  .line {
+    @apply w-full;
+    z-index: 2;
+    opacity: 0.2514851987361908;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      display: block;
+      left: 0;
+      right: -24px;
+      height: 1px;
+      background: #fff;
+    }
+  }
+
+  .navLinks {
+    @apply flex flex-row h-full gap-12 pr-40 pl-24;
+    counter-reset: my-awesome-counter;
+    list-style: none;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(40.774227142333984px);
+    letter-spacing: 2.7px;
+
+    & > li {
+      @apply uppercase font-['Barlow_Condensed'] cursor-pointer relative;
+      @apply flex flex-row items-center;
+      counter-increment: my-awesome-counter;
+      position: relative;
+
+      &:nth-child(1) {
+        counter-set: my-awesome-counter;
+      }
+
+      .navItemMarker::before {
+        content: counter(my-awesome-counter, decimal-leading-zero);
+        @apply font-bold mr-2;
+        font-family: Barlow Condensed;
+      }
+
+      &.navLinkActive {
+        @apply after:content-[''] after:block after:absolute after:left-0 after:right-0 after:bottom-0 after:h-1 after:bg-white;
+      }
+    }
+  }
+}
