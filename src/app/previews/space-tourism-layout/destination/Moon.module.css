@@ -1,3 +1,59 @@
 .main {
-  @apply flex flex-col h-full w-full;
+  @apply flex flex-col h-full w-full justify-evenly;
+
+  & > header {
+    color: #fff;
+    font-family: Barlow Condensed;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 4.725px;
+    text-transform: uppercase;
+    width: 55%;
+    text-align: center;
+  }
+
+  .contentWrapper {
+    @apply flex flex-row w-full relative justify-evenly items-center;
+
+    .content {
+      @apply w-[448px];
+      .tabs {
+        @apply flex flex-row gap-3;
+      }
+
+      .tabContent {
+        .largeText {
+          @apply text-[100px] uppercase font-['Bellefair'];
+        }
+        .desc {
+          @apply text-justify font-['Barlow'] text-[#D0D6F9];
+          line-height: 32px;
+        }
+        .hr {
+          @apply h-[1px] w-full bg-[#383B4B] mt-9 mb-6;
+        }
+
+        .statistic {
+          @apply flex flex-row gap-20;
+
+          .statisticLabel {
+            @apply uppercase font-['Barlow_Condensed'] text-[#D0D6F9];
+            letter-spacing: 2.362px;
+          }
+
+          .statisticNumber {
+            @apply uppercase text-3xl font-['Bellefair'];
+          }
+
+          .distanceContainer {
+          }
+
+          .travelTimeContainer {
+          }
+        }
+      }
+    }
+  }
 }

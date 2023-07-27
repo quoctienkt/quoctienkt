@@ -42,13 +42,13 @@ export function Moon() {
               </div>
               <div className={styles.hr}></div>
               <div className={styles.statistic}>
-                <div>
-                  <div>AVG. DISTANCE</div>
-                  <div>384,400 km</div>
+                <div className={styles.distanceContainer}>
+                  <div className={styles.statisticLabel}>AVG. DISTANCE</div>
+                  <div className={styles.statisticNumber}>384,400 km</div>
                 </div>
-                <div>
-                  <div>Est. travel time</div>
-                  <div>3 days</div>
+                <div className={styles.travelTimeContainer}>
+                  <div className={styles.statisticLabel}>Est. travel time</div>
+                  <div className={styles.statisticNumber}>3 days</div>
                 </div>
               </div>
             </div>
