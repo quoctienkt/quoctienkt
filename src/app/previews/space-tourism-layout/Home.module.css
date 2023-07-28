@@ -21,4 +21,16 @@
       @apply flex justify-center items-center uppercase text-3xl font-['Bellefair'];
     }
   }
+
+  /* responsive */
+  @apply max-md:flex-col;
+
+  .content {
+    .leadingText {
+      @apply max-md:text-xl max-md:text-center;
+    }
+    .desc {
+      @apply max-md:text-center;
+    }
+  }
 }

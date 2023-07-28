@@ -57,4 +57,21 @@
       }
     }
   }
+
+  /* responsive */
+  @apply max-md:pt-0;
+
+  .line {
+    @apply max-md:hidden;
+  }
+
+  .navLinks {
+    @apply max-md:px-10;
+
+    & > li {
+      .navItemMarker {
+        @apply max-md:hidden;
+      }
+    }
+  }
 }

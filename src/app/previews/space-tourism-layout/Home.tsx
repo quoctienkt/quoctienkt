@@ -24,7 +24,6 @@ export function Home() {
             world experience!
           </div>
         </section>
-        <section className={"invisible h-full w-0"}></section>
         <section className={styles.exploreSection}>
           <div className={styles.explore}>Explore</div>
         </section>
