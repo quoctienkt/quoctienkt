@@ -8,8 +8,9 @@ export default function Page() {
   return (
     <SpaceTourismLayout
       basePath={basePath}
-      backgroundDesktopUrl={`${basePath}${appPrefix}/assets/destination/background-destination-desktop.jpg`}
-      backgroundTabletUrl={`${basePath}${appPrefix}/assets/destination/background-destination-tablet.jpg`}
+      backgroundMobileUrl={`${appPrefix}/assets/destination/background-destination-mobile.jpg`}
+      backgroundTabletUrl={`${appPrefix}/assets/destination/background-destination-tablet.jpg`}
+      backgroundDesktopUrl={`${appPrefix}/assets/destination/background-destination-desktop.jpg`}
     >
       <Moon></Moon>
     </SpaceTourismLayout>

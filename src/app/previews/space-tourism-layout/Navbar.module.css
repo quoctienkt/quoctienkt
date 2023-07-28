@@ -1,5 +1,5 @@
 .navbar {
-  @apply basis-24 flex-none;
+  @apply basis-24 flex-none z-10;
   @apply flex flex-row w-full justify-between pt-6 items-center;
 
   .appLogo {
@@ -59,18 +59,18 @@
   }
 
   /* responsive */
-  @apply max-md:pt-0;
+  @apply max-lg:pt-0;
 
   .line {
-    @apply max-md:hidden;
+    @apply max-lg:hidden;
   }
 
   .navLinks {
-    @apply max-md:px-10 select-none;
+    @apply max-lg:px-10 select-none;
 
     & > li {
       .navItemMarker {
-        @apply max-md:hidden;
+        @apply max-lg:hidden;
       }
     }
   }
