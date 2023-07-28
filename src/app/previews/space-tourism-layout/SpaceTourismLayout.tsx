@@ -20,7 +20,7 @@ export function SpaceTourismLayout({
     <div
       className={styles.wrapper}
       style={{
-        background: `url('${basePath}${backgroundDesktopUrl}')`,
+        background: `url('${backgroundDesktopUrl}')`,
         backgroundSize: "cover",
       }}
     >
