@@ -17,9 +17,8 @@
     }
 
     & > main {
-      @apply flex items-center justify-center p-1 max-lg:p-0;
-      flex: 1 1 100%;
-      position: relative;
+      @apply w-full h-full overflow-auto;
+      @apply flex justify-center items-center;
     }
 
     & > footer {

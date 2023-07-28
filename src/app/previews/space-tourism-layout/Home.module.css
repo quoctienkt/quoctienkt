@@ -1,0 +1,36 @@
+.main {
+  @apply flex flex-row justify-evenly items-center h-full;
+
+  .content {
+    @apply w-[420px] flex flex-col justify-end;
+
+    .leadingText {
+      @apply text-3xl uppercase font-['Barlow_Condensed'] tracking-tighter text-[#D0D6F9];
+    }
+    .mainText {
+      @apply text-[140px] uppercase w-full font-['Bellefair'];
+    }
+    .desc {
+      @apply text-justify font-['Barlow'] text-[#D0D6F9];
+    }
+  }
+
+  .exploreSection {
+    .explore {
+      @apply w-[274px] h-[274px] rounded-full bg-white text-black cursor-pointer;
+      @apply flex justify-center items-center uppercase text-3xl font-['Bellefair'];
+    }
+  }
+
+  /* responsive */
+  @apply max-md:flex-col;
+
+  .content {
+    .leadingText {
+      @apply max-md:text-xl max-md:text-center;
+    }
+    .desc {
+      @apply max-md:text-center;
+    }
+  }
+}
