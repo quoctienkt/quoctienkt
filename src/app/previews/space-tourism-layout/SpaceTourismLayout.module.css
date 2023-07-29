@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css?family=Barlow Condensed');
 
 .wrapper {
-  @apply w-full h-full relative flex flex-col overflow-auto;
+  @apply w-full h-full relative overflow-auto;
+
+  & > div {
+    @apply w-full relative flex flex-col min-h-full;
+  }
 }

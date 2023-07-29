@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { navItemActiveAtom } from "../SpaceTourismLayout";
 import { useAtom } from "jotai";
-import styles from "./Moon.module.css";
+import styles from "./Destination.module.css";
 import { AppImage } from "@/components/core_components/image/Image";
 import { classes, toggle } from "@/utils/toggle";
 import pageData from "./data.json";

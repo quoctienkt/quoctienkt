@@ -1,6 +1,6 @@
 import { basePath } from "@/utils/assetUtil";
 import { SpaceTourismLayout } from "../SpaceTourismLayout";
-import { Moon } from "./Moon";
+import { Moon } from "./Destination";
 
 const appPrefix = "/previews/space-tourism-layout";
 

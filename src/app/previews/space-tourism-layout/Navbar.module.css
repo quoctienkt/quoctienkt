@@ -76,9 +76,12 @@
   }
 
   /* responsive mobile */
+  .appLogo {
+    @apply max-sm:basis-24 max-sm:px-0 max-sm:flex max-sm:justify-center;
+  }
   .hamburger {
     @apply hidden;
-    @apply max-sm:flex w-36 h-full cursor-pointer justify-center items-center;
+    @apply max-sm:flex w-24 h-full cursor-pointer justify-center items-center;
 
     img {
       @apply w-12 p-2 hover:bg-slate-500 rounded-sm;
@@ -86,11 +89,11 @@
   }
   .navbarToggleClose {
     @apply hidden;
-    @apply max-sm:flex w-36 h-full cursor-pointer justify-center items-center z-[61];
+    @apply max-sm:flex w-24 h-full cursor-pointer justify-center items-center z-[61];
   }
   .backdrop {
     @apply hidden;
-    @apply max-sm:block max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:top-0 max-sm:bottom-0 z-40;
+    @apply max-sm:block max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:top-0 max-sm:bottom-0 max-sm:z-40;
   }
   .navLinks {
     @apply max-sm:hidden;
