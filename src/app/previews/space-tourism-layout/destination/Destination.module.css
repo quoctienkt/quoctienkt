@@ -3,7 +3,7 @@
   @apply flex flex-col w-full relative;
 
   & > header {
-    @apply flex-auto basis-1/4;
+    @apply flex-none pt-[7%] pb-[5%];
     @apply flex flex-row items-center justify-center uppercase text-center;
     color: #fff;
     font-family: Barlow Condensed;
@@ -82,7 +82,7 @@
     @apply max-lg:basis-0;
   }
   .contentWrapper {
-    @apply max-lg:flex-col max-lg:gap-4;
+    @apply max-lg:flex-col max-lg:gap-4 max-lg:items-center;
 
     .demoImg {
       @apply max-lg:flex max-lg:justify-center;
@@ -92,12 +92,15 @@
     }
 
     .content {
-      @apply max-lg:w-full max-lg:flex max-lg:flex-col max-lg:items-center;
+      @apply max-lg:w-8/12 max-lg:flex max-lg:flex-col max-lg:items-center;
 
       .tabContents {
-        @apply max-lg:w-4/5 max-lg:text-center;
+        @apply max-lg:w-full max-lg:text-center;
 
         .tabContent {
+          .largeText {
+            @apply max-lg:text-7xl mt-8 mb-5;
+          }
           .desc {
             @apply max-lg:text-center;
           }
