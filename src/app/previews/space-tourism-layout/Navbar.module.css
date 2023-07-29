@@ -1,5 +1,5 @@
 .navbar {
-  @apply basis-24 flex-none;
+  @apply basis-24 flex-none z-20;
   @apply flex flex-row w-full justify-between pt-6 items-center;
 
   .appLogo {
@@ -18,7 +18,7 @@
     position: relative;
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       display: block;
       left: 0;
@@ -58,20 +58,53 @@
     }
   }
 
-  /* responsive */
-  @apply max-md:pt-0;
+  /* responsive tablet */
+  @apply max-lg:pt-0;
 
   .line {
-    @apply max-md:hidden;
+    @apply max-lg:hidden;
   }
 
   .navLinks {
-    @apply max-md:px-10;
+    @apply max-lg:px-10 select-none;
 
     & > li {
       .navItemMarker {
-        @apply max-md:hidden;
+        @apply sm:max-lg:hidden;
       }
+    }
+  }
+
+  /* responsive mobile */
+  .appLogo {
+    @apply max-sm:basis-24 max-sm:px-0 max-sm:flex max-sm:justify-center;
+  }
+  .hamburger {
+    @apply hidden;
+    @apply max-sm:flex w-24 h-full cursor-pointer justify-center items-center;
+
+    img {
+      @apply w-12 p-2 hover:bg-slate-500 rounded-sm;
+    }
+  }
+  .navbarToggleClose {
+    @apply hidden;
+    @apply max-sm:flex w-24 h-full cursor-pointer justify-center items-center z-[61];
+  }
+  .backdrop {
+    @apply hidden;
+    @apply max-sm:block max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:top-0 max-sm:bottom-0 max-sm:z-40;
+  }
+  .navLinks {
+    @apply max-sm:hidden;
+    @apply max-sm:fixed max-sm:right-0 max-sm:top-0 max-sm:bottom-0 max-sm:w-[250px] max-sm:z-[60] max-sm:gap-8;
+    @apply max-sm:h-screen max-sm:flex-col max-sm:pt-32;
+    &.navbarOpen {
+      @apply max-sm:flex;
+    }
+
+    & > li {
+      @apply max-sm:pb-2;
     }
   }
 }

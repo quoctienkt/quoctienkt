@@ -1,0 +1,149 @@
+.main {
+  @apply flex-1 z-10;;
+  @apply flex flex-col w-full relative;
+
+  & > header {
+    @apply flex-none pt-[7%] pb-[5%];
+    @apply flex flex-row items-center justify-center uppercase text-center;
+    color: #fff;
+    font-family: Barlow Condensed;
+    font-size: 28px;
+    letter-spacing: 4.725px;
+    width: 55%;
+  }
+
+  .contentWrapper {
+    @apply flex-auto basis-3/4 justify-self-start;
+    @apply flex flex-row w-full relative justify-evenly;
+
+    .content {
+      @apply h-full w-[448px] relative;
+      .tabs {
+        @apply flex flex-row gap-8;
+
+        & > * {
+          @apply relative py-2 cursor-pointer select-none uppercase;
+        }
+
+        .tabActive {
+          @apply after:content-[''] after:block after:absolute after:left-0 after:right-0 after:bottom-0 after:h-0.5 after:bg-white;
+        }
+      }
+
+      .tabContents {
+        @apply h-full w-full relative flex flex-row flex-nowrap;
+
+        .tabContent {
+          @apply flex-none w-full;
+          @apply hidden;
+
+          &.tabContentActive {
+            @apply block;
+          }
+
+          .largeText {
+            @apply text-[100px] uppercase font-['Bellefair'];
+          }
+          .desc {
+            @apply text-justify font-['Barlow'] text-[#D0D6F9];
+            line-height: 32px;
+          }
+          .hr {
+            @apply h-[1px] w-full bg-[#383B4B] mt-9 mb-6;
+          }
+
+          .statistic {
+            @apply flex flex-row gap-20 pb-8;
+
+            .statisticLabel {
+              @apply uppercase font-['Barlow_Condensed'] text-[#D0D6F9];
+              letter-spacing: 2.362px;
+            }
+
+            .statisticNumber {
+              @apply uppercase text-3xl font-['Bellefair'];
+            }
+
+            .distanceContainer {
+            }
+
+            .travelTimeContainer {
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /* responsive tablet */
+  @apply max-lg:gap-10;
+
+  & > header {
+    @apply max-lg:basis-0;
+  }
+  .contentWrapper {
+    @apply max-lg:flex-col max-lg:gap-4 max-lg:items-center;
+
+    .demoImg {
+      @apply max-lg:flex max-lg:justify-center;
+      img {
+        @apply max-lg:w-[300px] max-lg:h-[300px];
+      }
+    }
+
+    .content {
+      @apply max-lg:w-8/12 max-lg:flex max-lg:flex-col max-lg:items-center;
+
+      .tabContents {
+        @apply max-lg:w-full max-lg:text-center;
+
+        .tabContent {
+          .largeText {
+            @apply max-lg:text-7xl mt-8 mb-5;
+          }
+          .desc {
+            @apply max-lg:text-center;
+          }
+
+          .statistic {
+            @apply max-lg:justify-evenly;
+          }
+        }
+      }
+    }
+  }
+
+  /* responsive mobile */
+  & > header {
+    @apply max-sm:text-center max-sm:w-full max-sm:text-base;
+  }
+  .contentWrapper {
+    .demoImg {
+      img {
+        @apply max-sm:w-[230px] max-sm:h-[230px];
+      }
+    }
+
+    .content {
+      .tabs {
+        @apply max-sm:gap-4;
+      }
+
+      .tabContents {
+        @apply max-sm:w-full max-sm:px-4;
+        .tabContent {
+          .largeText {
+            @apply max-sm:text-6xl max-sm:mt-6 max-sm:mb-3;
+          }
+          .statistic {
+            @apply max-sm:flex-col max-sm:gap-0;
+
+            & > * {
+              @apply max-sm:mb-8;
+            }
+          }
+        }
+      }
+    }
+  }
+}
