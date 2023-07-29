@@ -88,9 +88,10 @@ export function Destination() {
                     key={destination.name}
                     className={classes(
                       styles.tabContent,
+                      "animate-showFromTop",
                       toggle(
                         tabActive === destination.name,
-                        styles.tabContentActive
+                        classes(styles.tabContentActive)
                       )
                     )}
                   >

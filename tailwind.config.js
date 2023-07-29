@@ -29,6 +29,21 @@ module.exports = {
         "2xl": "1536px",
         // => @media (min-width: 1536px) { ... }
       },
+      animation: {
+        mySpin: "rotate 15s linear infinite",
+        showFromTop: "showFromTop .5s ease-in-out",
+      },
+
+      keyframes: {
+        rotate: {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        showFromTop: {
+          "0%": { transform: "translateY(-15px)" },
+          "100%": { transform: "translateY(0px)" },
+        },
+      },
     },
   },
   plugins: [],

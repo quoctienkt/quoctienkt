@@ -3,7 +3,6 @@
 import { AppImage } from "@/components/core_components/image/Image";
 import styles from "./Navbar.module.css";
 import Link from "next/link";
-import { useAtom } from "jotai";
 import { classes, toggle } from "@/utils/toggle";
 import { useState } from "react";
 
