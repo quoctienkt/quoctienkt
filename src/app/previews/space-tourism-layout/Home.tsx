@@ -1,16 +1,6 @@
-"use client";
-
-import { useAtom } from "jotai";
 import styles from "./Home.module.css";
-import { navItemActiveAtom } from "./SpaceTourismLayout";
-import { useEffect } from "react";
 
 export function Home() {
-  const [navItemActive, setNavItemActive] = useAtom(navItemActiveAtom);
-  useEffect(() => {
-    setNavItemActive("home");
-  }, [setNavItemActive]);
-
   return (
     <>
       <main className={styles.main}>

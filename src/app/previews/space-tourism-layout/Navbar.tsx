@@ -4,14 +4,17 @@ import { AppImage } from "@/components/core_components/image/Image";
 import styles from "./Navbar.module.css";
 import Link from "next/link";
 import { useAtom } from "jotai";
-import { navItemActiveAtom } from "./SpaceTourismLayout";
 import { classes, toggle } from "@/utils/toggle";
 import { useState } from "react";
 
 const appPrefix = "/previews/space-tourism-layout";
 
-export function Navbar() {
-  const [navItemActive, setNavItemActive] = useAtom(navItemActiveAtom);
+export type NavItemActiveTypes = "home" | "destination" | null;
+type NavbarProps = {
+  navItemActive: NavItemActiveTypes;
+};
+
+export function Navbar({ navItemActive }: NavbarProps) {
   const [navbarOpen, setNavbarOpen] = useState<boolean>(false);
   const handleHamburgerClicked = (): void => {
     setNavbarOpen(true);

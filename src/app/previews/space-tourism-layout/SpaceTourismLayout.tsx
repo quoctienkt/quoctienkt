@@ -1,17 +1,12 @@
-"use client";
-
 import styles from "./SpaceTourismLayout.module.css";
-import { Navbar } from "./Navbar";
-import { atom } from "jotai";
+import { NavItemActiveTypes, Navbar } from "./Navbar";
 import { classes } from "@/utils/toggle";
-
-const appPrefix = "/previews/space-tourism-layout";
-type NavItemActiveTypes = "home" | "destination" | null;
-export const navItemActiveAtom = atom<NavItemActiveTypes>(null);
+import { Suspense } from "react";
 
 type SpaceTourismLayoutProps = {
-  basePath: string;
   children: React.ReactNode;
+  basePath: string;
+  navItemActive: NavItemActiveTypes;
   backgroundMobileUrl: string;
   backgroundTabletUrl: string;
   backgroundDesktopUrl: string;
@@ -20,6 +15,7 @@ type SpaceTourismLayoutProps = {
 export function SpaceTourismLayout({
   basePath,
   children,
+  navItemActive,
   backgroundMobileUrl,
   backgroundTabletUrl,
   backgroundDesktopUrl,
@@ -51,8 +47,10 @@ export function SpaceTourismLayout({
           )}
           style={{ backgroundImage: backgroundDesktopCss }}
         ></div>
-        <Navbar></Navbar>
+        <Navbar navItemActive={navItemActive}></Navbar>
+        {/* <Suspense fallback={<>loading....</>}> */}
         {children}
+        {/* </Suspense> */}
       </div>
     </div>
   );

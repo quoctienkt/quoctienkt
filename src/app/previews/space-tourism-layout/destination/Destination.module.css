@@ -16,6 +16,11 @@
     @apply flex-auto basis-3/4 justify-self-start;
     @apply flex flex-row w-full relative justify-evenly;
 
+    .demoImg {
+      .img {
+        @apply w-[430px] h-[430px];
+      }
+    }
     .content {
       @apply h-full w-[448px] relative;
       .tabs {
@@ -86,7 +91,7 @@
 
     .demoImg {
       @apply max-lg:flex max-lg:justify-center;
-      img {
+      .img {
         @apply max-lg:w-[300px] max-lg:h-[300px];
       }
     }
@@ -119,7 +124,7 @@
   }
   .contentWrapper {
     .demoImg {
-      img {
+      .img {
         @apply max-sm:w-[230px] max-sm:h-[230px];
       }
     }

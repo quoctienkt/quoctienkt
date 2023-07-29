@@ -1,28 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { navItemActiveAtom } from "../SpaceTourismLayout";
-import { useAtom } from "jotai";
+import { Suspense, useEffect, useState } from "react";
 import styles from "./Destination.module.css";
 import { AppImage } from "@/components/core_components/image/Image";
 import { classes, toggle } from "@/utils/toggle";
 import pageData from "./data.json";
 
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
 type TabTypes = "Moon" | "Mars" | "Europa" | "Titan";
 const destinationsData = pageData.destinations;
 const appPrefix = "/previews/space-tourism-layout";
 
-export function Moon() {
-  const [navItemActive, setNavItemActive] = useAtom(navItemActiveAtom);
+export function Destination() {
   const [tabActive, setTabActive] = useState<TabTypes>("Moon");
-
-  const handleTabClicked = (tab: TabTypes) => {
-    setTabActive(tab);
-  };
+  const [demoImgLoading, setDemoImgLoading] = useState(false);
 
   useEffect(() => {
-    setNavItemActive("destination");
-  }, [setNavItemActive]);
+    setDemoImgLoading(true);
+  }, []);
+
+  const handleTabClicked = (tab: TabTypes) => {
+    if (tab !== tabActive) {
+      setDemoImgLoading(true);
+      setTabActive(tab);
+    }
+  };
 
   return (
     <>
@@ -30,11 +34,24 @@ export function Moon() {
         <header>Pick your destination</header>
         <section className={styles.contentWrapper}>
           <div className={styles.demoImg}>
+            {demoImgLoading && (
+              <Skeleton circle baseColor="#00000038" className={styles.img} />
+            )}
             <AppImage
-              src={`${appPrefix}${destinationsData.find((i) => i.name === tabActive)?.images.png ?? "undefined"}`}
+              className={classes(
+                styles.img,
+                toggle(!demoImgLoading, "block", "hidden")
+              )}
+              src={`${appPrefix}${
+                destinationsData.find((i) => i.name === tabActive)?.images
+                  .png ?? "undefined"
+              }`}
               alt="Moon image"
               width="430"
               height="430"
+              onLoadingComplete={() => {
+                setDemoImgLoading(false);
+              }}
             ></AppImage>
           </div>
           <div className={styles.content}>
