@@ -96,11 +96,17 @@
     @apply max-sm:block max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:top-0 max-sm:bottom-0 max-sm:z-40;
   }
   .navLinks {
-    @apply max-sm:hidden;
     @apply max-sm:fixed max-sm:right-0 max-sm:top-0 max-sm:bottom-0 max-sm:w-[250px] max-sm:z-[60] max-sm:gap-8;
     @apply max-sm:h-screen max-sm:flex-col max-sm:pt-32;
+    @apply max-sm:transition-all max-sm:ease-in-out max-sm:duration-700;
+    @apply max-sm:hidden;
+
+    &.navbarTransitionInStart {
+      @apply max-sm:flex max-sm:translate-x-[100%];
+    }
     &.navbarOpen {
       @apply max-sm:flex;
+      @apply max-sm:translate-x-0;
     }
 
     & > li {

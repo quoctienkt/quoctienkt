@@ -14,12 +14,18 @@ type NavbarProps = {
 };
 
 export function Navbar({ navItemActive }: NavbarProps) {
+  const [navbarTransitioning, setNavbarTransitioning] = useState(false);
   const [navbarOpen, setNavbarOpen] = useState<boolean>(false);
   const handleHamburgerClicked = (): void => {
-    setNavbarOpen(true);
+    setNavbarTransitioning(true);
+    setTimeout(() => {
+      setNavbarTransitioning(false);
+      setNavbarOpen(true);
+    }, 1);
   };
 
   const closeNavbarToggle = (): void => {
+    setNavbarTransitioning(true);
     setNavbarOpen(false);
   };
 
@@ -72,8 +78,12 @@ export function Navbar({ navItemActive }: NavbarProps) {
         <ol
           className={classes(
             styles.navLinks,
+            toggle(navbarTransitioning, styles.navbarTransitionInStart),
             toggle(navbarOpen, styles.navbarOpen)
           )}
+          onTransitionEnd={() => {
+            setNavbarTransitioning(false);
+          }}
         >
           <li
             className={toggle(navItemActive === "home", styles.navLinkActive)}
