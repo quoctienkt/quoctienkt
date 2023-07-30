@@ -17,6 +17,7 @@
     @apply flex flex-row w-full relative justify-evenly;
 
     .demoImg {
+      @apply flex-none;
       .img {
         @apply w-[430px] h-[430px];
       }
@@ -146,7 +147,7 @@
       }
 
       .tabContents {
-        @apply max-sm:w-full max-sm:px-4;
+        @apply max-sm:w-full;
         .tabContent {
           .largeText {
             @apply max-sm:text-6xl max-sm:mt-6 max-sm:mb-3;

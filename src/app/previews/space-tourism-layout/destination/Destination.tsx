@@ -91,7 +91,12 @@ export function Destination() {
         <section className={styles.contentWrapper}>
           <div className={styles.demoImg}>
             {demoImgLoading && (
-              <Skeleton circle baseColor="#00000038" className={styles.img} />
+              <Skeleton
+                circle
+                baseColor="#00000038"
+                className={styles.img}
+                containerClassName={styles.demoImg}
+              />
             )}
             <AppImage
               className={classes(
