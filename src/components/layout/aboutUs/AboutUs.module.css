@@ -1,5 +1,7 @@
 .wrapper {
-  @apply fixed bottom-4 left-1/2 -translate-x-1/2 rounded-lg h-20 py-4 px-6 text-white;
+  @apply fixed bottom-4 left-1/2 -translate-x-1/2 rounded-lg h-20 py-4 px-6 text-white z-[9999];
   @apply flex flex-row gap-5 items-center justify-evenly;
-  @apply bg-[rgb(var(--primary-rgb))];
+  @apply bg-[rgb(var(--primary-rgb),_0.9)];
+
+  @apply max-lg:hidden;
 }

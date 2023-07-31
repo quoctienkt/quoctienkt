@@ -2,7 +2,7 @@
   @apply flex flex-col lg:flex-row overflow-auto h-full;
 
   .navbar, .mainPage {
-    @apply mx-3 mt-4 mb-16 box-border rounded-lg;
+    @apply mx-3 mt-4 mb-28 box-border rounded-lg;
     @apply max-lg:m-0 max-lg:rounded-none;
   }
 
