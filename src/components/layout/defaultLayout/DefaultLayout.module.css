@@ -1,8 +1,14 @@
 .appWrapper {
-  @apply flex flex-col w-full h-full bg-sky-950 lg:flex-row;
+  @apply flex flex-col lg:flex-row overflow-auto h-full;
+
+  & > * {
+    @apply mx-6 my-8 box-border rounded-lg;
+    @apply max-lg:m-0 max-lg:rounded-none;
+  }
 
   .mainPage {
-    @apply relative flex flex-col w-full h-full max-lg:overflow-x-hidden;
+    @apply relative flex flex-col w-full h-full max-lg:overflow-x-hidden p-2 overflow-auto bg-[rgb(var(--foreground-rgb))];
+    @apply max-lg:p-0;
 
     & > * {
       z-index: 1;
@@ -19,10 +25,6 @@
     & > main {
       @apply w-full h-full overflow-auto;
       @apply flex justify-center items-center;
-    }
-
-    & > footer {
-      @apply max-lg:hidden flex flex-row items-center justify-between w-full bg-amber-900 h-9 flex-[0_0_50px] px-5;
     }
   }
 }

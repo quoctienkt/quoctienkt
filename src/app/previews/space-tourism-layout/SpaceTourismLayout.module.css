@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Barlow Condensed');
 
 .wrapper {
-  @apply w-full h-full relative overflow-auto;
+  @apply w-full h-full relative overflow-auto text-white;
   color-scheme: dark;
 
   & > div {

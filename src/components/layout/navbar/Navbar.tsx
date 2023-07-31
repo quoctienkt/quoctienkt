@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import styles from "./Navbar.module.css";
-import { AppImage } from "../core_components/image/Image";
+import { AppImage } from "../../core_components/image/Image";
 import { useState } from "react";
 import { classes, toggle } from "@/utils/toggle";
 
@@ -53,7 +53,7 @@ export default function Navbar(props: NavbarProps) {
       </button>
 
       <div
-        className={classes(styles.nav_links, toggle(navbarOpen, styles.active))}
+        className={classes(styles.navLinks, toggle(navbarOpen, styles.active))}
       >
         <Link href="/apps/handwritingclassification">
           Hand-writing classification

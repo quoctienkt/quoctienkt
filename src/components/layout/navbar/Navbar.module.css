@@ -1,0 +1,28 @@
+.navbar {
+  @apply relative flex flex-row flex-wrap items-center w-full lg:flex-[0_0_300px] lg:gap-2 shadow-lg h-fit lg:flex-col border-none p-4 bg-[rgb(var(--foreground-rgb))];
+  @apply bg-gradient-to-l from-[rgb(var(--background-end-rgb))] to-[rgb(var(--background-start-rgb))];
+  @apply max-lg:px-[15px] max-lg:justify-between max-lg:py-[8px];
+
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
+  .logo {
+    @apply mt-1 lg:mt-8 lg:mb-8 lg:m-auto max-lg:w-[100px];
+    /* @apply dark:invert; */
+  }
+
+  .navLinks {
+    @apply flex flex-col w-full lg:block max-lg:hidden;
+
+    &.active {
+      @apply p-2 mt-3 max-lg:flex bg-slate-300;
+    }
+
+    & > * {
+      @apply flex w-full p-2 border-amber-500 lg:block max-lg:bg-[#f8f9fa] max-lg:text-stone-900;
+      @apply hover:text-[rgb(var(--vivid-rgb))] hover:font-bold;
+
+      border-top: 1px solid white;
+      border-bottom: 1px solid white;
+    }
+  }
+}
