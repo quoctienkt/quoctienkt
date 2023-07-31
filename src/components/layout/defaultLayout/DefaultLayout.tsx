@@ -17,15 +17,13 @@ export function DefaultLayout({ children, basePath }: LayoutProps) {
   return (
     <>
       <div className={styles.appWrapper}>
-        <Navbar basePath={basePath} />
+        <Navbar basePath={basePath} className={styles.navbar} />
 
         <div className={styles.mainPage}>
-          <main>{children}</main>
-
-          <footer>
-            <AboutUs></AboutUs>
-          </footer>
+          <main className={styles.main}>{children}</main>
         </div>
+
+        <AboutUs></AboutUs>
       </div>
     </>
   );

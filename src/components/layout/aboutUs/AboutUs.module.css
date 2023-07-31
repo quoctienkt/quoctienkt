@@ -1,3 +1,5 @@
 .wrapper {
-  @apply max-lg:hidden flex flex-row items-center justify-between w-full bg-amber-900 h-9 flex-[0_0_50px] px-5 text-white;
+  @apply fixed bottom-4 left-1/2 -translate-x-1/2 rounded-lg h-20 py-4 px-6 text-white;
+  @apply flex flex-row gap-5 items-center justify-evenly;
+  @apply bg-[rgb(var(--primary-rgb))];
 }

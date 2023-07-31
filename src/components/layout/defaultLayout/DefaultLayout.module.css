@@ -1,28 +1,17 @@
 .appWrapper {
   @apply flex flex-col lg:flex-row overflow-auto h-full;
 
-  & > * {
-    @apply mx-6 my-8 box-border rounded-lg;
+  .navbar, .mainPage {
+    @apply mx-3 mt-4 mb-16 box-border rounded-lg;
     @apply max-lg:m-0 max-lg:rounded-none;
   }
 
   .mainPage {
-    @apply relative flex flex-col w-full h-full max-lg:overflow-x-hidden p-2 overflow-auto bg-[rgb(var(--foreground-rgb))];
-    @apply max-lg:p-0;
+    @apply relative flex flex-col w-full h-fit overflow-auto p-0;
+    @apply max-lg:p-0 max-lg:overflow-x-hidden;
 
-    & > * {
+    .main {
       z-index: 1;
-    }
-
-    & > header {
-      @apply bg-gray-800;
-      flex: 0 0 35px;
-      padding: 5px;
-      text-align: center;
-      font-size: 24px;
-    }
-
-    & > main {
       @apply w-full h-full overflow-auto;
       @apply flex justify-center items-center;
     }

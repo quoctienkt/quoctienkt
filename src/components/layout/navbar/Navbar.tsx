@@ -8,13 +8,14 @@ import { classes, toggle } from "@/utils/toggle";
 
 type NavbarProps = {
   basePath: string;
-}
+  className: string;
+};
 
 export default function Navbar(props: NavbarProps) {
   const [navbarOpen, setNavbarOpen] = useState(false);
 
   return (
-    <div className={styles.navbar}>
+    <div className={classes(styles.navbar, props.className)}>
       <Link href="/">
         <AppImage
           src="/img/next.svg"
@@ -59,9 +60,15 @@ export default function Navbar(props: NavbarProps) {
           Hand-writing classification
         </Link>
         <Link href="/apps/sinhtumon">Sinh tử môn</Link>
-        <Link href="/previews/single-price-grid" target="_blank">Single Price Grid</Link>
-        <Link href="/previews/result-summary" target="_blank">Result summary</Link>
-        <Link href="/previews/space-tourism-layout" target="_blank">Space Tourism Layout</Link>
+        <Link href="/previews/single-price-grid" target="_blank">
+          Single Price Grid
+        </Link>
+        <Link href="/previews/result-summary" target="_blank">
+          Result summary
+        </Link>
+        <Link href="/previews/space-tourism-layout" target="_blank">
+          Space Tourism Layout
+        </Link>
       </div>
     </div>
   );
