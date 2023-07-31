@@ -1,8 +1,9 @@
 import { DefaultLayout } from "@/components/layout/defaultLayout/DefaultLayout";
-import { basePath } from "@/utils/assetUtil";
+import { basePath, getAssetPath } from "@/utils/assetUtil";
 import { Metadata } from "next";
+import Image from "next/image";
 
-import SpaceTourismLayoutHomepage from "./previews/space-tourism-layout/page";
+import SpaceTourismLayoutDestinationPage from "./previews/space-tourism-layout/destination/page";
 
 export const metadata: Metadata = {
   title: "Tiến Đặng collection",
@@ -13,7 +14,7 @@ export default function Home() {
   return (
     <>
       <DefaultLayout basePath={basePath}>
-        <SpaceTourismLayoutHomepage></SpaceTourismLayoutHomepage>
+        <SpaceTourismLayoutDestinationPage></SpaceTourismLayoutDestinationPage>
       </DefaultLayout>
     </>
   );
