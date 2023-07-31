@@ -2,6 +2,7 @@
 
 .wrapper {
   @apply w-full h-full relative overflow-auto;
+  color-scheme: dark;
 
   & > div {
     @apply w-full relative flex flex-col min-h-full;
