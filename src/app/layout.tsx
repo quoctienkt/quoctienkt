@@ -1,7 +1,8 @@
+import "./colors.css";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { basePath } from "@/utils/assetUtil";
-import { LayoutProvider } from "@/components/layout/LayoutProvider";
+import { GlobalProvider } from "@/provider/GlobalProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,11 +12,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        {/* <LayoutProvider basePath={basePath}> */}
+        <GlobalProvider>
           {children}
-        {/* </LayoutProvider> */}
+        </GlobalProvider>
       </body>
     </html>
   );
