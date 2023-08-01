@@ -6,10 +6,23 @@ import styles from "./AboutUs.module.css";
 import { VerticalLine } from "@/components/verticalLine/VerticalLine";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useAtom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
+import { classes, toggle } from "@/utils/toggle";
+
+const AboutUsExpansionLocalStorageKey = "about-us-expansion";
+const aboutUsExpansionAtom = atomWithStorage(
+  AboutUsExpansionLocalStorageKey,
+  true
+);
 
 export function AboutUs() {
   const [mount, setMount] = useState(false);
   const { theme, setTheme } = useTheme();
+  const [aboutUsExpansion, setAboutUsExpansion] = useAtom(aboutUsExpansionAtom);
+  const verticalLine = (
+    <VerticalLine background="bg-[rgb(var(--color-central))]"></VerticalLine>
+  );
 
   useEffect(() => {
     setMount(true);
@@ -20,9 +33,14 @@ export function AboutUs() {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div
+      className={classes(
+        styles.wrapper,
+        toggle(!aboutUsExpansion, styles.wrapperCollapse)
+      )}
+    >
       <div>TienDang Collection</div>
-      <VerticalLine></VerticalLine>
+      {verticalLine}
       <Link
         className="flex flex-row items-center gap-1"
         href="https://www.facebook.com/dangquoctienvktl/"
@@ -47,9 +65,9 @@ export function AboutUs() {
           width={35}
           height={35}
         ></AppImage>
-        <span>Give me a star</span>
+        <span className={styles.hideOnCollapse}>Give me a star</span>
       </Link>
-      <VerticalLine></VerticalLine>
+      {verticalLine}
       {theme === "dark" && (
         <div
           className={styles.themeToggle}
@@ -80,6 +98,30 @@ export function AboutUs() {
           ></AppImage>
         </div>
       )}
+
+      <div
+        className={styles.aboutUsExpansion}
+        onClick={() => setAboutUsExpansion(!aboutUsExpansion)}
+      >
+        {aboutUsExpansion && (
+          <AppImage
+            className="rotate-180 invert"
+            src="/img/to_top.png"
+            alt="About Us Collapse Icon"
+            width={40}
+            height={40}
+          ></AppImage>
+        )}
+        {!aboutUsExpansion && (
+          <AppImage
+            className="invert"
+            src="/img/to_top.png"
+            alt="About Us Expansion Icon"
+            width={40}
+            height={40}
+          ></AppImage>
+        )}
+      </div>
     </div>
   );
 }

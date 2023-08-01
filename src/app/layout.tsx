@@ -1,5 +1,5 @@
-import "./colors.css";
-import "./globals.css";
+import "./styles/colors.css";
+import "./styles/globals.css";
 import { Inter } from "next/font/google";
 import { basePath } from "@/utils/assetUtil";
 import { GlobalProvider } from "@/provider/GlobalProvider";
