@@ -1,11 +1,22 @@
 .wrapper {
   @apply fixed bottom-4 left-1/2 -translate-x-1/2 rounded-lg h-20 py-4 px-6 text-white z-[9999];
-  @apply flex flex-row gap-5 items-center justify-evenly;
-  @apply bg-[rgb(var(--primary-rgb),_0.9)];
-
+  @apply flex flex-row gap-5 items-center justify-evenly bg-[rgb(var(--primary-rgb),_0.9)] border-[rgb(var(--color-central))] border-4 border-solid text-[rgb(var(--color-central))];
+  @apply transition-all;
   @apply max-lg:hidden;
+
+  &.wrapperCollapse {
+    @apply bottom-0 border-b-0 py-1 h-11 rounded-none rounded-t-full gap-2;
+
+    .hideOnCollapse {
+      @apply hidden;
+    }
+  }
 
   .themeToggle {
     @apply cursor-pointer p-2 hover:bg-[rgb(var(--primary-rgb),_1)] hover:rounded-full;
+  }
+
+  .aboutUsExpansion {
+    @apply hover:cursor-pointer;
   }
 }
