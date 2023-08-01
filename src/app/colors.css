@@ -1,0 +1,42 @@
+[data-theme="light"] {
+  color-scheme: light;
+  /* rgb(255,255,255) */
+  --foreground-rgb: 255, 255, 255;
+  /* rgb(0, 0,0) */
+  --color-rgb: 0 0 0;
+  /* rgb(45, 212, 191) */
+  --background-start-rgb: 45, 212, 191;
+  /* rgb(225, 236, 232) */
+  --background-via-rgb: 225, 236, 232;
+  /* rgb(225, 217, 171) */
+  --background-end-rgb: 225, 217, 171;
+  /* rgb(38, 70, 83) */
+  --primary-rgb: 38, 70, 83;
+  /* rgb(244, 162, 97) */
+  --secondary-rgb: 244, 162, 97;
+  /* rgb(42, 157, 143) */
+  --neutral-rgb: 42, 157, 143;
+  /* rgb(231, 111, 81) */
+  --vivid-rgb: 231, 111, 81;
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  /* rgb( 0, 0, 0) */
+  --foreground-rgb: 0, 0, 0;
+  /* rgb(0, 0,0) */
+  --color-rgb: 0 0 0;
+  /* rgb(214, 219, 220) */
+  --background-start-rgb: 214, 219, 220;
+  /* rgb(225, 236, 232) */
+  --background-via-rgb: 225, 236, 232;
+  /* rgb(255, 255, 255) */
+  --background-end-rgb: 255, 255, 255;
+  /* rgb(38, 70, 83) */
+  --primary-rgb: 0, 0, 0;
+  /* rgb(244, 162, 97) */
+  --secondary-rgb: 244, 162, 97;
+  /* rgb(0, 0, 0) */
+  --neutral-rgb: 0, 0, 0;
+  /* rgb(0, 0, 0) */
+  --vivid-rgb: 0, 0, 0;
+}

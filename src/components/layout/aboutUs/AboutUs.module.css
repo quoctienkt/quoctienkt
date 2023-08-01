@@ -4,4 +4,8 @@
   @apply bg-[rgb(var(--primary-rgb),_0.9)];
 
   @apply max-lg:hidden;
+
+  .themeToggle {
+    @apply cursor-pointer p-2 hover:bg-[rgb(var(--primary-rgb),_1)] hover:rounded-full;
+  }
 }

@@ -7,7 +7,7 @@
 
   .logo {
     @apply mt-1 lg:mt-8 lg:mb-8 lg:m-auto max-lg:w-[100px];
-    /* @apply dark:invert; */
+    @apply dark:invert;
   }
 
   .navLinks {
