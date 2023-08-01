@@ -3,7 +3,16 @@ import styles from "./VerticalLine.module.css";
 
 type VerticalLineProps = {
   className?: string;
+  background: string;
 };
-export function VerticalLine({ className }: VerticalLineProps) {
-  return <div className={classes(className ?? "", styles.wrapper)}></div>;
+export function VerticalLine({ className, background }: VerticalLineProps) {
+  return (
+    <div
+      className={classes(
+        styles.wrapper,
+        className ?? "",
+        background ?? "bg-white"
+      )}
+    ></div>
+  );
 }
