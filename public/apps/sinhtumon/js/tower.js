@@ -1,52 +1,48 @@
 window.setupTower = () => {
   window.Tower = class extends Phaser.Physics.Arcade.Sprite {
-    //Type : range, melee, sample
-    //name: power arrow frozen thunder
     constructor(
       scene,
       x,
       y,
       towerType,
       level,
-      isInit = true,
+      bindEvents = true,
       isSampleTower = false
     ) {
       super(scene, x, y, window.getTowerAssetName(towerType, level));
+
+      this.towerType = towerType;
+      this.level = level;
+      this.isSampleTower = isSampleTower;
+
       scene.add.existing(this);
       scene.physics.add.existing(this);
       this.Phaserscene = scene;
 
-      this.isSampleTower = isSampleTower;
-      this.towerType = towerType;
-      this.isReady = true;
-
-      this.level = level;
-      this.range;
-      this.upgradeCost = window.getTowerUpgradeCost(
-        this.getName(),
-        this.isSampleTower ? 1 : this.level + 1
-      );
-
       this.setDepth(3);
       this.setInteractive();
-
-      this.posX = (this.x - CELL_SIZE / 2) / CELL_SIZE;
-      this.posY = (this.y - OFFSET_Y) / CELL_SIZE;
-      if (isInit) {
-        this.init();
-      }
-    }
-
-    init() {
-      this.range =
-        window.getTowerAttackRange(this.getName(), this.level) + CELL_SIZE;
-
       const [towerWidth, towerHeight] = window.getTowerDisplaySize(
         this.getName(),
         this.level
       );
       this.setDisplaySize(towerWidth, towerHeight);
 
+      this.isReady = true;
+      this.upgradeCost = window.getTowerUpgradeCost(
+        this.getName(),
+        this.isSampleTower ? 1 : this.level + 1
+      );
+      this.posX = (this.x - CELL_SIZE / 2) / CELL_SIZE;
+      this.posY = (this.y - OFFSET_Y) / CELL_SIZE;
+      this.range =
+        window.getTowerAttackRange(this.getName(), this.level) + CELL_SIZE;
+
+      if (bindEvents) {
+        this.bindEvents();
+      }
+    }
+
+    bindEvents() {
       //buy sample tower
       if (this.isSampleTower) {
         this.on("pointerdown", (pointer) => {
@@ -87,7 +83,7 @@ window.setupTower = () => {
       else {
         //upgrade clicked
         this.on("pointerdown", (pointer) => {
-          this.pointerdown(pointer);
+          this.handleTowerFocus();
         });
 
         //show info
@@ -106,7 +102,32 @@ window.setupTower = () => {
       }
     }
 
-    showinfo() {
+    handleTowerFocus() {
+      console.log("tower clicked");
+
+      if (!isBuying) {
+        if (upgradeImage) upgradeImage.destroy();
+        if (sellImage) sellImage.destroy();
+        if (rangeImage) rangeImage.destroy();
+
+        isTowerClicked = false;
+        this.Phaserscene.time.addEvent({
+          delay: 0,
+          callback: () => {
+            isTowerClicked = true;
+          },
+          callbackScope: this,
+          loop: false,
+        });
+
+        this.showDesc(); // seamlessly only
+        this.showAttackRange();
+        this.showUpgradeAction();
+        this.showSellAction();
+      }
+    }
+
+    showDesc() {
       //show detailed tower
       if (detailText) {
         detailText.destroy();
@@ -136,212 +157,201 @@ window.setupTower = () => {
       });
     }
 
-    pointerdown(pointer) {
-      if (!isBuying) {
-        this.showinfo();
+    showAttackRange() {
+      if (rangeImage) {
+        rangeImage.destroy();
+      }
+      rangeImage = this.Phaserscene.physics.add.image(
+        this.x,
+        this.y,
+        "tower_range"
+      );
+      rangeImage.setDisplaySize(
+        window.getTowerAttackRange(this.getName(), this.level) * 2,
+        window.getTowerAttackRange(this.getName(), this.level) * 2
+      );
+      rangeImage.setAlpha(0.4);
+      rangeImage.setDepth(3);
+      rangeImage.setTint("0xfff000");
+    }
 
-        // console.log('tower clicked');
-        if (rangeImage) {
-          rangeImage.destroy();
+    showUpgradeAction() {
+      if (upgradeImage) {
+        upgradeImage.destroy();
+      }
+
+      upgradeImage = this.Phaserscene.physics.add.image(
+        this.x + CELL_SIZE / 2,
+        this.y - CELL_SIZE / 2,
+        "upgrade"
+      );
+      if (this.level == 5) {
+        upgradeImage.setAlpha(0.5);
+      }
+
+      upgradeImage.setInteractive();
+
+      upgradeImage.on("pointerdown", (pointer) => {
+        console.log('tower upgrade clicked');
+
+        if (gold < this.getUpgradeCost()) {
+          return;
         }
 
-        if (isTowerClicked) {
-          upgradeImage.destroy();
-          sellImage.destroy();
+        if (this.level == 5) {
+          return;
         }
 
-        rangeImage = this.Phaserscene.physics.add.image(
+        gold -= this.getUpgradeCost();
+        goldText.setText(`${gold}`);
+
+        towers.splice(towers.indexOf(this), 1);
+
+        let tower = new Tower(
+          this.Phaserscene,
           this.x,
           this.y,
-          "tower_range"
+          this.getName(),
+          this.level + 1
         );
-        rangeImage.setDisplaySize(
-          window.getTowerAttackRange(this.getName(), this.level) * 2,
-          window.getTowerAttackRange(this.getName(), this.level) * 2
-        );
-        rangeImage.setAlpha(0.4);
-        rangeImage.setDepth(3);
-        rangeImage.setTint("0xfff000");
 
+        if (detailText) {
+          detailText.destroy();
+        }
+        rangeImage.destroy();
         isTowerClicked = false;
+        // rangeImage.setDisplaySize(tower.getRange() * 2, tower.getRange() * 2);
+        towers.push(tower);
+        upgradeImage.destroy();
+        sellImage.destroy();
+        this.destroy();
+      });
+
+      upgradeImage.on("pointerover", (pointer) => {
+        if (detailText) {
+          detailText.destroy();
+        }
+        detailText = this.Phaserscene.add.text(
+          150,
+          640,
+          `Nâng cấp: ${this.getUpgradeCost()}$`,
+          {
+            fontStyle: "bold",
+            fontSize: "20px",
+            fill: "#ff0000",
+            fontFamily: "roboto",
+          }
+        );
+        detailTextClicked = false;
         this.Phaserscene.time.addEvent({
           delay: 100,
-          callback: () => {
-            isTowerClicked = true;
-          },
+          callback: () => (detailTextClicked = true),
           callbackScope: this,
-          loop: false,
+          loop: true,
+        });
+      });
+
+      upgradeImage.on("pointerout", (pointer) => {
+        detailText.destroy();
+      });
+
+      upgradeImage.setDisplaySize(25, 25);
+      upgradeImage.setDepth(3);
+    }
+
+    showSellAction() {
+      sellImage = this.Phaserscene.physics.add.sprite(
+        this.x + CELL_SIZE / 2,
+        this.y + CELL_SIZE / 2,
+        "sell"
+      );
+      sellImage.setDepth(3);
+      sellImage.play("rotate");
+      sellImage.setInteractive();
+
+      sellImage.on("pointerdown", (pointer) => {
+        detailText.destroy();
+        // console.log('sell clicked');
+        gold += window.getTowerSellPrice(this.getName(), this.level);
+        goldText.setText(`${gold}`);
+        towers.splice(towers.indexOf(this), 1);
+
+        let square = new Square(this.Phaserscene, this.posX, this.posY);
+
+        COLLISION[this.posY][this.posX] = 0;
+        mazePuzzle = findWay(COLLISION, START_POS, END_POS);
+
+        monsters.forEach((m) => {
+          if (m.type == "landing") {
+            let pre = [
+              parseInt((m.y - OFFSET_Y) / CELL_SIZE),
+              parseInt(m.x / CELL_SIZE),
+            ];
+
+            let prePath = findWay(COLLISION, pre, END_POS);
+
+            if (
+              (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 > m.x &&
+                m.x > prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
+              (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 < m.x &&
+                m.x < prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
+              (prePath[0][0] * CELL_SIZE + OFFSET_Y > m.y &&
+                m.y > prePath[1][0] * CELL_SIZE + OFFSET_Y) ||
+              (prePath[0][0] * CELL_SIZE + OFFSET_Y < m.y &&
+                m.y < prePath[1][0] * CELL_SIZE + OFFSET_Y)
+            ) {
+              prePath.splice(0, 1);
+            }
+
+            m.createPath(prePath);
+          }
         });
 
-        upgradeImage = this.Phaserscene.physics.add.image(
-          this.x + CELL_SIZE / 2,
-          this.y - CELL_SIZE / 2,
-          "upgrade"
-        );
-        if (this.level == 5) {
-          upgradeImage.setAlpha(0.5);
+        isTowerClicked = false;
+        rangeImage.destroy();
+
+        sellImage.destroy();
+        upgradeImage.destroy();
+        this.destroy();
+      });
+
+      sellImage.on("pointerover", (pointer) => {
+        if (detailText) {
+          detailText.destroy();
         }
-
-        upgradeImage.setInteractive();
-
-        upgradeImage.on("pointerdown", (pointer) => {
-          if (detailText) {
-            detailText.destroy();
+        detailText = this.Phaserscene.add.text(
+          150,
+          640,
+          `Bán giá: ${window.getTowerSellPrice(this.getName(), this.level)}$`,
+          {
+            fontStyle: "bold",
+            fontSize: "20px",
+            fill: "#ff0000",
+            fontFamily: "roboto",
           }
-
-          if (gold < this.getUpgradeCost()) {
-            return;
-          }
-          // console.log('upgrade clicked');
-
-          if (this.level == 5) {
-            return;
-          }
-
-          gold -= this.getUpgradeCost();
-          goldText.setText(`${gold}`);
-
-          towers.splice(towers.indexOf(this), 1);
-
-          let tower = new Tower(
-            this.Phaserscene,
-            this.x,
-            this.y,
-            this.getName(),
-            this.level + 1
-          );
-
-          rangeImage.destroy();
-          isTowerClicked = false;
-          // rangeImage.setDisplaySize(tower.getRange() * 2, tower.getRange() * 2);
-          towers.push(tower);
-          upgradeImage.destroy();
-          sellImage.destroy();
-          this.destroy();
-        });
-
-        upgradeImage.on("pointerover", (pointer) => {
-          if (detailText) {
-            detailText.destroy();
-          }
-          detailText = this.Phaserscene.add.text(
-            150,
-            640,
-            `Nâng cấp: ${this.getUpgradeCost()}$`,
-            {
-              fontStyle: "bold",
-              fontSize: "20px",
-              fill: "#ff0000",
-              fontFamily: "roboto",
-            }
-          );
-          detailTextClicked = false;
-          this.Phaserscene.time.addEvent({
-            delay: 100,
-            callback: () => (detailTextClicked = true),
-            callbackScope: this,
-            loop: true,
-          });
-        });
-
-        upgradeImage.on("pointerout", (pointer) => {
-          detailText.destroy();
-        });
-
-        upgradeImage.setDisplaySize(25, 25);
-        upgradeImage.setDepth(3);
-        sellImage = this.Phaserscene.physics.add.sprite(
-          this.x + CELL_SIZE / 2,
-          this.y + CELL_SIZE / 2,
-          "sell"
         );
-        sellImage.setDepth(3);
-        sellImage.play("rotate");
-        sellImage.setInteractive();
-
-        sellImage.on("pointerdown", (pointer) => {
-          detailText.destroy();
-          // console.log('sell clicked');
-          gold += window.getTowerSellPrice(this.getName(), this.level);
-          goldText.setText(`${gold}`);
-          towers.splice(towers.indexOf(this), 1);
-
-          let square = new Square(this.Phaserscene, this.posX, this.posY);
-
-          COLLISION[this.posY][this.posX] = 0;
-          mazePuzzle = findWay(COLLISION, START_POS, END_POS);
-
-          monsters.forEach((m) => {
-            if (m.type == "landing") {
-              let pre = [
-                parseInt((m.y - OFFSET_Y) / CELL_SIZE),
-                parseInt(m.x / CELL_SIZE),
-              ];
-
-              let prePath = findWay(COLLISION, pre, END_POS);
-
-              if (
-                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 > m.x &&
-                  m.x > prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
-                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 < m.x &&
-                  m.x < prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
-                (prePath[0][0] * CELL_SIZE + OFFSET_Y > m.y &&
-                  m.y > prePath[1][0] * CELL_SIZE + OFFSET_Y) ||
-                (prePath[0][0] * CELL_SIZE + OFFSET_Y < m.y &&
-                  m.y < prePath[1][0] * CELL_SIZE + OFFSET_Y)
-              ) {
-                prePath.splice(0, 1);
-              }
-
-              m.createPath(prePath);
-            }
-          });
-
-          isTowerClicked = false;
-          rangeImage.destroy();
-
-          sellImage.destroy();
-          upgradeImage.destroy();
-          this.destroy();
+        detailTextClicked = false;
+        this.Phaserscene.time.addEvent({
+          delay: 100,
+          callback: () => (detailTextClicked = true),
+          callbackScope: this,
+          loop: true,
         });
+      });
 
-        sellImage.on("pointerover", (pointer) => {
-          if (detailText) {
-            detailText.destroy();
-          }
-          detailText = this.Phaserscene.add.text(
-            150,
-            640,
-            `Bán giá: ${window.getTowerSellPrice(this.getName(), this.level)}$`,
-            {
-              fontStyle: "bold",
-              fontSize: "20px",
-              fill: "#ff0000",
-              fontFamily: "roboto",
-            }
-          );
-          detailTextClicked = false;
-          this.Phaserscene.time.addEvent({
-            delay: 100,
-            callback: () => (detailTextClicked = true),
-            callbackScope: this,
-            loop: true,
-          });
-        });
+      sellImage.on("pointerout", (pointer) => {
+        detailText.destroy();
+      });
 
-        sellImage.on("pointerout", (pointer) => {
-          detailText.destroy();
-        });
-
-        sellImage.setDisplaySize(25, 25);
-      }
+      sellImage.setDisplaySize(25, 25);
     }
 
     pointerover(pointer) {
       if (!isBuying && isTowerClicked) {
-        this.showinfo();
+        this.showDesc();
       }
     }
+
     pointerout(pointer) {
       if (detailText) {
         detailText.destroy();
@@ -351,7 +361,7 @@ window.setupTower = () => {
 
     pointermove(pointer) {
       if (!isBuying && isTowerClicked) {
-        this.showinfo();
+        this.showDesc();
       }
     }
 

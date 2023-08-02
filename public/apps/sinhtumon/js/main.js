@@ -71,9 +71,9 @@ window.setupGame = (appPrefix) => {
     height: GAME_HEIGHT + OFFSET_Y + OFFSET_DOWN_Y,
     physics: {
       default: "arcade",
-      // arcade: {
-      //     debug: true,
-      // }
+      arcade: {
+          debug: true,
+      }
     },
     scene: {
       preload: preload,
