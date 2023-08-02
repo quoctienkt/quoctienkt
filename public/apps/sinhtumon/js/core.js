@@ -106,6 +106,6 @@ window.getMonsterGoldOnDead = (monsterType) => {
   return gameCoreConfig.monsters[monsterType].goldOnDead;
 };
 
-window.getMonsterAssetName = (monsterType, monsterMoveToDirection) => {
+window.getMonsterAnimationAssetName = (monsterType, monsterMoveToDirection) => {
   return `${monsterType}_${monsterMoveToDirection}`;
 };
