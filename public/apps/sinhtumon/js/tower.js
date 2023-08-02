@@ -2,16 +2,30 @@ window.setupTower = () => {
   window.Tower = class extends Phaser.Physics.Arcade.Sprite {
     //Type : range, melee, sample
     //name: power arrow frozen thunder
-    constructor(scene, x, y, name, level, isInit = true) {
-      super(scene, x, y, `${name}`);
+    constructor(
+      scene,
+      x,
+      y,
+      towerType,
+      level,
+      isInit = true,
+      isSampleTower = false
+    ) {
+      super(scene, x, y, window.getTowerAssetName(towerType, level));
       scene.add.existing(this);
       scene.physics.add.existing(this);
       this.Phaserscene = scene;
 
-      this.level = level;
+      this.isSampleTower = isSampleTower;
+      this.towerType = towerType;
       this.isReady = true;
+
+      this.level = level;
       this.range;
-      this.price;
+      this.upgradeCost = window.getTowerUpgradeCost(
+        this.getName(),
+        this.isSampleTower ? 1 : this.level + 1
+      );
 
       this.setDepth(3);
       this.setInteractive();
@@ -24,17 +38,21 @@ window.setupTower = () => {
     }
 
     init() {
-      this.price = this.getPrice();
-      this.range = this.getRange();
+      this.range =
+        window.getTowerAttackRange(this.getName(), this.level) + CELL_SIZE;
 
-      this.getDisplaySize();
+      const [towerWidth, towerHeight] = window.getTowerDisplaySize(
+        this.getName(),
+        this.level
+      );
+      this.setDisplaySize(towerWidth, towerHeight);
 
       //buy sample tower
-      if (this.getName().substr(-1) == "0") {
+      if (this.isSampleTower) {
         this.on("pointerdown", (pointer) => {
           // console.log('sampleTower clicked');
           //tạo tháp từ con trỏ chuột
-          if (gold >= this.getPrice()) {
+          if (window.gold >= this.getUpgradeCost()) {
             if (isBuying) {
               tempTower.destroy();
             }
@@ -54,12 +72,12 @@ window.setupTower = () => {
               pointer.x,
               pointer.y,
               this.getName(),
-              0,
-              false
+              1,
+              false,
+              true
             );
 
             tempTower.setDepth(-1);
-
             tempTower.setAlpha(0.5);
           }
         });
@@ -96,8 +114,11 @@ window.setupTower = () => {
       detailText = this.Phaserscene.add.text(
         150,
         630,
-        `Level: ${this.level}\nRange: ${this.getRange()}\nReload:${
-          this.getCharge() / 1000
+        `Level: ${this.level}\nRange: ${window.getTowerAttackRange(
+          this.getName(),
+          this.level
+        )}\nReload:${
+          window.getTowerAttackReload(this.getName(), this.level) / 1000
         }/s`,
         {
           fontStyle: "bold",
@@ -134,7 +155,10 @@ window.setupTower = () => {
           this.y,
           "tower_range"
         );
-        rangeImage.setDisplaySize(this.getRange() * 2, this.getRange() * 2);
+        rangeImage.setDisplaySize(
+          window.getTowerAttackRange(this.getName(), this.level) * 2,
+          window.getTowerAttackRange(this.getName(), this.level) * 2
+        );
         rangeImage.setAlpha(0.4);
         rangeImage.setDepth(3);
         rangeImage.setTint("0xfff000");
@@ -183,7 +207,7 @@ window.setupTower = () => {
             this.Phaserscene,
             this.x,
             this.y,
-            this.getNextLevelName(),
+            this.getName(),
             this.level + 1
           );
 
@@ -238,7 +262,7 @@ window.setupTower = () => {
         sellImage.on("pointerdown", (pointer) => {
           detailText.destroy();
           // console.log('sell clicked');
-          gold += this.getPrice();
+          gold += window.getTowerSellPrice(this.getName(), this.level);
           goldText.setText(`${gold}`);
           towers.splice(towers.indexOf(this), 1);
 
@@ -288,7 +312,7 @@ window.setupTower = () => {
           detailText = this.Phaserscene.add.text(
             150,
             640,
-            `Bán giá: ${this.getPrice()}$`,
+            `Bán giá: ${window.getTowerSellPrice(this.getName(), this.level)}$`,
             {
               fontStyle: "bold",
               fontSize: "20px",
@@ -332,138 +356,11 @@ window.setupTower = () => {
     }
 
     getUpgradeCost() {
-      if (this.getName() == "power1") {
-        return 150;
-      } else if (this.getName() == "power2") {
-        return 240;
-      } else if (this.getName() == "power3") {
-        return 320;
-      } else if (this.getName() == "power4") {
-        return 400;
-      }
-
-      if (this.getName() == "frozen1") {
-        return 120;
-      } else if (this.getName() == "frozen2") {
-        return 180;
-      } else if (this.getName() == "frozen3") {
-        return 240;
-      } else if (this.getName() == "frozen4") {
-        return 320;
-      }
-    }
-
-    getPrice() {
-      //Sell price
-      if (this.getName() == "power0") {
-        this.price = 110;
-      } else if (this.getName() == "power1") {
-        this.price = 70;
-      } else if (this.getName() == "power2") {
-        this.price = 110;
-      } else if (this.getName() == "power3") {
-        this.price = 180;
-      } else if (this.getName() == "power4") {
-        this.price = 240;
-      } else if (this.getName() == "power5") {
-        this.price = 320;
-      }
-
-      //Sell price
-      if (this.getName() == "frozen0") {
-        this.price = 80;
-      } else if (this.getName() == "frozen1") {
-        this.price = 40;
-      } else if (this.getName() == "frozen2") {
-        this.price = 110;
-      } else if (this.getName() == "frozen3") {
-        this.price = 150;
-      } else if (this.getName() == "frozen4") {
-        this.price = 170;
-      } else if (this.getName() == "frozen5") {
-        this.price = 220;
-      }
-
-      return this.price;
-    }
-
-    getDisplaySize() {
-      this.setDisplaySize(35, 35);
-      if (this.getName() == "frozen2") {
-        this.setDisplaySize(40, 40);
-      } else if (this.getName() == "frozen3") {
-        this.setDisplaySize(35, 35);
-      } else if (this.getName() == "frozen4") {
-        this.setDisplaySize(40, 40);
-        // this.setTint()
-      } else if (this.getName() == "frozen5") {
-        this.setDisplaySize(40, 40);
-      }
-    }
-
-    getNextLevelName() {
-      if (this.level == 5) return this.getName();
-      return this.getName().slice(0, -1) + (this.level + 1);
+      return this.upgradeCost;
     }
 
     getName() {
-      return this.texture.key;
-    }
-
-    getRange() {
-      if (this.getName() == "power1") {
-        this.range = 80;
-      } else if (this.getName() == "power2") {
-        this.range = 80;
-      } else if (this.getName() == "power3") {
-        this.range = 80;
-      } else if (this.getName() == "power4") {
-        this.range = 80;
-      } else if (this.getName() == "power5") {
-        this.range = 80;
-      }
-
-      if (this.getName() == "frozen1") {
-        this.range = 30;
-      } else if (this.getName() == "frozen2") {
-        this.range = 35;
-      } else if (this.getName() == "frozen3") {
-        this.range = 40;
-      } else if (this.getName() == "frozen4") {
-        this.range = 45;
-      } else if (this.getName() == "frozen5") {
-        this.range = 55;
-      }
-      this.range += CELL_SIZE;
-      return this.range;
-    }
-
-    getCharge() {
-      if (this.getName() == "frozen1") {
-        return 300;
-      } else if (this.getName() == "frozen2") {
-        return 280;
-      } else if (this.getName() == "frozen3") {
-        return 250;
-      } else if (this.getName() == "frozen4") {
-        return 200;
-      } else if (this.getName() == "frozen5") {
-        return 180;
-      }
-    }
-
-    getBulletName() {
-      if (this.getName() == "frozen1") {
-        return "bullet1";
-      } else if (this.getName() == "frozen2") {
-        return "bullet2";
-      } else if (this.getName() == "frozen3") {
-        return "bullet3";
-      } else if (this.getName() == "frozen4") {
-        return "bullet4";
-      } else if (this.getName() == "frozen5") {
-        return "bullet5";
-      }
+      return this.towerType;
     }
 
     shoot() {
@@ -491,7 +388,7 @@ window.setupTower = () => {
         this.rotation += 0.1;
         this.isReady = false;
         this.Phaserscene.time.addEvent({
-          delay: this.getCharge(),
+          delay: window.getTowerAttackReload(this.getName(), this.level),
           callback: () => {
             // this.clearTint();
             this.isReady = true;
@@ -506,7 +403,7 @@ window.setupTower = () => {
           this.Phaserscene,
           this.x,
           this.y,
-          this.getBulletName(),
+          this,
           this.level
         );
         bullet.target = this.target;
