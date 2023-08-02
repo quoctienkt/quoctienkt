@@ -38,7 +38,7 @@ window.setupSquare = () => {
 
           let tempPath = [];
           for (let i = 0; i < monsters.length; i++) {
-            if (monsters[i].type == "landing") {
+            if (monsters[i].getMoveType() == window.getConstants().MONSTER_MOVE_TYPE_GROUND) {
               let pre = [
                 parseInt((monsters[i].y - OFFSET_Y) / CELL_SIZE),
                 parseInt(monsters[i].x / CELL_SIZE),

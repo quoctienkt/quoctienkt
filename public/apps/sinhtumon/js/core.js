@@ -1,17 +1,17 @@
 window.constants = {
   TOWER_SNOWFLAKE_NAME: "Tower_Snowflake",
 
-  MONSTER_MOVE_TYPE_FLY: "Monster_fly",
   MONSTER_MOVE_TYPE_GROUND: "Monster_ground",
+  MONSTER_MOVE_TYPE_FLY: "Monster_fly",
 
   MONSTER_MOVE_DIRECTION_TO_TOP: "TO_TOP",
+  MONSTER_MOVE_DIRECTION_TO_RIGHT: "TO_RIGHT",
   MONSTER_MOVE_DIRECTION_TO_BOTTOM: "TO_BOTTOM",
   MONSTER_MOVE_DIRECTION_TO_LEFT: "TO_LEFT",
-  MONSTER_MOVE_DIRECTION_TO_RIGHT: "TO_RIGHT",
   MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT: "TO_BOTTOM_RIGHT",
 
-  MONSTER_BUTTERFLY: "Monster_Butterfly",
   MONSTER_THIEF: "Monster_Thief",
+  MONSTER_BUTTERFLY: "Monster_Butterfly",
 };
 
 window.gameCoreConfig = {
@@ -41,7 +41,7 @@ window.gameCoreConfig = {
       goldOnDead: 15,
       moveType: constants.MONSTER_MOVE_TYPE_GROUND,
     },
-    MONSTER_BUTTERFLY: {
+    Monster_Butterfly: {
       goldOnDead: 10,
       moveType: constants.MONSTER_MOVE_TYPE_FLY,
     },
@@ -104,4 +104,8 @@ window.getAmmoData = (towerType, level) => {
 
 window.getMonsterGoldOnDead = (monsterType) => {
   return gameCoreConfig.monsters[monsterType].goldOnDead;
+};
+
+window.getMonsterAssetName = (monsterType, monsterMoveToDirection) => {
+  return `${monsterType}_${monsterMoveToDirection}`;
 };

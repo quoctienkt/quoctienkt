@@ -282,7 +282,7 @@ window.setupTower = () => {
         mazePuzzle = findWay(COLLISION, START_POS, END_POS);
 
         monsters.forEach((m) => {
-          if (m.type == "landing") {
+          if (m.getMoveType() == window.getConstants().MONSTER_MOVE_TYPE_GROUND) {
             let pre = [
               parseInt((m.y - OFFSET_Y) / CELL_SIZE),
               parseInt(m.x / CELL_SIZE),

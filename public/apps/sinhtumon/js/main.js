@@ -156,7 +156,7 @@ function preload() {
   );
 
   this.load.spritesheet(
-    "ani_beast",
+    window.getConstants().MONSTER_THIEF,
     window.getAssetPathWithAppPrefix(window.appPrefix, "/img/ani_beast.png"),
     {
       frameWidth: 32,
@@ -164,7 +164,7 @@ function preload() {
     }
   );
   this.load.spritesheet(
-    "butterfly",
+    window.getConstants().MONSTER_BUTTERFLY,
     window.getAssetPathWithAppPrefix(
       window.appPrefix,
       "/img/monster/flying/butterfly.png"
@@ -344,7 +344,7 @@ function monsterReachEndpoint(tween, targets, monster) {
 }
 
 function monsterRespawn(number) {
-  let name = parseInt(Math.random() * 10) % 2 ? "butterfly" : "ani_beast";
+  let name = parseInt(Math.random() * 10) % 2 ? window.getConstants().MONSTER_THIEF : window.getConstants().MONSTER_THIEF;
   wave += 1;
   waveText.setText(`${wave}`);
   for (let i = 0; i < 15; i++) {
