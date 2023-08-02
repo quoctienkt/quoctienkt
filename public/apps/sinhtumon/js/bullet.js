@@ -13,13 +13,6 @@ window.setupBullet = () => {
       this.level = level;
       this.target;
 
-      this.speed;
-      this.damage;
-
-      this.init();
-    }
-
-    init() {
       const ammoData = window.getAmmoData(this.tower.towerType, this.level);
       this.speed = ammoData.attackSpeed;
       this.damage = ammoData.attackDamage;

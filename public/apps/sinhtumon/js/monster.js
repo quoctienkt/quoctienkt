@@ -2,12 +2,12 @@ window.setupMonster = () => {
   window.Monster = class extends Phaser.Physics.Arcade.Sprite {
     //Type : range, melee, sample
     //name: power arrow frozen thunder
-    constructor(scene, x, y, name) {
+    constructor(scene, x, y, monsterType) {
       super(
         scene,
         x * CELL_SIZE + CELL_SIZE / 2,
         y * CELL_SIZE + OFFSET_Y,
-        `${name}`
+        monsterType
       );
       scene.add.existing(this);
       scene.physics.add.existing(this);
@@ -15,7 +15,9 @@ window.setupMonster = () => {
       this.Phaserscene = scene;
       this.setDepth(2);
 
-      this.type;
+      this.monsterType = monsterType;
+
+      this.getMoveType();
       this.speed;
       this.maxHealth;
       this.health;
@@ -33,87 +35,124 @@ window.setupMonster = () => {
     }
 
     init() {
-      this.direction = "down";
+      this.direction = window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM;
       this.setInteractive();
       this.on("pointerdown", (pointer) => this.pointerdown());
 
-      if (this.getName() == "ani_beast") {
+      if (this.getName() == window.getConstants().MONSTER_THIEF) {
+        // register animation for sprite
         this.Phaserscene.anims.create({
-          key: "ani_beast_right",
-          frames: this.Phaserscene.anims.generateFrameNumbers("ani_beast", {
-            start: 0,
-            end: 5,
-          }),
-          frameRate: 10,
-          repeat: -1,
-        });
-
-        //tạm thời
-        this.Phaserscene.anims.create({
-          key: "ani_beast_down",
-          frames: this.Phaserscene.anims.generateFrameNumbers("ani_beast", {
-            start: 0,
-            end: 5,
-          }),
-          frameRate: 10,
-          repeat: -1,
-        });
-
-        this.Phaserscene.anims.create({
-          key: "ani_beast_left",
-          frames: this.Phaserscene.anims.generateFrameNumbers("ani_beast", {
-            start: 6,
-            end: 11,
-          }),
+          key: window.getMonsterAnimationAssetName(
+            this.getName(),
+            window.getConstants().MONSTER_MOVE_DIRECTION_TO_RIGHT
+          ),
+          frames: this.Phaserscene.anims.generateFrameNumbers(
+            window.getConstants().MONSTER_THIEF,
+            {
+              start: 0,
+              end: 5,
+            }
+          ),
           frameRate: 10,
           repeat: -1,
         });
 
         this.Phaserscene.anims.create({
-          key: "ani_beast_up",
-          frames: this.Phaserscene.anims.generateFrameNumbers("ani_beast", {
-            start: 6,
-            end: 11,
-          }),
+          key: window.getMonsterAnimationAssetName(
+            this.getName(),
+            window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM
+          ),
+          frames: this.Phaserscene.anims.generateFrameNumbers(
+            window.getConstants().MONSTER_THIEF,
+            {
+              start: 0,
+              end: 5,
+            }
+          ),
           frameRate: 10,
           repeat: -1,
         });
 
-        this.anims.play("ani_beast_down", true);
+        this.Phaserscene.anims.create({
+          key: window.getMonsterAnimationAssetName(
+            this.getName(),
+            window.getConstants().MONSTER_MOVE_DIRECTION_TO_LEFT
+          ),
+          frames: this.Phaserscene.anims.generateFrameNumbers(
+            window.getConstants().MONSTER_THIEF,
+            {
+              start: 6,
+              end: 11,
+            }
+          ),
+          frameRate: 10,
+          repeat: -1,
+        });
+
+        this.Phaserscene.anims.create({
+          key: window.getMonsterAnimationAssetName(
+            this.getName(),
+            window.getConstants().MONSTER_MOVE_DIRECTION_TO_TOP
+          ),
+          frames: this.Phaserscene.anims.generateFrameNumbers(
+            window.getConstants().MONSTER_THIEF,
+            {
+              start: 6,
+              end: 11,
+            }
+          ),
+          frameRate: 10,
+          repeat: -1,
+        });
+
+        this.anims.play(
+          window.getMonsterAnimationAssetName(this.getName(), this.direction),
+          true
+        );
 
         this.setCircle(10, 3, 15);
-        this.type = "landing";
         this.maxHealth = 30 + wave * 100;
         this.health = 30 + wave * 100;
         this.speed = 75;
-      } else if (this.getName() == "butterfly") {
+      } else if (this.getName() == window.getConstants().MONSTER_BUTTERFLY) {
         this.Phaserscene.anims.create({
-          key: "butterfly_fly",
-          frames: this.Phaserscene.anims.generateFrameNumbers("butterfly", {
-            start: 0,
-            end: 19,
-          }),
+          key: window.getMonsterAnimationAssetName(
+            window.getConstants().MONSTER_BUTTERFLY,
+            window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT
+          ),
+          frames: this.Phaserscene.anims.generateFrameNumbers(
+            window.getConstants().MONSTER_BUTTERFLY,
+            {
+              start: 0,
+              end: 19,
+            }
+          ),
           frameRate: 20,
           repeat: -1,
         });
 
         this.setDisplaySize(40, 40);
-        this.anims.play("butterfly_fly");
+        this.anims.play(
+          window.getMonsterAnimationAssetName(
+            window.getConstants().MONSTER_BUTTERFLY,
+            window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT
+          )
+        );
         this.setCircle(15, 30, 28);
-        this.type = "flying";
         this.maxHealth = 30 + wave * 100;
         this.health = 30 + wave * 100;
         this.speed = 75;
       }
 
-      if (this.type == "flying") {
+      if (this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_FLY) {
         this.createPath(null);
-      }
-
-      if (this.type == "landing") {
+      } else if (
+        this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_GROUND
+      ) {
         this.createPath(mazePuzzle);
       }
     }
+
     pointerdown(pointer) {
       // console.log("monster clicked")
       if (detailText) {
@@ -124,7 +163,7 @@ window.setupMonster = () => {
         630,
         `Máu: ${this.health}\nTốc độ: ${
           this.speed
-        }km/h\nVàng: ${this.getPrice()}`,
+        }km/h\nVàng: ${this.getGoldOnDead()}`,
         {
           fontStyle: "bold",
           fontSize: "20px",
@@ -143,7 +182,9 @@ window.setupMonster = () => {
 
     createPath(solved) {
       //solved is mazePuzzle
-      if (this.type == "landing") {
+      if (
+        this.getMoveType() == window.getConstants().MONSTER_MOVE_TYPE_GROUND
+      ) {
         if (this.tween) {
           this.tween.stop();
         }
@@ -172,7 +213,9 @@ window.setupMonster = () => {
           onComplete: monsterReachEndpoint,
           onCompleteParams: [this],
         });
-      } else if (this.type == "flying") {
+      } else if (
+        this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_FLY
+      ) {
         if (this.tween) {
           //this.tween.stop();
           return;
@@ -207,7 +250,7 @@ window.setupMonster = () => {
     }
 
     dead() {
-      gold += this.getPrice();
+      gold += this.getGoldOnDead();
       goldText.setText(`${gold}`);
       this.tween.stop();
       let index = monsters.indexOf(this);
@@ -233,21 +276,49 @@ window.setupMonster = () => {
       this.lastPosX = this.x;
       this.lastPosY = this.y;
       this.setPosition(posX, posY);
-      if (this.type == "landing") {
-        if (this.lastPosX > this.x && this.direction != "left") {
-          this.direction = "left";
-          this.anims.play(`${this.getName()}_left`);
-        } else if (this.lastPosX < this.x && this.direction != "right") {
-          this.direction = "right";
-          this.anims.play(`${this.getName()}_right`);
-        } else if (this.lastPosY > this.y && this.direction != "up") {
-          this.direction = "up";
-          this.anims.play(`${this.getName()}_up`);
-        } else if (this.lastPosY < this.y && this.direction != "down") {
-          this.direction = "down";
-          this.anims.play(`${this.getName()}_down`);
+      if (
+        this.getMoveType() == window.getConstants().MONSTER_MOVE_TYPE_GROUND
+      ) {
+        if (
+          this.lastPosX > this.x &&
+          this.direction != window.getConstants().MONSTER_MOVE_DIRECTION_TO_LEFT
+        ) {
+          this.direction = window.getConstants().MONSTER_MOVE_DIRECTION_TO_LEFT;
+          this.anims.play(
+            window.getMonsterAnimationAssetName(this.getName(), this.direction)
+          );
+        } else if (
+          this.lastPosX < this.x &&
+          this.direction !=
+            window.getConstants().MONSTER_MOVE_DIRECTION_TO_RIGHT
+        ) {
+          this.direction =
+            window.getConstants().MONSTER_MOVE_DIRECTION_TO_RIGHT;
+          this.anims.play(
+            window.getMonsterAnimationAssetName(this.getName(), this.direction)
+          );
+        } else if (
+          this.lastPosY > this.y &&
+          this.direction != window.getConstants().MONSTER_MOVE_DIRECTION_TO_TOP
+        ) {
+          this.direction = window.getConstants().MONSTER_MOVE_DIRECTION_TO_TOP;
+          this.anims.play(
+            window.getMonsterAnimationAssetName(this.getName(), this.direction)
+          );
+        } else if (
+          this.lastPosY < this.y &&
+          this.direction !=
+            window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM
+        ) {
+          this.direction =
+            window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM;
+          this.anims.play(
+            window.getMonsterAnimationAssetName(this.getName(), this.direction)
+          );
         }
-      } else if (this.type == "flying") {
+      } else if (
+        this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_FLY
+      ) {
         // butterfly
       }
 
@@ -270,24 +341,17 @@ window.setupMonster = () => {
       //end health draw
     }
 
-    getPrice() {
-      if (this.getName() == "bigBee") {
-        this.price = 10;
-      }
-
-      if (this.getName() == "ani_beast") {
-        this.price = 10;
-      }
-
-      if (this.getName() == "butterfly") {
-        this.price = 15;
-      }
-
-      return this.price;
+    getGoldOnDead() {
+      return window.getMonsterGoldOnDead(this.getName());
     }
 
     getName() {
-      return this.texture.key;
+      return this.monsterType;
     }
-  }
+
+    // fly or ground
+    getMoveType() {
+      return window.gameCoreConfig.monsters[this.getName()].moveType;
+    }
+  };
 };
