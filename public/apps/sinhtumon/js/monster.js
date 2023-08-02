@@ -42,9 +42,10 @@ window.setupMonster = () => {
       if (this.getName() == window.getConstants().MONSTER_THIEF) {
         // register animation for sprite
         this.Phaserscene.anims.create({
-          key: `${window.getConstants().MONSTER_THIEF}_${
+          key: window.getMonsterAnimationAssetName(
+            this.getName(),
             window.getConstants().MONSTER_MOVE_DIRECTION_TO_RIGHT
-          }`,
+          ),
           frames: this.Phaserscene.anims.generateFrameNumbers(
             window.getConstants().MONSTER_THIEF,
             {
@@ -57,9 +58,10 @@ window.setupMonster = () => {
         });
 
         this.Phaserscene.anims.create({
-          key: `${window.getConstants().MONSTER_THIEF}_${
+          key: window.getMonsterAnimationAssetName(
+            this.getName(),
             window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM
-          }`,
+          ),
           frames: this.Phaserscene.anims.generateFrameNumbers(
             window.getConstants().MONSTER_THIEF,
             {
@@ -72,9 +74,10 @@ window.setupMonster = () => {
         });
 
         this.Phaserscene.anims.create({
-          key: `${window.getConstants().MONSTER_THIEF}_${
+          key: window.getMonsterAnimationAssetName(
+            this.getName(),
             window.getConstants().MONSTER_MOVE_DIRECTION_TO_LEFT
-          }`,
+          ),
           frames: this.Phaserscene.anims.generateFrameNumbers(
             window.getConstants().MONSTER_THIEF,
             {
@@ -87,9 +90,10 @@ window.setupMonster = () => {
         });
 
         this.Phaserscene.anims.create({
-          key: `${window.getConstants().MONSTER_THIEF}_${
+          key: window.getMonsterAnimationAssetName(
+            this.getName(),
             window.getConstants().MONSTER_MOVE_DIRECTION_TO_TOP
-          }`,
+          ),
           frames: this.Phaserscene.anims.generateFrameNumbers(
             window.getConstants().MONSTER_THIEF,
             {

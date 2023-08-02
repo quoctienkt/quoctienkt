@@ -107,5 +107,5 @@ window.getMonsterGoldOnDead = (monsterType) => {
 };
 
 window.getMonsterAnimationAssetName = (monsterType, monsterMoveToDirection) => {
-  return `${monsterType}_${monsterMoveToDirection}`;
+  return `${monsterType}_MOVETO_${monsterMoveToDirection}`;
 };
