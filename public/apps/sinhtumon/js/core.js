@@ -1,5 +1,17 @@
 window.constants = {
   TOWER_SNOWFLAKE_NAME: "Tower_Snowflake",
+
+  MONSTER_MOVE_TYPE_FLY: "Monster_fly",
+  MONSTER_MOVE_TYPE_GROUND: "Monster_ground",
+
+  MONSTER_MOVE_DIRECTION_TO_TOP: "TO_TOP",
+  MONSTER_MOVE_DIRECTION_TO_BOTTOM: "TO_BOTTOM",
+  MONSTER_MOVE_DIRECTION_TO_LEFT: "TO_LEFT",
+  MONSTER_MOVE_DIRECTION_TO_RIGHT: "TO_RIGHT",
+  MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT: "TO_BOTTOM_RIGHT",
+
+  MONSTER_BUTTERFLY: "Monster_Butterfly",
+  MONSTER_THIEF: "Monster_Thief",
 };
 
 window.gameCoreConfig = {
@@ -22,6 +34,16 @@ window.gameCoreConfig = {
       ],
       ammoDisplaySizePerLevel: [null, null, null, [20, 15], [20, 15]],
       ammoDisplayTintPerLevel: [null, null, null, "0xffa500", "0xffa500"],
+    },
+  },
+  monsters: {
+    Monster_Thief: {
+      goldOnDead: 15,
+      moveType: constants.MONSTER_MOVE_TYPE_GROUND,
+    },
+    MONSTER_BUTTERFLY: {
+      goldOnDead: 10,
+      moveType: constants.MONSTER_MOVE_TYPE_FLY,
     },
   },
 };
@@ -63,14 +85,23 @@ window.getTowerAttackRange = (towerType, level) => {
 
 window.getTowerAttackReload = (towerType, level) => {
   return gameCoreConfig.towers[towerType].attackReloadPerLevel[level - 1];
-}
+};
 
 window.getAmmoData = (towerType, level) => {
   return {
-    attackDamage: gameCoreConfig.towers[towerType].attackDamagePerLevel[level - 1],
-    attackSpeed: gameCoreConfig.towers[towerType].attackSpeedPerLevel[level - 1],
-    attackReload: gameCoreConfig.towers[towerType].attackReloadPerLevel[level - 1],
-    ammoDisplaySize: gameCoreConfig.towers[towerType].ammoDisplaySizePerLevel[level - 1],
-    ammoDisplayTint: gameCoreConfig.towers[towerType].ammoDisplayTintPerLevel[level - 1],
+    attackDamage:
+      gameCoreConfig.towers[towerType].attackDamagePerLevel[level - 1],
+    attackSpeed:
+      gameCoreConfig.towers[towerType].attackSpeedPerLevel[level - 1],
+    attackReload:
+      gameCoreConfig.towers[towerType].attackReloadPerLevel[level - 1],
+    ammoDisplaySize:
+      gameCoreConfig.towers[towerType].ammoDisplaySizePerLevel[level - 1],
+    ammoDisplayTint:
+      gameCoreConfig.towers[towerType].ammoDisplayTintPerLevel[level - 1],
   };
+};
+
+window.getMonsterGoldOnDead = (monsterType) => {
+  return gameCoreConfig.monsters[monsterType].goldOnDead;
 };
