@@ -26,21 +26,25 @@
   /* rgb( 0, 0, 0) */
   --foreground-rgb: 0, 0, 0;
   /* rgb(0, 0,0) */
-  --color-rgb: 0 0 0;
+  --color-rgb: 255, 255, 255;
   /* rgb(214, 219, 220) */
-  --background-start-rgb: 214, 219, 220;
-  /* rgb(225, 236, 232) */
-  --background-via-rgb: 225, 236, 232;
+  --background-start-rgb: 51, 52, 79;
+  /* rgb(51, 65, 85) */
+  --background-via-rgb: 51, 65, 85;
   /* rgb(255, 255, 255) */
-  --background-end-rgb: 255, 255, 255;
-  /* rgb(38, 70, 83) */
-  --primary-rgb: 0, 0, 0;
+  --background-end-rgb: 15, 23, 43;
+  /* rgb(15, 23, 43) */
+  --primary-rgb: 51, 52, 79;
   /* rgb(244, 162, 97) */
   --secondary-rgb: 244, 162, 97;
   /* rgb(233, 196, 106) */
   --color-central: 233, 196, 106;
   /* rgb(0, 0, 0) */
-  --neutral-rgb: 0, 0, 0;
-  /* rgb(0, 0, 0) */
-  --vivid-rgb: 0, 0, 0;
+  --neutral-rgb: 91, 92, 146;
+  /* rgb(179, 177, 88) */
+  --vivid-rgb: 179, 177, 88;
+}
+
+html.asdfasdf { 
+  @apply text-slate-700;
 }

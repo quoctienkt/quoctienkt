@@ -71,9 +71,9 @@ window.setupGame = (appPrefix) => {
     height: GAME_HEIGHT + OFFSET_Y + OFFSET_DOWN_Y,
     physics: {
       default: "arcade",
-      // arcade: {
-      //     debug: true,
-      // }
+      arcade: {
+          debug: true,
+      }
     },
     scene: {
       preload: preload,
@@ -88,6 +88,8 @@ window.setupGame = (appPrefix) => {
 };
 
 function preload() {
+  const snowflakeTower = window.getTowerSnowFlakeData();
+
   this.load.image(
     "background",
     window.getAssetPathWithAppPrefix(window.appPrefix, "/img/background.png")
@@ -111,27 +113,23 @@ function preload() {
   );
 
   this.load.image(
-    "bullet",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/bullet.png")
-  );
-  this.load.image(
-    "bullet1",
+    window.getTowerAmmoAssetName(snowflakeTower.towerType, 1),
     window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen_bullet/1.png")
   );
   this.load.image(
-    "bullet2",
+    window.getTowerAmmoAssetName(snowflakeTower.towerType, 2),
     window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen_bullet/2.png")
   );
   this.load.image(
-    "bullet3",
+    window.getTowerAmmoAssetName(snowflakeTower.towerType, 3),
     window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen_bullet/3.png")
   );
   this.load.image(
-    "bullet4",
+    window.getTowerAmmoAssetName(snowflakeTower.towerType, 4),
     window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen_bullet/4.png")
   );
   this.load.image(
-    "bullet5",
+    window.getTowerAmmoAssetName(snowflakeTower.towerType, 5),
     window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen_bullet/5.png")
   );
 
@@ -178,53 +176,24 @@ function preload() {
   );
 
   this.load.image(
-    "frozen0",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen/0.png")
-  );
-  this.load.image(
-    "frozen1",
+    window.getTowerAssetName(snowflakeTower.towerType, 1),
     window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen/1.png")
   );
   this.load.image(
-    "frozen2",
+    window.getTowerAssetName(snowflakeTower.towerType, 2),
     window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen/2.png")
   );
   this.load.image(
-    "frozen3",
+    window.getTowerAssetName(snowflakeTower.towerType, 3),
     window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen/3.png")
   );
   this.load.image(
-    "frozen4",
+    window.getTowerAssetName(snowflakeTower.towerType, 4),
     window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen/4.png")
   );
   this.load.image(
-    "frozen5",
+    window.getTowerAssetName(snowflakeTower.towerType, 5),
     window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen/5.png")
-  );
-
-  this.load.image(
-    "power0",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/power/0.png")
-  );
-  this.load.image(
-    "power1",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/power/1.png")
-  );
-  this.load.image(
-    "power2",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/power/2.png")
-  );
-  this.load.image(
-    "power3",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/power/3.png")
-  );
-  this.load.image(
-    "power4",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/power/4.png")
-  );
-  this.load.image(
-    "power5",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/power/5.png")
   );
 
   wave = 1;
@@ -296,7 +265,7 @@ function create() {
   // this.add.text(560, 200, 'Tháp', { fontSize: '20px', fill: '#aaa' });
   // this.add.text(560, 420, 'Skill', { fontSize: '20px', fill: '#aaa' });
 
-  sampleTower1 = new Tower(this, 640, 350, "frozen0");
+  sampleTower1 = new Tower(this, 640, 350, window.getTowerSnowFlakeData().towerType, 1, true, true);
   // sampleTower2 = new Tower(this, 640, 340, 'power0')
 
   // this.add.image(580, 300, `0.png`).setDisplaySize(40, 40)

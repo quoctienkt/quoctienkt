@@ -81,11 +81,11 @@ window.setupSquare = () => {
             this.Phaserscene,
             this.x,
             this.y,
-            tempTower.getNextLevelName(),
+            tempTower.getName(),
             1
           );
 
-          gold -= tempTower.getPrice();
+          window.gold -= tempTower.getUpgradeCost();
           goldText.setText(`${gold}`);
 
           this.destroy();
