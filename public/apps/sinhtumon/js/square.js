@@ -25,7 +25,7 @@ window.setupSquare = () => {
         this.setAlpha(0.1);
 
         // console.log('clicked square');
-        if (isBuying && gold >= 70) {
+        if (isBuying && savedData.gold >= 70) {
           //Check isOkPath
 
           COLLISION[this.posY][this.posX] = 1;
@@ -37,11 +37,11 @@ window.setupSquare = () => {
           }
 
           let tempPath = [];
-          for (let i = 0; i < monsters.length; i++) {
-            if (monsters[i].getMoveType() == window.getConstants().MONSTER_MOVE_TYPE_GROUND) {
+          for (let i = 0; i < savedData.monsters.length; i++) {
+            if (savedData.monsters[i].getMoveType() == window.getConstants().MONSTER_MOVE_TYPE_GROUND) {
               let pre = [
-                parseInt((monsters[i].y - OFFSET_Y) / CELL_SIZE),
-                parseInt(monsters[i].x / CELL_SIZE),
+                parseInt((savedData.monsters[i].y - OFFSET_Y) / CELL_SIZE),
+                parseInt(savedData.monsters[i].x / CELL_SIZE),
               ];
 
               let prePath = findWay(COLLISION, pre, END_POS);
@@ -52,14 +52,14 @@ window.setupSquare = () => {
               }
 
               if (
-                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 > monsters[i].x &&
-                  monsters[i].x > prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
-                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 < monsters[i].x &&
-                  monsters[i].x < prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
-                (prePath[0][0] * CELL_SIZE + OFFSET_Y > monsters[i].y &&
-                  monsters[i].y > prePath[1][0] * CELL_SIZE + OFFSET_Y) ||
-                (prePath[0][0] * CELL_SIZE + OFFSET_Y < monsters[i].y &&
-                  monsters[i].y < prePath[1][0] * CELL_SIZE + OFFSET_Y)
+                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 > savedData.monsters[i].x &&
+                savedData.monsters[i].x > prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
+                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 < savedData.monsters[i].x &&
+                savedData.monsters[i].x < prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
+                (prePath[0][0] * CELL_SIZE + OFFSET_Y > savedData.monsters[i].y &&
+                  savedData.monsters[i].y > prePath[1][0] * CELL_SIZE + OFFSET_Y) ||
+                (prePath[0][0] * CELL_SIZE + OFFSET_Y < savedData.monsters[i].y &&
+                  savedData.monsters[i].y < prePath[1][0] * CELL_SIZE + OFFSET_Y)
               ) {
                 prePath.splice(0, 1);
               }
@@ -73,7 +73,7 @@ window.setupSquare = () => {
           //ok
           mazePuzzle = temp;
           //Cập nhật lại đường đi quái vật landing
-          monsters.forEach((m, index) => {
+          savedData.monsters.forEach((m, index) => {
             m.createPath(tempPath[index]);
           });
 
@@ -85,11 +85,11 @@ window.setupSquare = () => {
             1
           );
 
-          window.gold -= tempTower.getUpgradeCost();
-          goldText.setText(`${gold}`);
+          savedData.gold -= tempTower.getUpgradeCost();
+          goldText.setText(`${savedData.gold}`);
 
           this.destroy();
-          towers.push(tower);
+          savedData.towers.push(tower);
         }
       });
 

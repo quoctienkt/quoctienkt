@@ -48,7 +48,7 @@ window.setupTower = () => {
         this.on("pointerdown", (pointer) => {
           // console.log('sampleTower clicked');
           //tạo tháp từ con trỏ chuột
-          if (window.gold >= this.getUpgradeCost()) {
+          if (savedData.gold >= this.getUpgradeCost()) {
             if (isBuying) {
               tempTower.destroy();
             }
@@ -194,7 +194,7 @@ window.setupTower = () => {
       upgradeImage.on("pointerdown", (pointer) => {
         console.log('tower upgrade clicked');
 
-        if (gold < this.getUpgradeCost()) {
+        if (savedData.gold < this.getUpgradeCost()) {
           return;
         }
 
@@ -202,10 +202,10 @@ window.setupTower = () => {
           return;
         }
 
-        gold -= this.getUpgradeCost();
-        goldText.setText(`${gold}`);
+        savedData.gold -= this.getUpgradeCost();
+        goldText.setText(`${savedData.gold}`);
 
-        towers.splice(towers.indexOf(this), 1);
+        savedData.towers.splice(savedData.towers.indexOf(this), 1);
 
         let tower = new Tower(
           this.Phaserscene,
@@ -221,7 +221,7 @@ window.setupTower = () => {
         rangeImage.destroy();
         isTowerClicked = false;
         // rangeImage.setDisplaySize(tower.getRange() * 2, tower.getRange() * 2);
-        towers.push(tower);
+        savedData.towers.push(tower);
         upgradeImage.destroy();
         sellImage.destroy();
         this.destroy();
@@ -272,16 +272,16 @@ window.setupTower = () => {
       sellImage.on("pointerdown", (pointer) => {
         detailText.destroy();
         // console.log('sell clicked');
-        gold += window.getTowerSellPrice(this.getName(), this.level);
-        goldText.setText(`${gold}`);
-        towers.splice(towers.indexOf(this), 1);
+        savedData.gold += window.getTowerSellPrice(this.getName(), this.level);
+        goldText.setText(`${savedData.gold}`);
+        savedData.towers.splice(savedData.towers.indexOf(this), 1);
 
         let square = new Square(this.Phaserscene, this.posX, this.posY);
 
         COLLISION[this.posY][this.posX] = 0;
         mazePuzzle = findWay(COLLISION, START_POS, END_POS);
 
-        monsters.forEach((m) => {
+        savedData.monsters.forEach((m) => {
           if (m.getMoveType() == window.getConstants().MONSTER_MOVE_TYPE_GROUND) {
             let pre = [
               parseInt((m.y - OFFSET_Y) / CELL_SIZE),
@@ -380,7 +380,7 @@ window.setupTower = () => {
 
       let minDistance = this.range;
 
-      monsters.forEach((monster) => {
+      savedData.monsters.forEach((monster) => {
         let dist = getDistance(this, monster);
         if (
           this.isReady && //sẵn sàng bắn // chờ nạp đạn
@@ -427,7 +427,7 @@ window.setupTower = () => {
           this.Phaserscene
         );
 
-        bullets.push(bullet);
+        savedData.bullets.push(bullet);
       }
     }
   };
