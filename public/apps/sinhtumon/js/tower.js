@@ -1,5 +1,6 @@
-window.setupTower = () => {
+window.setupTower = (gameStateService) => {
   window.Tower = class extends Phaser.Physics.Arcade.Sprite {
+    _gameStateService = null;
     constructor(
       scene,
       x,
@@ -10,14 +11,14 @@ window.setupTower = () => {
       isSampleTower = false
     ) {
       super(scene, x, y, window.getTowerAssetName(towerType, level));
+      scene.add.existing(this);
+      scene.physics.add.existing(this);
+      this.Phaserscene = scene;
+      this._gameStateService = gameStateService;
 
       this.towerType = towerType;
       this.level = level;
       this.isSampleTower = isSampleTower;
-
-      scene.add.existing(this);
-      scene.physics.add.existing(this);
-      this.Phaserscene = scene;
 
       this.setDepth(3);
       this.setInteractive();
@@ -192,7 +193,7 @@ window.setupTower = () => {
       upgradeImage.setInteractive();
 
       upgradeImage.on("pointerdown", (pointer) => {
-        console.log('tower upgrade clicked');
+        console.log("tower upgrade clicked");
 
         if (savedData.gold < this.getUpgradeCost()) {
           return;
@@ -202,8 +203,7 @@ window.setupTower = () => {
           return;
         }
 
-        savedData.gold -= this.getUpgradeCost();
-        goldText.setText(`${savedData.gold}`);
+        this._gameStateService.setGold((prev) => prev - this.getUpgradeCost());
 
         savedData.towers.splice(savedData.towers.indexOf(this), 1);
 
@@ -272,8 +272,10 @@ window.setupTower = () => {
       sellImage.on("pointerdown", (pointer) => {
         detailText.destroy();
         // console.log('sell clicked');
-        savedData.gold += window.getTowerSellPrice(this.getName(), this.level);
-        goldText.setText(`${savedData.gold}`);
+
+        this._gameStateService.setGold(
+          (prev) => prev + window.getTowerSellPrice(this.getName(), this.level)
+        );
         savedData.towers.splice(savedData.towers.indexOf(this), 1);
 
         let square = new Square(this.Phaserscene, this.posX, this.posY);
@@ -282,7 +284,9 @@ window.setupTower = () => {
         mazePuzzle = findWay(COLLISION, START_POS, END_POS);
 
         savedData.monsters.forEach((m) => {
-          if (m.getMoveType() == window.getConstants().MONSTER_MOVE_TYPE_GROUND) {
+          if (
+            m.getMoveType() == window.getConstants().MONSTER_MOVE_TYPE_GROUND
+          ) {
             let pre = [
               parseInt((m.y - OFFSET_Y) / CELL_SIZE),
               parseInt(m.x / CELL_SIZE),

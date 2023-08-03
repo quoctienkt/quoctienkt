@@ -1,7 +1,8 @@
-window.setupMonster = () => {
+window.setupMonster = (gameStateService) => {
   window.Monster = class extends Phaser.Physics.Arcade.Sprite {
     //Type : range, melee, sample
     //name: power arrow frozen thunder
+    __gameStateService;
     constructor(scene, x, y, monsterType) {
       super(
         scene,
@@ -13,6 +14,7 @@ window.setupMonster = () => {
       scene.physics.add.existing(this);
 
       this.Phaserscene = scene;
+      this._gameStateService = gameStateService;
       this.setDepth(2);
 
       this.monsterType = monsterType;
@@ -250,8 +252,7 @@ window.setupMonster = () => {
     }
 
     dead() {
-      savedData.gold += this.getGoldOnDead();
-      goldText.setText(`${savedData.gold}`);
+      this._gameStateService.setGold((prev) => prev + this.getGoldOnDead());
       this.tween.stop();
       let index = savedData.monsters.indexOf(this);
 

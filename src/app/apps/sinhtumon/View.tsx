@@ -38,6 +38,9 @@ export default function Page({ basePath }: ViewProps) {
   const coreScriptStatus: UseScriptStatus = useScript(
     getAssetPathWithBasePath(basePath, appPrefix, "/js/core.js")
   );
+  const stateManagementScriptStatus: UseScriptStatus = useScript(
+    getAssetPathWithBasePath(basePath, appPrefix, "/js/stateManagement.js")
+  );
   const mainScriptStatus: UseScriptStatus = useScript(
     getAssetPathWithBasePath(basePath, appPrefix, "/js/main.js")
   );
@@ -51,6 +54,7 @@ export default function Page({ basePath }: ViewProps) {
       monsterScriptStatus === "ready" &&
       bulletScriptStatus === "ready" &&
       coreScriptStatus === "ready" &&
+      stateManagementScriptStatus === "ready" &&
       mainScriptStatus === "ready";
 
     if (allScriptsReady) {
@@ -64,6 +68,7 @@ export default function Page({ basePath }: ViewProps) {
     monsterScriptStatus,
     bulletScriptStatus,
     coreScriptStatus,
+    stateManagementScriptStatus,
     mainScriptStatus,
   ]);
 

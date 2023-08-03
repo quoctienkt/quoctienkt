@@ -1,12 +1,14 @@
-window.setupBullet = () => {
+window.setupBullet = (gameStateService) => {
   window.Bullet = class extends Phaser.Physics.Arcade.Sprite {
     //Type : range, melee, sample
     //name: power arrow frozen thunder
+    _gameStateService;
     constructor(scene, x, y, tower, level) {
       super(scene, x, y, window.getTowerAmmoAssetName(tower.towerType, level));
       scene.add.existing(this);
       scene.physics.add.existing(this);
       this.Phaserscene = scene;
+      this._gameStateService = gameStateService;
 
       this.setDepth(3);
       this.tower = tower;
@@ -21,12 +23,15 @@ window.setupBullet = () => {
         this.setTint(ammoData.ammoDisplayTint);
       }
       if (ammoData.ammoDisplaySize !== null) {
-        this.setDisplaySize(ammoData.ammoDisplaySize[0], ammoData.ammoDisplaySize[1]);
+        this.setDisplaySize(
+          ammoData.ammoDisplaySize[0],
+          ammoData.ammoDisplaySize[1]
+        );
       }
     }
 
     getName() {
       return this.texture.key;
     }
-  }
+  };
 };

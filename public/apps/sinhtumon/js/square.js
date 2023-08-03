@@ -1,12 +1,16 @@
-window.setupSquare = () => {
+window.setupSquare = (gameStateService) => {
   window.Square = class extends Phaser.Physics.Arcade.Sprite {
     //Type : range, melee, sample
     //name: power arrow frozen thunder
+
+    _gameStateService;
     constructor(scene, x, y, isInit = true) {
       super(scene, x * CELL_SIZE + 20, y * CELL_SIZE + OFFSET_Y, "square");
       scene.add.existing(this);
       scene.physics.add.existing(this);
       this.Phaserscene = scene;
+
+      this._gameStateService = gameStateService;
       this.posX = x;
       this.posY = y;
       this.setAlpha(0.1);
@@ -38,7 +42,10 @@ window.setupSquare = () => {
 
           let tempPath = [];
           for (let i = 0; i < savedData.monsters.length; i++) {
-            if (savedData.monsters[i].getMoveType() == window.getConstants().MONSTER_MOVE_TYPE_GROUND) {
+            if (
+              savedData.monsters[i].getMoveType() ==
+              window.getConstants().MONSTER_MOVE_TYPE_GROUND
+            ) {
               let pre = [
                 parseInt((savedData.monsters[i].y - OFFSET_Y) / CELL_SIZE),
                 parseInt(savedData.monsters[i].x / CELL_SIZE),
@@ -52,14 +59,22 @@ window.setupSquare = () => {
               }
 
               if (
-                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 > savedData.monsters[i].x &&
-                savedData.monsters[i].x > prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
-                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 < savedData.monsters[i].x &&
-                savedData.monsters[i].x < prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
-                (prePath[0][0] * CELL_SIZE + OFFSET_Y > savedData.monsters[i].y &&
-                  savedData.monsters[i].y > prePath[1][0] * CELL_SIZE + OFFSET_Y) ||
-                (prePath[0][0] * CELL_SIZE + OFFSET_Y < savedData.monsters[i].y &&
-                  savedData.monsters[i].y < prePath[1][0] * CELL_SIZE + OFFSET_Y)
+                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 >
+                  savedData.monsters[i].x &&
+                  savedData.monsters[i].x >
+                    prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
+                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 <
+                  savedData.monsters[i].x &&
+                  savedData.monsters[i].x <
+                    prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
+                (prePath[0][0] * CELL_SIZE + OFFSET_Y >
+                  savedData.monsters[i].y &&
+                  savedData.monsters[i].y >
+                    prePath[1][0] * CELL_SIZE + OFFSET_Y) ||
+                (prePath[0][0] * CELL_SIZE + OFFSET_Y <
+                  savedData.monsters[i].y &&
+                  savedData.monsters[i].y <
+                    prePath[1][0] * CELL_SIZE + OFFSET_Y)
               ) {
                 prePath.splice(0, 1);
               }
@@ -85,8 +100,7 @@ window.setupSquare = () => {
             1
           );
 
-          savedData.gold -= tempTower.getUpgradeCost();
-          goldText.setText(`${savedData.gold}`);
+          this._gameStateService.setGold((gold) => gold - tempTower.getUpgradeCost());
 
           this.destroy();
           savedData.towers.push(tower);

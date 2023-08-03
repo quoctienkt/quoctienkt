@@ -1,8 +1,10 @@
 window.setupGame = (appPrefix) => {
-  window.setupBullet();
-  window.setupTower();
-  window.setupSquare();
-  window.setupMonster();
+  window._gameStateService = new GameStateService();
+
+  window.setupBullet(_gameStateService);
+  window.setupTower(_gameStateService);
+  window.setupSquare(_gameStateService);
+  window.setupMonster(_gameStateService);
 
   window.savedData = {
     towers: [],
@@ -23,12 +25,8 @@ window.setupGame = (appPrefix) => {
   window.sampleTower3 = null;
   window.sampleTower4 = null;
 
-  window.lifeText = null;
-  window.waveText = null;
-
   window.nextWave = undefined;
   window.waveDelay = 15000;
-  window.goldText = null;
   window.sellImage = null;
   window.upgradeImage = null;
   window.rangeImage = null;
@@ -86,10 +84,12 @@ window.setupGame = (appPrefix) => {
     },
   };
 
-  window.game = new Phaser.Game(config);
+  window.phaserGame = new Phaser.Game(config);
 };
 
 function preload() {
+  _gameStateService.setScene(this);
+
   const snowflakeTower = window.getTowerSnowFlakeData();
 
   this.load.image(
@@ -244,21 +244,6 @@ function create() {
     repeat: 0,
   });
 
-  // let background = this.add.image(0, OFFSET_Y - CELL_SIZE / 2, "background").setOrigin(0)
-  let background = this.add.image(-2, 0, "background1").setOrigin(0);
-  background.setDepth(-3);
-  background.setDisplaySize(
-    GAME_WIDTH + OFFSET_RIGHT_X,
-    5 + GAME_HEIGHT + OFFSET_Y + OFFSET_DOWN_Y
-  );
-  for (let i = 0; i < GAME_HEIGHT / CELL_SIZE; i++) {
-    for (let j = 0; j < GAME_WIDTH / CELL_SIZE; j++) {
-      if (!COLLISION[i][j]) {
-        let square = new Square(this, j, i);
-      }
-    }
-  }
-
   this.anims.create({
     key: "rotate",
     frames: "sell",
@@ -276,22 +261,23 @@ function create() {
     fill: "#ffffff",
     fontFamily: "roboto",
   });
-  waveText = this.add.text(300, 34, `${savedData.wave}`, {
-    fontSize: "15px",
-    fill: "#fff",
-    fontFamily: "roboto",
-  });
 
-  lifeText = this.add.text(360, 150, `Máu ${savedData.life}`, {
-    fontSize: "20px",
-    fill: "#fff",
-    fontFamily: "roboto",
-  });
-  goldText = this.add.text(615, 241, `${savedData.gold}`, {
-    fontSize: "13px",
-    fill: "#ffd64c",
-    fontFamily: "roboto",
-  });
+  // let background = this.add.image(0, OFFSET_Y - CELL_SIZE / 2, "background").setOrigin(0)
+  let background = this.add.image(-2, 0, "background1").setOrigin(0);
+  background.setDepth(-3);
+  background.setDisplaySize(
+    GAME_WIDTH + OFFSET_RIGHT_X,
+    5 + GAME_HEIGHT + OFFSET_Y + OFFSET_DOWN_Y
+  );
+  for (let i = 0; i < GAME_HEIGHT / CELL_SIZE; i++) {
+    for (let j = 0; j < GAME_WIDTH / CELL_SIZE; j++) {
+      if (!COLLISION[i][j]) {
+        let square = new Square(this, j, i);
+      }
+    }
+  }
+
+  window._gameStateService.preload(window.savedData);
 
   // tháp mẫu
   // this.add.text(560, 200, 'Tháp', { fontSize: '20px', fill: '#aaa' });
@@ -368,8 +354,7 @@ function create() {
 }
 
 function monsterReachEndpoint(tween, targets, monster) {
-  savedData.life -= 1;
-  lifeText.setText(`Máu: ${savedData.life}`);
+  _gameStateService.setLife((prev) => prev - 1);
   let i = savedData.bullets.length - 1;
   while (i >= 0) {
     if (savedData.bullets[i].target === monster) {
@@ -388,8 +373,7 @@ function monsterRespawn(number) {
     parseInt(Math.random() * 10) % 2
       ? window.getConstants().MONSTER_BUTTERFLY
       : window.getConstants().MONSTER_THIEF;
-  savedData.wave += 1;
-  waveText.setText(`${savedData.wave}`);
+  window._gameStateService.setWave((wave) => wave + 1);
   for (let i = 0; i < 15; i++) {
     this.time.addEvent({
       delay: i * 650,
