@@ -1,7 +1,8 @@
-window.setupMonster = () => {
+window.setupMonster = (gameStateService) => {
   window.Monster = class extends Phaser.Physics.Arcade.Sprite {
     //Type : range, melee, sample
     //name: power arrow frozen thunder
+    __gameStateService;
     constructor(scene, x, y, monsterType) {
       super(
         scene,
@@ -13,6 +14,7 @@ window.setupMonster = () => {
       scene.physics.add.existing(this);
 
       this.Phaserscene = scene;
+      this._gameStateService = gameStateService;
       this.setDepth(2);
 
       this.monsterType = monsterType;
@@ -111,8 +113,8 @@ window.setupMonster = () => {
         );
 
         this.setCircle(10, 3, 15);
-        this.maxHealth = 30 + wave * 100;
-        this.health = 30 + wave * 100;
+        this.maxHealth = 30 + savedData.wave * 100;
+        this.health = 30 + savedData.wave * 100;
         this.speed = 75;
       } else if (this.getName() == window.getConstants().MONSTER_BUTTERFLY) {
         this.Phaserscene.anims.create({
@@ -139,8 +141,8 @@ window.setupMonster = () => {
           )
         );
         this.setCircle(15, 30, 28);
-        this.maxHealth = 30 + wave * 100;
-        this.health = 30 + wave * 100;
+        this.maxHealth = 30 + savedData.wave * 100;
+        this.health = 30 + savedData.wave * 100;
         this.speed = 75;
       }
 
@@ -250,21 +252,20 @@ window.setupMonster = () => {
     }
 
     dead() {
-      gold += this.getGoldOnDead();
-      goldText.setText(`${gold}`);
+      this._gameStateService.setGold((prev) => prev + this.getGoldOnDead());
       this.tween.stop();
-      let index = monsters.indexOf(this);
+      let index = savedData.monsters.indexOf(this);
 
-      let i = bullets.length - 1;
+      let i = savedData.bullets.length - 1;
       while (i >= 0) {
-        if (bullets[i].target === this) {
-          bullets[i].destroy();
-          bullets.splice(i, 1);
+        if (savedData.bullets[i].target === this) {
+          savedData.bullets[i].destroy();
+          savedData.bullets.splice(i, 1);
         }
         i--;
       }
 
-      monsters.splice(index, 1);
+      savedData.monsters.splice(index, 1);
 
       this.anims.play("dead");
       this.setAlpha(0.5);

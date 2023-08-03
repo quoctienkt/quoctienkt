@@ -1,15 +1,22 @@
 window.setupGame = (appPrefix) => {
-  window.setupBullet();
-  window.setupTower();
-  window.setupSquare();
-  window.setupMonster();
+  window._gameStateService = new GameStateService();
+
+  window.setupBullet(_gameStateService);
+  window.setupTower(_gameStateService);
+  window.setupSquare(_gameStateService);
+  window.setupMonster(_gameStateService);
+
+  window.savedData = {
+    towers: [],
+    monsters: [],
+    bullets: [],
+    wave: -1,
+    gold: -1,
+    life: -1,
+  };
 
   window.mazePuzzle = null;
   window.graphics = undefined;
-
-  window.towers = [];
-  window.bullets = [];
-  window.monsters = [];
 
   window.tempTower = null;
 
@@ -18,13 +25,8 @@ window.setupGame = (appPrefix) => {
   window.sampleTower3 = null;
   window.sampleTower4 = null;
 
-  window.lifeText = null;
-  window.wave = null;
-  window.waveText = null;
   window.nextWave = undefined;
   window.waveDelay = 15000;
-  window.gold = null;
-  window.goldText = null;
   window.sellImage = null;
   window.upgradeImage = null;
   window.rangeImage = null;
@@ -66,14 +68,14 @@ window.setupGame = (appPrefix) => {
 
   window.config = {
     type: Phaser.CANVAS,
-    canvas: document.getElementById('myCustomCanvas'),
+    canvas: document.getElementById("myCustomCanvas"),
     width: GAME_WIDTH + OFFSET_RIGHT_X,
     height: GAME_HEIGHT + OFFSET_Y + OFFSET_DOWN_Y,
     physics: {
       default: "arcade",
       arcade: {
-          debug: true,
-      }
+        debug: true,
+      },
     },
     scene: {
       preload: preload,
@@ -82,12 +84,12 @@ window.setupGame = (appPrefix) => {
     },
   };
 
-  window.game = new Phaser.Game(config);
-
-
+  window.phaserGame = new Phaser.Game(config);
 };
 
 function preload() {
+  _gameStateService.setScene(this);
+
   const snowflakeTower = window.getTowerSnowFlakeData();
 
   this.load.image(
@@ -114,23 +116,38 @@ function preload() {
 
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 1),
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen_bullet/1.png")
+    window.getAssetPathWithAppPrefix(
+      window.appPrefix,
+      "/img/tower/frozen_bullet/1.png"
+    )
   );
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 2),
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen_bullet/2.png")
+    window.getAssetPathWithAppPrefix(
+      window.appPrefix,
+      "/img/tower/frozen_bullet/2.png"
+    )
   );
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 3),
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen_bullet/3.png")
+    window.getAssetPathWithAppPrefix(
+      window.appPrefix,
+      "/img/tower/frozen_bullet/3.png"
+    )
   );
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 4),
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen_bullet/4.png")
+    window.getAssetPathWithAppPrefix(
+      window.appPrefix,
+      "/img/tower/frozen_bullet/4.png"
+    )
   );
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 5),
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen_bullet/5.png")
+    window.getAssetPathWithAppPrefix(
+      window.appPrefix,
+      "/img/tower/frozen_bullet/5.png"
+    )
   );
 
   this.load.image(
@@ -177,29 +194,44 @@ function preload() {
 
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 1),
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen/1.png")
+    window.getAssetPathWithAppPrefix(
+      window.appPrefix,
+      "/img/tower/frozen/1.png"
+    )
   );
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 2),
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen/2.png")
+    window.getAssetPathWithAppPrefix(
+      window.appPrefix,
+      "/img/tower/frozen/2.png"
+    )
   );
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 3),
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen/3.png")
+    window.getAssetPathWithAppPrefix(
+      window.appPrefix,
+      "/img/tower/frozen/3.png"
+    )
   );
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 4),
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen/4.png")
+    window.getAssetPathWithAppPrefix(
+      window.appPrefix,
+      "/img/tower/frozen/4.png"
+    )
   );
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 5),
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/tower/frozen/5.png")
+    window.getAssetPathWithAppPrefix(
+      window.appPrefix,
+      "/img/tower/frozen/5.png"
+    )
   );
 
-  wave = 1;
+  savedData.wave = 1;
+  savedData.life = 10;
+  savedData.gold = 1000;
 
-  life = 10;
-  gold = 1000;
   graphics = this.add.graphics();
   mazePuzzle = findWay(COLLISION, START_POS, END_POS);
 }
@@ -211,21 +243,6 @@ function create() {
     frameRate: 500,
     repeat: 0,
   });
-
-  // let background = this.add.image(0, OFFSET_Y - CELL_SIZE / 2, "background").setOrigin(0)
-  let background = this.add.image(-2, 0, "background1").setOrigin(0);
-  background.setDepth(-3);
-  background.setDisplaySize(
-    GAME_WIDTH + OFFSET_RIGHT_X,
-    5 + GAME_HEIGHT + OFFSET_Y + OFFSET_DOWN_Y
-  );
-  for (let i = 0; i < GAME_HEIGHT / CELL_SIZE; i++) {
-    for (let j = 0; j < GAME_WIDTH / CELL_SIZE; j++) {
-      if (!COLLISION[i][j]) {
-        let square = new Square(this, j, i);
-      }
-    }
-  }
 
   this.anims.create({
     key: "rotate",
@@ -244,28 +261,37 @@ function create() {
     fill: "#ffffff",
     fontFamily: "roboto",
   });
-  waveText = this.add.text(300, 34, `${wave}`, {
-    fontSize: "15px",
-    fill: "#fff",
-    fontFamily: "roboto",
-  });
 
-  lifeText = this.add.text(360, 150, `Máu ${life}`, {
-    fontSize: "20px",
-    fill: "#fff",
-    fontFamily: "roboto",
-  });
-  goldText = this.add.text(615, 241, `${gold}`, {
-    fontSize: "13px",
-    fill: "#ffd64c",
-    fontFamily: "roboto",
-  });
+  // let background = this.add.image(0, OFFSET_Y - CELL_SIZE / 2, "background").setOrigin(0)
+  let background = this.add.image(-2, 0, "background1").setOrigin(0);
+  background.setDepth(-3);
+  background.setDisplaySize(
+    GAME_WIDTH + OFFSET_RIGHT_X,
+    5 + GAME_HEIGHT + OFFSET_Y + OFFSET_DOWN_Y
+  );
+  for (let i = 0; i < GAME_HEIGHT / CELL_SIZE; i++) {
+    for (let j = 0; j < GAME_WIDTH / CELL_SIZE; j++) {
+      if (!COLLISION[i][j]) {
+        let square = new Square(this, j, i);
+      }
+    }
+  }
+
+  window._gameStateService.preload(window.savedData);
 
   // tháp mẫu
   // this.add.text(560, 200, 'Tháp', { fontSize: '20px', fill: '#aaa' });
   // this.add.text(560, 420, 'Skill', { fontSize: '20px', fill: '#aaa' });
 
-  sampleTower1 = new Tower(this, 640, 350, window.getTowerSnowFlakeData().towerType, 1, true, true);
+  sampleTower1 = new Tower(
+    this,
+    640,
+    350,
+    window.getTowerSnowFlakeData().towerType,
+    1,
+    true,
+    true
+  );
   // sampleTower2 = new Tower(this, 640, 340, 'power0')
 
   // this.add.image(580, 300, `0.png`).setDisplaySize(40, 40)
@@ -328,31 +354,32 @@ function create() {
 }
 
 function monsterReachEndpoint(tween, targets, monster) {
-  life -= 1;
-  lifeText.setText(`Máu: ${life}`);
-  let i = bullets.length - 1;
+  _gameStateService.setLife((prev) => prev - 1);
+  let i = savedData.bullets.length - 1;
   while (i >= 0) {
-    if (bullets[i].target === monster) {
-      bullets[i].destroy();
-      bullets.splice(i, 1);
+    if (savedData.bullets[i].target === monster) {
+      savedData.bullets[i].destroy();
+      savedData.bullets.splice(i, 1);
     }
     i--;
   }
 
-  monsters.splice(monsters.indexOf(monster), 1);
+  savedData.monsters.splice(savedData.monsters.indexOf(monster), 1);
   monster.destroy();
 }
 
 function monsterRespawn(number) {
-  let name = parseInt(Math.random() * 10) % 2 ? window.getConstants().MONSTER_BUTTERFLY : window.getConstants().MONSTER_THIEF;
-  wave += 1;
-  waveText.setText(`${wave}`);
+  let name =
+    parseInt(Math.random() * 10) % 2
+      ? window.getConstants().MONSTER_BUTTERFLY
+      : window.getConstants().MONSTER_THIEF;
+  window._gameStateService.setWave((wave) => wave + 1);
   for (let i = 0; i < 15; i++) {
     this.time.addEvent({
       delay: i * 650,
       callback: () => {
         let monster = new Monster(this, 0, 0, name);
-        monsters.push(monster);
+        savedData.monsters.push(monster);
       },
       callbackScope: this,
       loop: false,
@@ -364,7 +391,7 @@ function dealDamage(bullet, monster) {
   // console.log("touch monster")
   monster.health -= bullet.damage;
 
-  bullets.splice(bullets.indexOf(bullet), 1);
+  savedData.bullets.splice(savedData.bullets.indexOf(bullet), 1);
   bullet.destroy();
 
   if (monster.health <= 0) {
@@ -394,10 +421,10 @@ function update(time, delta) {
   graphics.clear();
 
   //end game
-  if (life < 1) {
+  if (savedData.life < 1) {
     this.physics.pause();
     monsterRespawnEvent.destroy();
-    monsters.forEach((m) => m.destroy());
+    savedData.monsters.forEach((m) => m.destroy());
     return;
   }
 
@@ -412,7 +439,7 @@ function update(time, delta) {
   );
 
   //landing monster move
-  monsters.forEach((monster) => {
+  savedData.monsters.forEach((monster) => {
     graphics.lineStyle(2, 0xffffff, 1);
     graphics.lineStyle(1, 0xffffff, 1);
     // monster.path.draw(graphics)
@@ -421,10 +448,10 @@ function update(time, delta) {
   });
 
   //Cập nhật đường đạn
-  bullets.forEach((bullet) =>
+  savedData.bullets.forEach((bullet) =>
     moveTo.call(this, bullet, bullet.target, bullet.speed)
   );
 
   //fire
-  towers.forEach((tower) => tower.shoot());
+  savedData.towers.forEach((tower) => tower.shoot());
 }
