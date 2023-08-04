@@ -1,14 +1,16 @@
-window.setupBullet = (gameStateService) => {
+window.setupBullet = (gameStateService, gameMapService) => {
   window.Bullet = class extends Phaser.Physics.Arcade.Sprite {
     //Type : range, melee, sample
     //name: power arrow frozen thunder
     _gameStateService;
+    _gameMapService;
     constructor(scene, x, y, tower, level) {
       super(scene, x, y, window.getTowerAmmoAssetName(tower.towerType, level));
       scene.add.existing(this);
       scene.physics.add.existing(this);
       this.Phaserscene = scene;
       this._gameStateService = gameStateService;
+      this._gameMapService = gameMapService;
 
       this.setDepth(3);
       this.tower = tower;

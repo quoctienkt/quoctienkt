@@ -12,7 +12,7 @@ window.setupSquare = (gameStateService, gameMapService) => {
         x * gameMapService.CELL_SIZE + gameMapService.CELL_SIZE / 2,
         y * gameMapService.CELL_HEIGHT +
           gameMapService.CELL_HEIGHT / 2 +
-          window.GAME_BOARD_PADDING_TOP,
+          gameMapService.GAME_BOARD_PADDING_TOP,
         "square"
       );
 
