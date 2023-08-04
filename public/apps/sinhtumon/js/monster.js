@@ -1,13 +1,14 @@
-window.setupMonster = (gameStateService) => {
+window.setupMonster = (gameStateService, gameMapService) => {
   window.Monster = class extends Phaser.Physics.Arcade.Sprite {
     //Type : range, melee, sample
     //name: power arrow frozen thunder
-    __gameStateService;
+    _gameStateService;
+    _gameMapService;
     constructor(scene, x, y, monsterType) {
       super(
         scene,
-        x * CELL_SIZE + CELL_SIZE / 2,
-        y * CELL_SIZE + OFFSET_Y,
+        x * gameMapService.CELL_SIZE + gameMapService.CELL_SIZE / 2,
+        y * gameMapService.CELL_SIZE + OFFSET_Y,
         monsterType
       );
       scene.add.existing(this);
@@ -15,6 +16,8 @@ window.setupMonster = (gameStateService) => {
 
       this.Phaserscene = scene;
       this._gameStateService = gameStateService;
+      this._gameMapService = gameMapService;
+
       this.setDepth(2);
 
       this.monsterType = monsterType;
@@ -151,7 +154,7 @@ window.setupMonster = (gameStateService) => {
       } else if (
         this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_GROUND
       ) {
-        this.updateMonsterPath(_gameMapService.groundMonsterMovingPathDefault);
+        this.updateMonsterPath(this._gameMapService.groundMonsterMovingPathDefault);
       }
     }
 
@@ -193,8 +196,8 @@ window.setupMonster = (gameStateService) => {
         this.path = new Phaser.Curves.Path(this.x, this.y);
         newMonsterPath.forEach((i) => {
           this.path.lineTo(
-            CELL_SIZE * i[1] + CELL_SIZE / 2,
-            i[0] * CELL_SIZE + OFFSET_Y
+            this._gameMapService.CELL_SIZE * i[1] + this._gameMapService.CELL_SIZE / 2,
+            i[0] * this._gameMapService.CELL_SIZE + OFFSET_Y
           );
         });
 
@@ -224,12 +227,14 @@ window.setupMonster = (gameStateService) => {
 
         this.path = new Phaser.Curves.Path(this.x, this.y);
 
-        [_gameMapService.START_POSITION, _gameMapService.END_POSITION].forEach((i) => {
-          this.path.lineTo(
-            CELL_SIZE * i[1] + CELL_SIZE / 2,
-            i[0] * CELL_SIZE + OFFSET_Y
-          );
-        });
+        [this._gameMapService.START_POSITION, this._gameMapService.END_POSITION].forEach(
+          (i) => {
+            this.path.lineTo(
+              this._gameMapService.CELL_SIZE * i[1] + this._gameMapService.CELL_SIZE / 2,
+              i[0] * this._gameMapService.CELL_SIZE + OFFSET_Y
+            );
+          }
+        );
 
         this.duration =
           (Math.sqrt(this.path.getLength() * this.path.getLength()) /
@@ -325,17 +330,17 @@ window.setupMonster = (gameStateService) => {
       // health draw
       graphics.lineStyle(2, 0xff00, 0.5);
       graphics.strokeRoundedRect(
-        this.x - CELL_SIZE / 2.5,
+        this.x - this._gameMapService.CELL_SIZE / 2.5,
         this.y + 22,
-        CELL_SIZE,
+        this._gameMapService.CELL_SIZE,
         3,
         0
       );
       graphics.fillStyle(0x00ff00, 1, 0.5);
       graphics.fillRect(
-        this.x - CELL_SIZE / 2.5,
+        this.x - this._gameMapService.CELL_SIZE / 2.5,
         this.y + 22,
-        (CELL_SIZE * this.health) / this.maxHealth,
+        (this._gameMapService.CELL_SIZE * this.health) / this.maxHealth,
         3
       );
       //end health draw

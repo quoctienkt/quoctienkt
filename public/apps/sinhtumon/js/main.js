@@ -5,7 +5,7 @@ window.setupGame = (appPrefix) => {
   window.setupBullet(_gameStateService);
   window.setupTower(_gameStateService);
   window.setupSquare(_gameStateService, _gameMapService);
-  window.setupMonster(_gameStateService);
+  window.setupMonster(_gameStateService, _gameMapService);
 
   window.graphics = undefined;
   window.tempTower = null;
@@ -29,7 +29,6 @@ window.setupGame = (appPrefix) => {
   window.OFFSET_DOWN_Y = 60;
   window.GAME_WIDTH = 520;
   window.GAME_HEIGHT = 520;
-  window.CELL_SIZE = 40;
 
   window.isBuying = false;
   window.isTowerClicked = false;
