@@ -8,7 +8,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
       super(
         scene,
         x * gameMapService.CELL_SIZE + gameMapService.CELL_SIZE / 2,
-        y * gameMapService.CELL_SIZE + GAME_BOARD_PADDING_TOP,
+        y * gameMapService.CELL_HEIGHT + gameMapService.GAME_BOARD_PADDING_TOP,
         monsterType
       );
       scene.add.existing(this);
@@ -154,7 +154,9 @@ window.setupMonster = (gameStateService, gameMapService) => {
       } else if (
         this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_GROUND
       ) {
-        this.updateMonsterPath(this._gameMapService.groundMonsterMovingPathDefault);
+        this.updateMonsterPath(
+          this._gameMapService.groundMonsterMovingPathDefault
+        );
       }
     }
 
@@ -165,7 +167,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
       }
       detailText = this.Phaserscene.add.text(
         150,
-        630,
+        600,
         `Máu: ${this.health}\nTốc độ: ${
           this.speed
         }km/h\nVàng: ${this.getGoldOnDead()}`,
@@ -196,8 +198,11 @@ window.setupMonster = (gameStateService, gameMapService) => {
         this.path = new Phaser.Curves.Path(this.x, this.y);
         newMonsterPath.forEach((i) => {
           this.path.lineTo(
-            this._gameMapService.CELL_SIZE * i[1] + this._gameMapService.CELL_SIZE / 2,
-            i[0] * this._gameMapService.CELL_SIZE + GAME_BOARD_PADDING_TOP
+            this._gameMapService.CELL_SIZE * i[1] +
+              this._gameMapService.CELL_SIZE / 2,
+            i[0] * this._gameMapService.CELL_HEIGHT +
+              this._gameMapService.CELL_HEIGHT / 2 +
+              this._gameMapService.GAME_BOARD_PADDING_TOP
           );
         });
 
@@ -227,14 +232,17 @@ window.setupMonster = (gameStateService, gameMapService) => {
 
         this.path = new Phaser.Curves.Path(this.x, this.y);
 
-        [this._gameMapService.START_POSITION, this._gameMapService.END_POSITION].forEach(
-          (i) => {
-            this.path.lineTo(
-              this._gameMapService.CELL_SIZE * i[1] + this._gameMapService.CELL_SIZE / 2,
-              i[0] * this._gameMapService.CELL_SIZE + GAME_BOARD_PADDING_TOP
-            );
-          }
-        );
+        [
+          this._gameMapService.START_POSITION,
+          this._gameMapService.END_POSITION,
+        ].forEach((i) => {
+          this.path.lineTo(
+            this._gameMapService.CELL_SIZE * i[1] +
+              this._gameMapService.CELL_SIZE / 2,
+            i[0] * this._gameMapService.CELL_SIZE +
+              this._gameMapService.GAME_BOARD_PADDING_TOP
+          );
+        });
 
         this.duration =
           (Math.sqrt(this.path.getLength() * this.path.getLength()) /
@@ -274,7 +282,11 @@ window.setupMonster = (gameStateService, gameMapService) => {
       this.anims.play("dead");
       this.setAlpha(0.5);
       this.setDisplaySize(30, 40);
-      // this.destroy();
+
+      // delay destroy for dead animation
+      setTimeout(() => {
+        this.destroy();
+      }, 2000);
     }
 
     setPosWithHealth(posX, posY) {

@@ -2,18 +2,13 @@ window.setupGame = (appPrefix) => {
   window._gameStateService = new GameStateService();
   window._gameMapService = new HoTuThanMap();
 
-  window.setupBullet(_gameStateService);
-  window.setupTower(_gameStateService);
+  window.setupBullet(_gameStateService, _gameMapService);
+  window.setupTower(_gameStateService, _gameMapService);
   window.setupSquare(_gameStateService, _gameMapService);
   window.setupMonster(_gameStateService, _gameMapService);
 
   window.graphics = undefined;
   window.tempTower = null;
-
-  window.sampleTower1 = null;
-  window.sampleTower2 = null;
-  window.sampleTower3 = null;
-  window.sampleTower4 = null;
 
   window.nextWave = undefined;
   window.waveDelay = 15000;
@@ -24,11 +19,8 @@ window.setupGame = (appPrefix) => {
   window.sellText = null;
   window.detailText = null;
 
-  window.GAME_BOARD_PADDING_TOP = 80;
-  window.OFFSET_RIGHT_X = 150;
-  window.OFFSET_DOWN_Y = 60;
-  window.GAME_WIDTH = 520;
-  window.GAME_HEIGHT = 520;
+  window.GAME_WIDTH = 520 + 150;
+  window.GAME_HEIGHT = 60 + 520;
 
   window.isBuying = false;
   window.isTowerClicked = false;
@@ -39,13 +31,13 @@ window.setupGame = (appPrefix) => {
   window.config = {
     type: Phaser.CANVAS,
     canvas: document.getElementById("myCustomCanvas"),
-    width: GAME_WIDTH + OFFSET_RIGHT_X,
-    height: GAME_HEIGHT + GAME_BOARD_PADDING_TOP + OFFSET_DOWN_Y,
+    width: GAME_WIDTH,
+    height: GAME_HEIGHT + _gameMapService.GAME_BOARD_PADDING_TOP,
     physics: {
       default: "arcade",
-      arcade: {
-        debug: true,
-      },
+      // arcade: {
+      //   debug: true,
+      // },
     },
     scene: {
       preload: preload,
@@ -203,56 +195,19 @@ function preload() {
 }
 
 function create() {
-  this.anims.create({
-    key: "dead",
-    frames: "onDead",
-    frameRate: 500,
-    repeat: 0,
-  });
-
-  this.anims.create({
-    key: "rotate",
-    frames: "sell",
-    frameRate: 10,
-    repeat: -1,
-  });
-
-  window._gameMapService.preload();
-
   savedData = {
     towers: [],
     monsters: [],
     bullets: [],
-    wave: 1,
+    wave: 0,
     life: 10,
-    gold: 1000,
+    gold: 650,
   };
 
-  window._gameStateService.preload(savedData);
-
-  // tháp mẫu
-  // this.add.text(560, 200, 'Tháp', { fontSize: '20px', fill: '#aaa' });
-  // this.add.text(560, 420, 'Skill', { fontSize: '20px', fill: '#aaa' });
-
-  sampleTower1 = new Tower(
-    this,
-    640,
-    350,
-    window.getTowerSnowFlakeData().towerType,
-    1,
-    true,
-    true
-  );
-  // sampleTower2 = new Tower(this, 640, 340, 'power0')
-
-  // this.add.image(580, 300, `0.png`).setDisplaySize(40, 40)
-  // this.add.image(580, 350, "arrow").setDisplaySize(40, 40);
-  // this.add.image(640, 250, "frozen").setDisplaySize(40, 40);
-  // this.add.image(640, 300, "frozen").setDisplaySize(40, 40);
-  // this.add.image(640, 350, "frozen").setDisplaySize(40, 40);
+  window._gameStateService.init(savedData);
+  window._gameMapService.init();
 
   //Wave
-  monsterRespawn.call(this, 15);
   monsterRespawnEvent = this.time.addEvent({
     delay: waveDelay,
     callback: () => monsterRespawn.call(this, 15),
@@ -263,7 +218,14 @@ function create() {
   nextWave = this.add.text(
     10,
     20,
-    `Đợt kế: ${monsterRespawnEvent.getProgress().toString()}`,
+    `Đợt kế: : ${
+      (waveDelay -
+        waveDelay *
+          parseFloat(
+            monsterRespawnEvent.getProgress().toString().substr(0, 4)
+          )) /
+      1000
+    }`,
     {
       fontSize: "15px",
       fill: "#fff",
@@ -315,7 +277,10 @@ function monsterReachEndpoint(tween, targets, monster) {
     i--;
   }
 
-  _gameStateService.savedData.monsters.splice(_gameStateService.savedData.monsters.indexOf(monster), 1);
+  _gameStateService.savedData.monsters.splice(
+    _gameStateService.savedData.monsters.indexOf(monster),
+    1
+  );
   monster.destroy();
 }
 
@@ -342,7 +307,10 @@ function dealDamage(bullet, monster) {
   // console.log("touch monster")
   monster.health -= bullet.damage;
 
-  _gameStateService.savedData.bullets.splice(_gameStateService.savedData.bullets.indexOf(bullet), 1);
+  _gameStateService.savedData.bullets.splice(
+    _gameStateService.savedData.bullets.indexOf(bullet),
+    1
+  );
   bullet.destroy();
 
   if (monster.health <= 0) {
@@ -380,13 +348,14 @@ function update(time, delta) {
   }
 
   nextWave.setText(
-    "Đợt kế: " +
+    `Đợt kế: : ${
       (waveDelay -
         waveDelay *
           parseFloat(
             monsterRespawnEvent.getProgress().toString().substr(0, 4)
           )) /
-        1000
+      1000
+    }`
   );
 
   //landing monster move

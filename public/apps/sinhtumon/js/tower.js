@@ -16,6 +16,7 @@ window.setupTower = (gameStateService, gameMapService) => {
       scene.physics.add.existing(this);
       this.Phaserscene = scene;
       this._gameStateService = gameStateService;
+      this._gameMapService = gameMapService;
 
       this.towerType = towerType;
       this.level = level;
@@ -36,13 +37,14 @@ window.setupTower = (gameStateService, gameMapService) => {
       );
 
       this.col = parseInt(
-        (x - _gameMapService.CELL_SIZE / 2) / _gameMapService.CELL_SIZE
+        (x - this._gameMapService.CELL_SIZE / 2) /
+          this._gameMapService.CELL_SIZE
       );
       this.row = parseInt(
         (y -
-          _gameMapService.GAME_BOARD_PADDING_TOP -
-          _gameMapService.CELL_HEIGHT / 2) /
-          _gameMapService.CELL_HEIGHT
+          this._gameMapService.GAME_BOARD_PADDING_TOP -
+          this._gameMapService.CELL_HEIGHT / 2) /
+          this._gameMapService.CELL_HEIGHT
       );
 
       this.range =
@@ -146,7 +148,7 @@ window.setupTower = (gameStateService, gameMapService) => {
       }
       detailText = this.Phaserscene.add.text(
         150,
-        630,
+        600,
         `Level: ${this.level}\nRange: ${window.getTowerAttackRange(
           this.getName(),
           this.level
@@ -174,8 +176,8 @@ window.setupTower = (gameStateService, gameMapService) => {
         rangeImage.destroy();
       }
       rangeImage = this.Phaserscene.physics.add.image(
-        this.col,
-        this.row,
+        this.x,
+        this.y,
         "tower_range"
       );
       rangeImage.setDisplaySize(
@@ -247,7 +249,7 @@ window.setupTower = (gameStateService, gameMapService) => {
         }
         detailText = this.Phaserscene.add.text(
           150,
-          640,
+          600,
           `Nâng cấp: ${this.getUpgradeCost()}$`,
           {
             fontStyle: "bold",
@@ -316,7 +318,7 @@ window.setupTower = (gameStateService, gameMapService) => {
         }
         detailText = this.Phaserscene.add.text(
           150,
-          640,
+          600,
           `Bán giá: ${window.getTowerSellPrice(this.getName(), this.level)}$`,
           {
             fontStyle: "bold",
