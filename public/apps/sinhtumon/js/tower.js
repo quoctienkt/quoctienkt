@@ -34,7 +34,7 @@ window.setupTower = (gameStateService) => {
         this.isSampleTower ? 1 : this.level + 1
       );
       this.posX = (this.x - _gameMapService.CELL_SIZE / 2) / _gameMapService.CELL_SIZE;
-      this.posY = (this.y - OFFSET_Y) / _gameMapService.CELL_SIZE;
+      this.posY = (this.y - GAME_BOARD_PADDING_TOP) / _gameMapService.CELL_SIZE;
       this.range =
         window.getTowerAttackRange(this.getName(), this.level) + _gameMapService.CELL_SIZE;
 

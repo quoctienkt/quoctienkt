@@ -9,7 +9,7 @@ window.setupSquare = (gameStateService, gameMapService) => {
       super(
         scene,
         x * gameMapService.CELL_SIZE + gameMapService.CELL_SIZE / 2,
-        y * gameMapService.CELL_SIZE + window.OFFSET_Y,
+        y * gameMapService.CELL_SIZE + window.GAME_BOARD_PADDING_TOP,
         "square"
       );
       scene.add.existing(this);

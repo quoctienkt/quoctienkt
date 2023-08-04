@@ -52,18 +52,19 @@ class HoTuThanMap {
       fontFamily: "roboto",
     });
 
-    // let background = this.add.image(0, OFFSET_Y - CELL_SIZE / 2, "background").setOrigin(0)
+    // let background = this.add.image(0, GAME_BOARD_PADDING_TOP - CELL_SIZE / 2, "background").setOrigin(0)
     let background = this.scene.add.image(-2, 0, "background1").setOrigin(0);
     background.setDepth(-3);
     background.setDisplaySize(
       window.GAME_WIDTH + window.OFFSET_RIGHT_X,
-      5 + window.GAME_HEIGHT + window.OFFSET_Y + window.OFFSET_DOWN_Y
+      5 + window.GAME_HEIGHT + window.GAME_BOARD_PADDING_TOP + window.OFFSET_DOWN_Y
     );
 
     for (let i = 0; i < window.GAME_HEIGHT / this.CELL_SIZE; i++) {
       for (let j = 0; j < window.GAME_WIDTH / this.CELL_SIZE; j++) {
         if (!this.map[i][j]) {
           let square = new Square(this.scene, j, i);
+          break;
         }
       }
     }
@@ -103,7 +104,7 @@ class HoTuThanMap {
       ) {
         let monsterPosition = [
           parseInt(
-            (this._gameStateService.savedData.monsters[i].y - OFFSET_Y) /
+            (this._gameStateService.savedData.monsters[i].y - GAME_BOARD_PADDING_TOP) /
               this.CELL_SIZE
           ),
           parseInt(
@@ -130,14 +131,14 @@ class HoTuThanMap {
             this._gameStateService.savedData.monsters[i].x &&
             this._gameStateService.savedData.monsters[i].x <
               newMonsterPath[1][1] * this.CELL_SIZE + this.CELL_SIZE / 2) ||
-          (newMonsterPath[0][0] * this.CELL_SIZE + OFFSET_Y >
+          (newMonsterPath[0][0] * this.CELL_SIZE + GAME_BOARD_PADDING_TOP >
             this._gameStateService.savedData.monsters[i].y &&
             this._gameStateService.savedData.monsters[i].y >
-              newMonsterPath[1][0] * this.CELL_SIZE + OFFSET_Y) ||
-          (newMonsterPath[0][0] * this.CELL_SIZE + OFFSET_Y <
+              newMonsterPath[1][0] * this.CELL_SIZE + GAME_BOARD_PADDING_TOP) ||
+          (newMonsterPath[0][0] * this.CELL_SIZE + GAME_BOARD_PADDING_TOP <
             this._gameStateService.savedData.monsters[i].y &&
             this._gameStateService.savedData.monsters[i].y <
-              newMonsterPath[1][0] * this.CELL_SIZE + OFFSET_Y)
+              newMonsterPath[1][0] * this.CELL_SIZE + GAME_BOARD_PADDING_TOP)
         ) {
           newMonsterPath.splice(0, 1);
         }

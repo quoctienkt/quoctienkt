@@ -8,7 +8,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
       super(
         scene,
         x * gameMapService.CELL_SIZE + gameMapService.CELL_SIZE / 2,
-        y * gameMapService.CELL_SIZE + OFFSET_Y,
+        y * gameMapService.CELL_SIZE + GAME_BOARD_PADDING_TOP,
         monsterType
       );
       scene.add.existing(this);
@@ -197,7 +197,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
         newMonsterPath.forEach((i) => {
           this.path.lineTo(
             this._gameMapService.CELL_SIZE * i[1] + this._gameMapService.CELL_SIZE / 2,
-            i[0] * this._gameMapService.CELL_SIZE + OFFSET_Y
+            i[0] * this._gameMapService.CELL_SIZE + GAME_BOARD_PADDING_TOP
           );
         });
 
@@ -231,7 +231,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
           (i) => {
             this.path.lineTo(
               this._gameMapService.CELL_SIZE * i[1] + this._gameMapService.CELL_SIZE / 2,
-              i[0] * this._gameMapService.CELL_SIZE + OFFSET_Y
+              i[0] * this._gameMapService.CELL_SIZE + GAME_BOARD_PADDING_TOP
             );
           }
         );

@@ -24,7 +24,7 @@ window.setupGame = (appPrefix) => {
   window.sellText = null;
   window.detailText = null;
 
-  window.OFFSET_Y = 110;
+  window.GAME_BOARD_PADDING_TOP = 110;
   window.OFFSET_RIGHT_X = 150;
   window.OFFSET_DOWN_Y = 60;
   window.GAME_WIDTH = 520;
@@ -40,7 +40,7 @@ window.setupGame = (appPrefix) => {
     type: Phaser.CANVAS,
     canvas: document.getElementById("myCustomCanvas"),
     width: GAME_WIDTH + OFFSET_RIGHT_X,
-    height: GAME_HEIGHT + OFFSET_Y + OFFSET_DOWN_Y,
+    height: GAME_HEIGHT + GAME_BOARD_PADDING_TOP + OFFSET_DOWN_Y,
     physics: {
       default: "arcade",
       arcade: {
