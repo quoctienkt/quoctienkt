@@ -10,11 +10,6 @@ window.setupGame = (appPrefix) => {
   window.graphics = undefined;
   window.tempTower = null;
 
-  window.sampleTower1 = null;
-  window.sampleTower2 = null;
-  window.sampleTower3 = null;
-  window.sampleTower4 = null;
-
   window.nextWave = undefined;
   window.waveDelay = 15000;
   window.sellImage = null;
@@ -200,22 +195,6 @@ function preload() {
 }
 
 function create() {
-  this.anims.create({
-    key: "dead",
-    frames: "onDead",
-    frameRate: 500,
-    repeat: 0,
-  });
-
-  this.anims.create({
-    key: "rotate",
-    frames: "sell",
-    frameRate: 10,
-    repeat: -1,
-  });
-
-  window._gameMapService.preload();
-
   savedData = {
     towers: [],
     monsters: [],
@@ -225,28 +204,8 @@ function create() {
     gold: 1000,
   };
 
-  window._gameStateService.preload(savedData);
-
-  // tháp mẫu
-  // this.add.text(560, 200, 'Tháp', { fontSize: '20px', fill: '#aaa' });
-  // this.add.text(560, 420, 'Skill', { fontSize: '20px', fill: '#aaa' });
-
-  sampleTower1 = new Tower(
-    this,
-    640,
-    340,
-    window.getTowerSnowFlakeData().towerType,
-    1,
-    true,
-    true
-  );
-  // sampleTower2 = new Tower(this, 640, 340, 'power0')
-
-  // this.add.image(580, 300, `0.png`).setDisplaySize(40, 40)
-  // this.add.image(580, 350, "arrow").setDisplaySize(40, 40);
-  // this.add.image(640, 250, "frozen").setDisplaySize(40, 40);
-  // this.add.image(640, 300, "frozen").setDisplaySize(40, 40);
-  // this.add.image(640, 350, "frozen").setDisplaySize(40, 40);
+  window._gameMapService.init();
+  window._gameStateService.init(savedData);
 
   //Wave
   monsterRespawn.call(this, 15);

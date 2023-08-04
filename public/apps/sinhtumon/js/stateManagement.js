@@ -1,3 +1,6 @@
+/** This service contains state that need to be sent to server,
+ * or to save game and load saved slot in local only
+ */
 class GameStateService {
   _scene = null;
   savedData = null;
@@ -36,7 +39,7 @@ class GameStateService {
     this.lifeText.setText(`Máu: ${this.savedData.life}`);
   }
 
-  preload(gameData) {
+  init(gameData) {
     this.savedData = gameData;
 
     this.waveText = this._scene.add.text(290, 29, `${this.savedData.wave}`, {

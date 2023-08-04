@@ -41,8 +41,23 @@ class HoTuThanMap {
     this.groundMonsterMovingPathDefault = this.getGroundMonsterMovingPath();
   }
 
-  preload() {
+  init() {
     this._gameStateService = window._gameStateService;
+
+    this.scene.anims.create({
+      key: "dead",
+      frames: "onDead",
+      frameRate: 500,
+      repeat: 0,
+    });
+
+    this.scene.anims.create({
+      key: "rotate",
+      frames: "sell",
+      frameRate: 10,
+      repeat: -1,
+    });
+
     this.scene.add.text(5, 60, "Cửa vào", {
       fontSize: "15px",
       fill: "#ffffff",
@@ -68,6 +83,16 @@ class HoTuThanMap {
         }
       }
     }
+
+    let sampleTower1 = new Tower(
+      this.scene,
+      640,
+      340,
+      window.getTowerSnowFlakeData().towerType,
+      1,
+      true,
+      true
+    );
   }
 
   getGroundMonsterMovingPath(
@@ -104,7 +129,8 @@ class HoTuThanMap {
       ) {
         let monsterPosition = [
           parseInt(
-            (this._gameStateService.savedData.monsters[i].y - this.GAME_BOARD_PADDING_TOP) /
+            (this._gameStateService.savedData.monsters[i].y -
+              this.GAME_BOARD_PADDING_TOP) /
               this.CELL_SIZE
           ),
           parseInt(
@@ -134,11 +160,13 @@ class HoTuThanMap {
           (newMonsterPath[0][0] * this.CELL_SIZE + this.GAME_BOARD_PADDING_TOP >
             this._gameStateService.savedData.monsters[i].y &&
             this._gameStateService.savedData.monsters[i].y >
-              newMonsterPath[1][0] * this.CELL_SIZE + this.GAME_BOARD_PADDING_TOP) ||
+              newMonsterPath[1][0] * this.CELL_SIZE +
+                this.GAME_BOARD_PADDING_TOP) ||
           (newMonsterPath[0][0] * this.CELL_SIZE + this.GAME_BOARD_PADDING_TOP <
             this._gameStateService.savedData.monsters[i].y &&
             this._gameStateService.savedData.monsters[i].y <
-              newMonsterPath[1][0] * this.CELL_SIZE + this.GAME_BOARD_PADDING_TOP)
+              newMonsterPath[1][0] * this.CELL_SIZE +
+                this.GAME_BOARD_PADDING_TOP)
         ) {
           newMonsterPath.splice(0, 1);
         }
