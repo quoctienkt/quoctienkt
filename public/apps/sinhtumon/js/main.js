@@ -24,7 +24,7 @@ window.setupGame = (appPrefix) => {
   window.sellText = null;
   window.detailText = null;
 
-  window.GAME_BOARD_PADDING_TOP = 110;
+  window.GAME_BOARD_PADDING_TOP = 80;
   window.OFFSET_RIGHT_X = 150;
   window.OFFSET_DOWN_Y = 60;
   window.GAME_WIDTH = 520;

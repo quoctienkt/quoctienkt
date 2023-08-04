@@ -1,7 +1,9 @@
 class HoTuThanMap {
   mapKey = "MAP_HOTUTHAN";
 
-  CELL_SIZE = 40;
+  GAME_BOARD_PADDING_TOP = 80;
+  CELL_SIZE = 40.0;
+  CELL_HEIGHT = 39.0;
   START_POSITION = [0, 0];
   END_POSITION = [13, 12];
   CELL_AVAILABLE = 0;
@@ -60,11 +62,10 @@ class HoTuThanMap {
       5 + window.GAME_HEIGHT + window.GAME_BOARD_PADDING_TOP + window.OFFSET_DOWN_Y
     );
 
-    for (let i = 0; i < window.GAME_HEIGHT / this.CELL_SIZE; i++) {
-      for (let j = 0; j < window.GAME_WIDTH / this.CELL_SIZE; j++) {
-        if (!this.map[i][j]) {
-          let square = new Square(this.scene, j, i);
-          break;
+    for (let row = 0; row < this.map.length; row++) {
+      for (let col = 0; col < this.map[row].length; col++) {
+        if (!this.map[row][col]) {
+          let square = new Square(this.scene, col, row);
         }
       }
     }

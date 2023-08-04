@@ -5,13 +5,17 @@ window.setupSquare = (gameStateService, gameMapService) => {
 
     _gameStateService;
     _gameMapService;
-    constructor(scene, x, y, isInit = true) {
+    constructor(scene, x, y) {
+      // NOTE: position x,y is the central point of square, need to transition to left and bottom
       super(
         scene,
         x * gameMapService.CELL_SIZE + gameMapService.CELL_SIZE / 2,
-        y * gameMapService.CELL_SIZE + window.GAME_BOARD_PADDING_TOP,
+        y * gameMapService.CELL_HEIGHT +
+          gameMapService.CELL_HEIGHT / 2 +
+          window.GAME_BOARD_PADDING_TOP,
         "square"
       );
+
       scene.add.existing(this);
       scene.physics.add.existing(this);
       this.Phaserscene = scene;
@@ -21,15 +25,13 @@ window.setupSquare = (gameStateService, gameMapService) => {
       this.posX = x;
       this.posY = y;
       this.setAlpha(0.1);
+      this.setDisplaySize(gameMapService.CELL_SIZE, gameMapService.CELL_HEIGHT);
       // this.setDepth(2)
-      if (isInit) {
-        this.init();
-      }
+      this.init();
     }
 
     init() {
       //decide buy
-      this.setDisplaySize(50, 50);
       this.setInteractive();
 
       this.on("pointerdown", (pointer) => {
@@ -42,7 +44,7 @@ window.setupSquare = (gameStateService, gameMapService) => {
           let success = this._gameMapService.tryUpdateMap(
             this.posX,
             this.posY,
-            this._gameStateService.BLOCKED
+            this._gameMapService.CELL_BLOCKED
           );
           if (!success) {
             return;

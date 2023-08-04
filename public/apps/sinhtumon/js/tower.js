@@ -1,6 +1,7 @@
-window.setupTower = (gameStateService) => {
+window.setupTower = (gameStateService, gameMapService) => {
   window.Tower = class extends Phaser.Physics.Arcade.Sprite {
     _gameStateService = null;
+    _gameMapService = null;
     constructor(
       scene,
       x,
@@ -33,10 +34,20 @@ window.setupTower = (gameStateService) => {
         this.getName(),
         this.isSampleTower ? 1 : this.level + 1
       );
-      this.posX = (this.x - _gameMapService.CELL_SIZE / 2) / _gameMapService.CELL_SIZE;
-      this.posY = (this.y - GAME_BOARD_PADDING_TOP) / _gameMapService.CELL_SIZE;
+
+      this.col = parseInt(
+        (x - _gameMapService.CELL_SIZE / 2) / _gameMapService.CELL_SIZE
+      );
+      this.row = parseInt(
+        (y -
+          _gameMapService.GAME_BOARD_PADDING_TOP -
+          _gameMapService.CELL_HEIGHT / 2) /
+          _gameMapService.CELL_HEIGHT
+      );
+
       this.range =
-        window.getTowerAttackRange(this.getName(), this.level) + _gameMapService.CELL_SIZE;
+        window.getTowerAttackRange(this.getName(), this.level) +
+        _gameMapService.CELL_SIZE;
 
       if (bindEvents) {
         this.bindEvents();
@@ -163,8 +174,8 @@ window.setupTower = (gameStateService) => {
         rangeImage.destroy();
       }
       rangeImage = this.Phaserscene.physics.add.image(
-        this.x,
-        this.y,
+        this.col,
+        this.row,
         "tower_range"
       );
       rangeImage.setDisplaySize(
@@ -205,7 +216,10 @@ window.setupTower = (gameStateService) => {
 
         this._gameStateService.setGold((prev) => prev - this.getUpgradeCost());
 
-        this._gameStateService.savedData.towers.splice(this._gameStateService.savedData.towers.indexOf(this), 1);
+        this._gameStateService.savedData.towers.splice(
+          this._gameStateService.savedData.towers.indexOf(this),
+          1
+        );
 
         let tower = new Tower(
           this.Phaserscene,
@@ -276,13 +290,16 @@ window.setupTower = (gameStateService) => {
         this._gameStateService.setGold(
           (prev) => prev + window.getTowerSellPrice(this.getName(), this.level)
         );
-        this._gameStateService.savedData.towers.splice(this._gameStateService.savedData.towers.indexOf(this), 1);
+        this._gameStateService.savedData.towers.splice(
+          this._gameStateService.savedData.towers.indexOf(this),
+          1
+        );
 
-        let square = new Square(this.Phaserscene, this.posX, this.posY);
+        let square = new Square(this.Phaserscene, this.col, this.row);
         _gameMapService.tryUpdateMap(
-          this.posX,
-          this.posY,
-          _gameMapService.AVAILABLE
+          this.col,
+          this.row,
+          _gameMapService.CELL_AVAILABLE
         );
 
         isTowerClicked = false;
