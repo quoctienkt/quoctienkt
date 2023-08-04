@@ -41,6 +41,9 @@ export default function Page({ basePath }: ViewProps) {
   const stateManagementScriptStatus: UseScriptStatus = useScript(
     getAssetPathWithBasePath(basePath, appPrefix, "/js/stateManagement.js")
   );
+  const HoTuThanScriptStatus: UseScriptStatus = useScript(
+    getAssetPathWithBasePath(basePath, appPrefix, "/js/maps/HoTuThan.js")
+  );
   const mainScriptStatus: UseScriptStatus = useScript(
     getAssetPathWithBasePath(basePath, appPrefix, "/js/main.js")
   );
@@ -55,6 +58,7 @@ export default function Page({ basePath }: ViewProps) {
       bulletScriptStatus === "ready" &&
       coreScriptStatus === "ready" &&
       stateManagementScriptStatus === "ready" &&
+      HoTuThanScriptStatus === "ready" &&
       mainScriptStatus === "ready";
 
     if (allScriptsReady) {
@@ -69,6 +73,7 @@ export default function Page({ basePath }: ViewProps) {
     bulletScriptStatus,
     coreScriptStatus,
     stateManagementScriptStatus,
+    HoTuThanScriptStatus,
     mainScriptStatus,
   ]);
 

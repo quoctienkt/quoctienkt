@@ -1,13 +1,14 @@
-window.setupMonster = (gameStateService) => {
+window.setupMonster = (gameStateService, gameMapService) => {
   window.Monster = class extends Phaser.Physics.Arcade.Sprite {
     //Type : range, melee, sample
     //name: power arrow frozen thunder
-    __gameStateService;
+    _gameStateService;
+    _gameMapService;
     constructor(scene, x, y, monsterType) {
       super(
         scene,
-        x * CELL_SIZE + CELL_SIZE / 2,
-        y * CELL_SIZE + OFFSET_Y,
+        x * gameMapService.CELL_SIZE + gameMapService.CELL_SIZE / 2,
+        y * gameMapService.CELL_SIZE + GAME_BOARD_PADDING_TOP,
         monsterType
       );
       scene.add.existing(this);
@@ -15,6 +16,8 @@ window.setupMonster = (gameStateService) => {
 
       this.Phaserscene = scene;
       this._gameStateService = gameStateService;
+      this._gameMapService = gameMapService;
+
       this.setDepth(2);
 
       this.monsterType = monsterType;
@@ -113,8 +116,8 @@ window.setupMonster = (gameStateService) => {
         );
 
         this.setCircle(10, 3, 15);
-        this.maxHealth = 30 + savedData.wave * 100;
-        this.health = 30 + savedData.wave * 100;
+        this.maxHealth = 30 + this._gameStateService.savedData.wave * 100;
+        this.health = 30 + this._gameStateService.savedData.wave * 100;
         this.speed = 75;
       } else if (this.getName() == window.getConstants().MONSTER_BUTTERFLY) {
         this.Phaserscene.anims.create({
@@ -141,17 +144,17 @@ window.setupMonster = (gameStateService) => {
           )
         );
         this.setCircle(15, 30, 28);
-        this.maxHealth = 30 + savedData.wave * 100;
-        this.health = 30 + savedData.wave * 100;
+        this.maxHealth = 30 + this._gameStateService.savedData.wave * 100;
+        this.health = 30 + this._gameStateService.savedData.wave * 100;
         this.speed = 75;
       }
 
       if (this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_FLY) {
-        this.createPath(null);
+        this.updateMonsterPath(null);
       } else if (
         this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_GROUND
       ) {
-        this.createPath(mazePuzzle);
+        this.updateMonsterPath(this._gameMapService.groundMonsterMovingPathDefault);
       }
     }
 
@@ -182,8 +185,7 @@ window.setupMonster = (gameStateService) => {
       });
     }
 
-    createPath(solved) {
-      //solved is mazePuzzle
+    updateMonsterPath(newMonsterPath) {
       if (
         this.getMoveType() == window.getConstants().MONSTER_MOVE_TYPE_GROUND
       ) {
@@ -192,10 +194,10 @@ window.setupMonster = (gameStateService) => {
         }
 
         this.path = new Phaser.Curves.Path(this.x, this.y);
-        solved.forEach((i) => {
+        newMonsterPath.forEach((i) => {
           this.path.lineTo(
-            CELL_SIZE * i[1] + CELL_SIZE / 2,
-            i[0] * CELL_SIZE + OFFSET_Y
+            this._gameMapService.CELL_SIZE * i[1] + this._gameMapService.CELL_SIZE / 2,
+            i[0] * this._gameMapService.CELL_SIZE + GAME_BOARD_PADDING_TOP
           );
         });
 
@@ -225,12 +227,14 @@ window.setupMonster = (gameStateService) => {
 
         this.path = new Phaser.Curves.Path(this.x, this.y);
 
-        [START_POS, END_POS].forEach((i) => {
-          this.path.lineTo(
-            CELL_SIZE * i[1] + CELL_SIZE / 2,
-            i[0] * CELL_SIZE + OFFSET_Y
-          );
-        });
+        [this._gameMapService.START_POSITION, this._gameMapService.END_POSITION].forEach(
+          (i) => {
+            this.path.lineTo(
+              this._gameMapService.CELL_SIZE * i[1] + this._gameMapService.CELL_SIZE / 2,
+              i[0] * this._gameMapService.CELL_SIZE + GAME_BOARD_PADDING_TOP
+            );
+          }
+        );
 
         this.duration =
           (Math.sqrt(this.path.getLength() * this.path.getLength()) /
@@ -254,18 +258,18 @@ window.setupMonster = (gameStateService) => {
     dead() {
       this._gameStateService.setGold((prev) => prev + this.getGoldOnDead());
       this.tween.stop();
-      let index = savedData.monsters.indexOf(this);
+      let index = this._gameStateService.savedData.monsters.indexOf(this);
 
-      let i = savedData.bullets.length - 1;
+      let i = this._gameStateService.savedData.bullets.length - 1;
       while (i >= 0) {
-        if (savedData.bullets[i].target === this) {
-          savedData.bullets[i].destroy();
-          savedData.bullets.splice(i, 1);
+        if (this._gameStateService.savedData.bullets[i].target === this) {
+          this._gameStateService.savedData.bullets[i].destroy();
+          this._gameStateService.savedData.bullets.splice(i, 1);
         }
         i--;
       }
 
-      savedData.monsters.splice(index, 1);
+      this._gameStateService.savedData.monsters.splice(index, 1);
 
       this.anims.play("dead");
       this.setAlpha(0.5);
@@ -326,17 +330,17 @@ window.setupMonster = (gameStateService) => {
       // health draw
       graphics.lineStyle(2, 0xff00, 0.5);
       graphics.strokeRoundedRect(
-        this.x - CELL_SIZE / 2.5,
+        this.x - this._gameMapService.CELL_SIZE / 2.5,
         this.y + 22,
-        CELL_SIZE,
+        this._gameMapService.CELL_SIZE,
         3,
         0
       );
       graphics.fillStyle(0x00ff00, 1, 0.5);
       graphics.fillRect(
-        this.x - CELL_SIZE / 2.5,
+        this.x - this._gameMapService.CELL_SIZE / 2.5,
         this.y + 22,
-        (CELL_SIZE * this.health) / this.maxHealth,
+        (this._gameMapService.CELL_SIZE * this.health) / this.maxHealth,
         3
       );
       //end health draw

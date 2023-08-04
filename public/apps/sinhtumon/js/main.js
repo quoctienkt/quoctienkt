@@ -1,23 +1,13 @@
 window.setupGame = (appPrefix) => {
   window._gameStateService = new GameStateService();
+  window._gameMapService = new HoTuThanMap();
 
   window.setupBullet(_gameStateService);
   window.setupTower(_gameStateService);
-  window.setupSquare(_gameStateService);
-  window.setupMonster(_gameStateService);
+  window.setupSquare(_gameStateService, _gameMapService);
+  window.setupMonster(_gameStateService, _gameMapService);
 
-  window.savedData = {
-    towers: [],
-    monsters: [],
-    bullets: [],
-    wave: -1,
-    gold: -1,
-    life: -1,
-  };
-
-  window.mazePuzzle = null;
   window.graphics = undefined;
-
   window.tempTower = null;
 
   window.sampleTower1 = null;
@@ -34,31 +24,11 @@ window.setupGame = (appPrefix) => {
   window.sellText = null;
   window.detailText = null;
 
-  window.COLLISION = [
-    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
-  ];
-
-  window.START_POS = [0, 0];
-  window.END_POS = [13, 12];
-  window.OFFSET_Y = 110;
+  window.GAME_BOARD_PADDING_TOP = 80;
   window.OFFSET_RIGHT_X = 150;
   window.OFFSET_DOWN_Y = 60;
   window.GAME_WIDTH = 520;
   window.GAME_HEIGHT = 520;
-  window.CELL_SIZE = 40;
 
   window.isBuying = false;
   window.isTowerClicked = false;
@@ -70,7 +40,7 @@ window.setupGame = (appPrefix) => {
     type: Phaser.CANVAS,
     canvas: document.getElementById("myCustomCanvas"),
     width: GAME_WIDTH + OFFSET_RIGHT_X,
-    height: GAME_HEIGHT + OFFSET_Y + OFFSET_DOWN_Y,
+    height: GAME_HEIGHT + GAME_BOARD_PADDING_TOP + OFFSET_DOWN_Y,
     physics: {
       default: "arcade",
       arcade: {
@@ -88,7 +58,8 @@ window.setupGame = (appPrefix) => {
 };
 
 function preload() {
-  _gameStateService.setScene(this);
+  window._gameStateService.setScene(this);
+  window._gameMapService.setScene(this);
 
   const snowflakeTower = window.getTowerSnowFlakeData();
 
@@ -228,12 +199,7 @@ function preload() {
     )
   );
 
-  savedData.wave = 1;
-  savedData.life = 10;
-  savedData.gold = 1000;
-
   graphics = this.add.graphics();
-  mazePuzzle = findWay(COLLISION, START_POS, END_POS);
 }
 
 function create() {
@@ -251,33 +217,18 @@ function create() {
     repeat: -1,
   });
 
-  this.add.text(5, 60, "Cửa vào", {
-    fontSize: "15px",
-    fill: "#ffffff",
-    fontFamily: "roboto",
-  });
-  this.add.text(445, 635, "Cửa ra", {
-    fontSize: "20px",
-    fill: "#ffffff",
-    fontFamily: "roboto",
-  });
+  window._gameMapService.preload();
 
-  // let background = this.add.image(0, OFFSET_Y - CELL_SIZE / 2, "background").setOrigin(0)
-  let background = this.add.image(-2, 0, "background1").setOrigin(0);
-  background.setDepth(-3);
-  background.setDisplaySize(
-    GAME_WIDTH + OFFSET_RIGHT_X,
-    5 + GAME_HEIGHT + OFFSET_Y + OFFSET_DOWN_Y
-  );
-  for (let i = 0; i < GAME_HEIGHT / CELL_SIZE; i++) {
-    for (let j = 0; j < GAME_WIDTH / CELL_SIZE; j++) {
-      if (!COLLISION[i][j]) {
-        let square = new Square(this, j, i);
-      }
-    }
-  }
+  savedData = {
+    towers: [],
+    monsters: [],
+    bullets: [],
+    wave: 1,
+    life: 10,
+    gold: 1000,
+  };
 
-  window._gameStateService.preload(window.savedData);
+  window._gameStateService.preload(savedData);
 
   // tháp mẫu
   // this.add.text(560, 200, 'Tháp', { fontSize: '20px', fill: '#aaa' });
@@ -355,16 +306,16 @@ function create() {
 
 function monsterReachEndpoint(tween, targets, monster) {
   _gameStateService.setLife((prev) => prev - 1);
-  let i = savedData.bullets.length - 1;
+  let i = _gameStateService.savedData.bullets.length - 1;
   while (i >= 0) {
-    if (savedData.bullets[i].target === monster) {
-      savedData.bullets[i].destroy();
-      savedData.bullets.splice(i, 1);
+    if (_gameStateService.savedData.bullets[i].target === monster) {
+      _gameStateService.savedData.bullets[i].destroy();
+      _gameStateService.savedData.bullets.splice(i, 1);
     }
     i--;
   }
 
-  savedData.monsters.splice(savedData.monsters.indexOf(monster), 1);
+  _gameStateService.savedData.monsters.splice(_gameStateService.savedData.monsters.indexOf(monster), 1);
   monster.destroy();
 }
 
@@ -379,7 +330,7 @@ function monsterRespawn(number) {
       delay: i * 650,
       callback: () => {
         let monster = new Monster(this, 0, 0, name);
-        savedData.monsters.push(monster);
+        _gameStateService.savedData.monsters.push(monster);
       },
       callbackScope: this,
       loop: false,
@@ -391,7 +342,7 @@ function dealDamage(bullet, monster) {
   // console.log("touch monster")
   monster.health -= bullet.damage;
 
-  savedData.bullets.splice(savedData.bullets.indexOf(bullet), 1);
+  _gameStateService.savedData.bullets.splice(_gameStateService.savedData.bullets.indexOf(bullet), 1);
   bullet.destroy();
 
   if (monster.health <= 0) {
@@ -421,10 +372,10 @@ function update(time, delta) {
   graphics.clear();
 
   //end game
-  if (savedData.life < 1) {
+  if (_gameStateService.savedData.life < 1) {
     this.physics.pause();
     monsterRespawnEvent.destroy();
-    savedData.monsters.forEach((m) => m.destroy());
+    _gameStateService.savedData.monsters.forEach((m) => m.destroy());
     return;
   }
 
@@ -439,7 +390,7 @@ function update(time, delta) {
   );
 
   //landing monster move
-  savedData.monsters.forEach((monster) => {
+  _gameStateService.savedData.monsters.forEach((monster) => {
     graphics.lineStyle(2, 0xffffff, 1);
     graphics.lineStyle(1, 0xffffff, 1);
     // monster.path.draw(graphics)
@@ -448,10 +399,10 @@ function update(time, delta) {
   });
 
   //Cập nhật đường đạn
-  savedData.bullets.forEach((bullet) =>
+  _gameStateService.savedData.bullets.forEach((bullet) =>
     moveTo.call(this, bullet, bullet.target, bullet.speed)
   );
 
   //fire
-  savedData.towers.forEach((tower) => tower.shoot());
+  _gameStateService.savedData.towers.forEach((tower) => tower.shoot());
 }

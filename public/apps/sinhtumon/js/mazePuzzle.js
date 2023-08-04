@@ -42,5 +42,5 @@ function findWay(matrix, position, end) {
   }
 
   // Can't solve
-  return 0;
+  return null;
 }

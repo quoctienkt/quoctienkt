@@ -1,96 +1,54 @@
-window.setupSquare = (gameStateService) => {
+window.setupSquare = (gameStateService, gameMapService) => {
   window.Square = class extends Phaser.Physics.Arcade.Sprite {
     //Type : range, melee, sample
     //name: power arrow frozen thunder
 
     _gameStateService;
-    constructor(scene, x, y, isInit = true) {
-      super(scene, x * CELL_SIZE + 20, y * CELL_SIZE + OFFSET_Y, "square");
+    _gameMapService;
+    constructor(scene, x, y) {
+      // NOTE: position x,y is the central point of square, need to transition to left and bottom
+      super(
+        scene,
+        x * gameMapService.CELL_SIZE + gameMapService.CELL_SIZE / 2,
+        y * gameMapService.CELL_HEIGHT +
+          gameMapService.CELL_HEIGHT / 2 +
+          window.GAME_BOARD_PADDING_TOP,
+        "square"
+      );
+
       scene.add.existing(this);
       scene.physics.add.existing(this);
       this.Phaserscene = scene;
 
       this._gameStateService = gameStateService;
+      this._gameMapService = gameMapService;
       this.posX = x;
       this.posY = y;
       this.setAlpha(0.1);
+      this.setDisplaySize(gameMapService.CELL_SIZE, gameMapService.CELL_HEIGHT);
       // this.setDepth(2)
-      if (isInit) {
-        this.init();
-      }
+      this.init();
     }
 
     init() {
       //decide buy
-      this.setDisplaySize(50, 50);
       this.setInteractive();
 
       this.on("pointerdown", (pointer) => {
         this.setAlpha(0.1);
 
-        // console.log('clicked square');
-        if (isBuying && savedData.gold >= 70) {
+        console.log("clicked square");
+        // TODO: replace hardcoded 70 with tempTowerPrice
+        if (isBuying && this._gameStateService.savedData.gold >= 70) {
           //Check isOkPath
-
-          COLLISION[this.posY][this.posX] = 1;
-          let temp = findWay(COLLISION, START_POS, END_POS);
-          //not ok
-          if (!temp) {
-            COLLISION[this.posY][this.posX] = 0;
+          let success = this._gameMapService.tryUpdateMap(
+            this.posX,
+            this.posY,
+            this._gameMapService.CELL_BLOCKED
+          );
+          if (!success) {
             return;
           }
-
-          let tempPath = [];
-          for (let i = 0; i < savedData.monsters.length; i++) {
-            if (
-              savedData.monsters[i].getMoveType() ==
-              window.getConstants().MONSTER_MOVE_TYPE_GROUND
-            ) {
-              let pre = [
-                parseInt((savedData.monsters[i].y - OFFSET_Y) / CELL_SIZE),
-                parseInt(savedData.monsters[i].x / CELL_SIZE),
-              ];
-
-              let prePath = findWay(COLLISION, pre, END_POS);
-
-              if (!prePath) {
-                COLLISION[this.posY][this.posX] = 0;
-                return;
-              }
-
-              if (
-                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 >
-                  savedData.monsters[i].x &&
-                  savedData.monsters[i].x >
-                    prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
-                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 <
-                  savedData.monsters[i].x &&
-                  savedData.monsters[i].x <
-                    prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
-                (prePath[0][0] * CELL_SIZE + OFFSET_Y >
-                  savedData.monsters[i].y &&
-                  savedData.monsters[i].y >
-                    prePath[1][0] * CELL_SIZE + OFFSET_Y) ||
-                (prePath[0][0] * CELL_SIZE + OFFSET_Y <
-                  savedData.monsters[i].y &&
-                  savedData.monsters[i].y <
-                    prePath[1][0] * CELL_SIZE + OFFSET_Y)
-              ) {
-                prePath.splice(0, 1);
-              }
-
-              tempPath.push(prePath);
-            } else {
-              tempPath.push([]);
-            }
-          }
-
-          //ok
-          mazePuzzle = temp;
-          //Cập nhật lại đường đi quái vật landing
-          savedData.monsters.forEach((m, index) => {
-            m.createPath(tempPath[index]);
-          });
 
           let tower = new Tower(
             this.Phaserscene,
@@ -100,10 +58,12 @@ window.setupSquare = (gameStateService) => {
             1
           );
 
-          this._gameStateService.setGold((gold) => gold - tempTower.getUpgradeCost());
+          this._gameStateService.setGold(
+            (gold) => gold - tempTower.getUpgradeCost()
+          );
 
           this.destroy();
-          savedData.towers.push(tower);
+          this._gameStateService.savedData.towers.push(tower);
         }
       });
 
