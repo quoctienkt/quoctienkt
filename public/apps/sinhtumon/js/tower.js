@@ -33,10 +33,10 @@ window.setupTower = (gameStateService) => {
         this.getName(),
         this.isSampleTower ? 1 : this.level + 1
       );
-      this.posX = (this.x - CELL_SIZE / 2) / CELL_SIZE;
-      this.posY = (this.y - OFFSET_Y) / CELL_SIZE;
+      this.posX = (this.x - _gameMapService.CELL_SIZE / 2) / _gameMapService.CELL_SIZE;
+      this.posY = (this.y - OFFSET_Y) / _gameMapService.CELL_SIZE;
       this.range =
-        window.getTowerAttackRange(this.getName(), this.level) + CELL_SIZE;
+        window.getTowerAttackRange(this.getName(), this.level) + _gameMapService.CELL_SIZE;
 
       if (bindEvents) {
         this.bindEvents();
@@ -182,8 +182,8 @@ window.setupTower = (gameStateService) => {
       }
 
       upgradeImage = this.Phaserscene.physics.add.image(
-        this.x + CELL_SIZE / 2,
-        this.y - CELL_SIZE / 2,
+        this.x + _gameMapService.CELL_SIZE / 2,
+        this.y - _gameMapService.CELL_SIZE / 2,
         "upgrade"
       );
       if (this.level == 5) {
@@ -261,8 +261,8 @@ window.setupTower = (gameStateService) => {
 
     showSellAction() {
       sellImage = this.Phaserscene.physics.add.sprite(
-        this.x + CELL_SIZE / 2,
-        this.y + CELL_SIZE / 2,
+        this.x + _gameMapService.CELL_SIZE / 2,
+        this.y + _gameMapService.CELL_SIZE / 2,
         "sell"
       );
       sellImage.setDepth(3);

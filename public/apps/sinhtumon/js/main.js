@@ -4,7 +4,7 @@ window.setupGame = (appPrefix) => {
 
   window.setupBullet(_gameStateService);
   window.setupTower(_gameStateService);
-  window.setupSquare(_gameStateService);
+  window.setupSquare(_gameStateService, _gameMapService);
   window.setupMonster(_gameStateService);
 
   window.graphics = undefined;
