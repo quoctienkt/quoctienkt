@@ -28,69 +28,13 @@ window.setupSquare = (gameStateService) => {
       this.on("pointerdown", (pointer) => {
         this.setAlpha(0.1);
 
-        // console.log('clicked square');
+        console.log('clicked square');
         if (isBuying && savedData.gold >= 70) {
           //Check isOkPath
-
-          COLLISION[this.posY][this.posX] = 1;
-          let temp = findWay(COLLISION, START_POS, END_POS);
-          //not ok
-          if (!temp) {
-            COLLISION[this.posY][this.posX] = 0;
+          let success = _gameMapService.tryUpdateMap(this.posX, this.posY, this._gameStateService.BLOCKED)
+          if (!success) {
             return;
           }
-
-          let tempPath = [];
-          for (let i = 0; i < savedData.monsters.length; i++) {
-            if (
-              savedData.monsters[i].getMoveType() ==
-              window.getConstants().MONSTER_MOVE_TYPE_GROUND
-            ) {
-              let pre = [
-                parseInt((savedData.monsters[i].y - OFFSET_Y) / CELL_SIZE),
-                parseInt(savedData.monsters[i].x / CELL_SIZE),
-              ];
-
-              let prePath = findWay(COLLISION, pre, END_POS);
-
-              if (!prePath) {
-                COLLISION[this.posY][this.posX] = 0;
-                return;
-              }
-
-              if (
-                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 >
-                  savedData.monsters[i].x &&
-                  savedData.monsters[i].x >
-                    prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
-                (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 <
-                  savedData.monsters[i].x &&
-                  savedData.monsters[i].x <
-                    prePath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
-                (prePath[0][0] * CELL_SIZE + OFFSET_Y >
-                  savedData.monsters[i].y &&
-                  savedData.monsters[i].y >
-                    prePath[1][0] * CELL_SIZE + OFFSET_Y) ||
-                (prePath[0][0] * CELL_SIZE + OFFSET_Y <
-                  savedData.monsters[i].y &&
-                  savedData.monsters[i].y <
-                    prePath[1][0] * CELL_SIZE + OFFSET_Y)
-              ) {
-                prePath.splice(0, 1);
-              }
-
-              tempPath.push(prePath);
-            } else {
-              tempPath.push([]);
-            }
-          }
-
-          //ok
-          mazePuzzle = temp;
-          //Cập nhật lại đường đi quái vật landing
-          savedData.monsters.forEach((m, index) => {
-            m.createPath(tempPath[index]);
-          });
 
           let tower = new Tower(
             this.Phaserscene,

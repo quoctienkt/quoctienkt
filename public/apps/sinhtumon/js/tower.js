@@ -279,9 +279,11 @@ window.setupTower = (gameStateService) => {
         savedData.towers.splice(savedData.towers.indexOf(this), 1);
 
         let square = new Square(this.Phaserscene, this.posX, this.posY);
-
-        COLLISION[this.posY][this.posX] = 0;
-        mazePuzzle = findWay(COLLISION, START_POS, END_POS);
+        _gameMapService.tryUpdateMap(
+          this.posX,
+          this.postY,
+          _gameMapService.AVAILABLE
+        );
 
         savedData.monsters.forEach((m) => {
           if (
@@ -292,7 +294,7 @@ window.setupTower = (gameStateService) => {
               parseInt(m.x / CELL_SIZE),
             ];
 
-            let prePath = findWay(COLLISION, pre, END_POS);
+            let prePath = findWay(_gameMapService.map, pre, END_POS);
 
             if (
               (prePath[0][1] * CELL_SIZE + CELL_SIZE / 2 > m.x &&

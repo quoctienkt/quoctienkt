@@ -147,11 +147,11 @@ window.setupMonster = (gameStateService) => {
       }
 
       if (this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_FLY) {
-        this.createPath(null);
+        this.updateMonsterPath(null);
       } else if (
         this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_GROUND
       ) {
-        this.createPath(mazePuzzle);
+        this.updateMonsterPath(_gameMapService.groundMonsterMovingPathDefault);
       }
     }
 
@@ -182,8 +182,7 @@ window.setupMonster = (gameStateService) => {
       });
     }
 
-    createPath(solved) {
-      //solved is mazePuzzle
+    updateMonsterPath(newMonsterPath) {
       if (
         this.getMoveType() == window.getConstants().MONSTER_MOVE_TYPE_GROUND
       ) {
@@ -192,7 +191,7 @@ window.setupMonster = (gameStateService) => {
         }
 
         this.path = new Phaser.Curves.Path(this.x, this.y);
-        solved.forEach((i) => {
+        newMonsterPath.forEach((i) => {
           this.path.lineTo(
             CELL_SIZE * i[1] + CELL_SIZE / 2,
             i[0] * CELL_SIZE + OFFSET_Y
@@ -225,7 +224,7 @@ window.setupMonster = (gameStateService) => {
 
         this.path = new Phaser.Curves.Path(this.x, this.y);
 
-        [START_POS, END_POS].forEach((i) => {
+        [_gameMapService.START_POSITION, _gameMapService.END_POSITION].forEach((i) => {
           this.path.lineTo(
             CELL_SIZE * i[1] + CELL_SIZE / 2,
             i[0] * CELL_SIZE + OFFSET_Y

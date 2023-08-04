@@ -1,5 +1,6 @@
 window.setupGame = (appPrefix) => {
   window._gameStateService = new GameStateService();
+  window._gameMapService = new HoTuThanMap();
 
   window.setupBullet(_gameStateService);
   window.setupTower(_gameStateService);
@@ -15,9 +16,7 @@ window.setupGame = (appPrefix) => {
     life: -1,
   };
 
-  window.mazePuzzle = null;
   window.graphics = undefined;
-
   window.tempTower = null;
 
   window.sampleTower1 = null;
@@ -34,25 +33,6 @@ window.setupGame = (appPrefix) => {
   window.sellText = null;
   window.detailText = null;
 
-  window.COLLISION = [
-    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
-  ];
-
-  window.START_POS = [0, 0];
-  window.END_POS = [13, 12];
   window.OFFSET_Y = 110;
   window.OFFSET_RIGHT_X = 150;
   window.OFFSET_DOWN_Y = 60;
@@ -88,7 +68,8 @@ window.setupGame = (appPrefix) => {
 };
 
 function preload() {
-  _gameStateService.setScene(this);
+  window._gameStateService.setScene(this);
+  window._gameMapService.setScene(this);
 
   const snowflakeTower = window.getTowerSnowFlakeData();
 
@@ -233,7 +214,6 @@ function preload() {
   savedData.gold = 1000;
 
   graphics = this.add.graphics();
-  mazePuzzle = findWay(COLLISION, START_POS, END_POS);
 }
 
 function create() {
@@ -251,32 +231,7 @@ function create() {
     repeat: -1,
   });
 
-  this.add.text(5, 60, "Cửa vào", {
-    fontSize: "15px",
-    fill: "#ffffff",
-    fontFamily: "roboto",
-  });
-  this.add.text(445, 635, "Cửa ra", {
-    fontSize: "20px",
-    fill: "#ffffff",
-    fontFamily: "roboto",
-  });
-
-  // let background = this.add.image(0, OFFSET_Y - CELL_SIZE / 2, "background").setOrigin(0)
-  let background = this.add.image(-2, 0, "background1").setOrigin(0);
-  background.setDepth(-3);
-  background.setDisplaySize(
-    GAME_WIDTH + OFFSET_RIGHT_X,
-    5 + GAME_HEIGHT + OFFSET_Y + OFFSET_DOWN_Y
-  );
-  for (let i = 0; i < GAME_HEIGHT / CELL_SIZE; i++) {
-    for (let j = 0; j < GAME_WIDTH / CELL_SIZE; j++) {
-      if (!COLLISION[i][j]) {
-        let square = new Square(this, j, i);
-      }
-    }
-  }
-
+  window._gameMapService.preload();
   window._gameStateService.preload(window.savedData);
 
   // tháp mẫu
