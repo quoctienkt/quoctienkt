@@ -2,14 +2,14 @@
  * or to save game and load saved slot in local only
  */
 class GameStateService {
-  _scene = null;
+  scene = null;
   savedData = null;
   waveText = null;
   lifeText = null;
   goldText = null;
 
   setScene(scene) {
-    this._scene = scene;
+    this.scene = scene;
   }
 
   /**
@@ -42,13 +42,13 @@ class GameStateService {
   init(gameData) {
     this.savedData = gameData;
 
-    this.waveText = this._scene.add.text(290, 29, `${this.savedData.wave}`, {
+    this.waveText = this.scene.add.text(290, 29, `${this.savedData.wave}`, {
       fontSize: "15px",
       fill: "#fff",
       fontFamily: "roboto",
     });
 
-    this.lifeText = this._scene.add.text(
+    this.lifeText = this.scene.add.text(
       360,
       150,
       `Máu ${this.savedData.life}`,
@@ -59,7 +59,7 @@ class GameStateService {
       }
     );
 
-    this.goldText = this._scene.add.text(615, 230, `${this.savedData.gold}`, {
+    this.goldText = this.scene.add.text(615, 230, `${this.savedData.gold}`, {
       fontSize: "13px",
       fill: "#ffd64c",
       fontFamily: "roboto",

@@ -1,4 +1,6 @@
 window.setupGame = (appPrefix) => {
+  window.setupGameMapService();
+
   window._gameStateService = new GameStateService();
   window._gameMapService = new HoTuThanMap();
 
@@ -32,7 +34,7 @@ window.setupGame = (appPrefix) => {
     type: Phaser.CANVAS,
     canvas: document.getElementById("myCustomCanvas"),
     width: GAME_WIDTH,
-    height: GAME_HEIGHT + _gameMapService.GAME_BOARD_PADDING_TOP,
+    height: GAME_HEIGHT + _gameMapService.mapConfig.GAME_BOARD_PADDING_TOP,
     physics: {
       default: "arcade",
       // arcade: {
@@ -208,6 +210,7 @@ function create() {
   window._gameMapService.init();
 
   //Wave
+  monsterRespawn.call(this, 15);
   monsterRespawnEvent = this.time.addEvent({
     delay: waveDelay,
     callback: () => monsterRespawn.call(this, 15),
@@ -294,7 +297,7 @@ function monsterRespawn(number) {
     this.time.addEvent({
       delay: i * 650,
       callback: () => {
-        let monster = new Monster(this, 0, 0, name);
+        let monster = MonsterFactory.createMonster(this, name, 0, 0);
         _gameStateService.savedData.monsters.push(monster);
       },
       callbackScope: this,

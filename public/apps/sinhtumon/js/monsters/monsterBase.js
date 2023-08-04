@@ -1,14 +1,27 @@
 window.setupMonster = (gameStateService, gameMapService) => {
-  window.Monster = class extends Phaser.Physics.Arcade.Sprite {
+  window.MonsterFactory = class {
+    static createMonster(scene, monsterType, col, row) {
+      if (monsterType === window.getConstants().MONSTER_THIEF) {
+        return new MonsterThief(scene, monsterType, col, row);
+      } else if (monsterType === window.getConstants().MONSTER_BUTTERFLY) {
+        return new MonsterButterfly(scene, monsterType, col, row);
+      }
+    }
+  };
+
+  window.MonsterBase = class extends Phaser.Physics.Arcade.Sprite {
     //Type : range, melee, sample
     //name: power arrow frozen thunder
     _gameStateService;
     _gameMapService;
-    constructor(scene, x, y, monsterType) {
+
+    // TODO: need to change (col, row) to (posX, posY)
+    constructor(scene, monsterType, col, row) {
       super(
         scene,
-        x * gameMapService.CELL_SIZE + gameMapService.CELL_SIZE / 2,
-        y * gameMapService.CELL_HEIGHT + gameMapService.GAME_BOARD_PADDING_TOP,
+        col * gameMapService.mapConfig.CELL_SIZE + gameMapService.mapConfig.CELL_SIZE / 2,
+        row * gameMapService.mapConfig.CELL_HEIGHT +
+          gameMapService.mapConfig.GAME_BOARD_PADDING_TOP,
         monsterType
       );
       scene.add.existing(this);
@@ -18,16 +31,12 @@ window.setupMonster = (gameStateService, gameMapService) => {
       this._gameStateService = gameStateService;
       this._gameMapService = gameMapService;
 
-      this.setDepth(2);
-
       this.monsterType = monsterType;
 
-      this.getMoveType();
       this.speed;
       this.maxHealth;
       this.health;
       this.aimed = [];
-      this.init();
 
       this.lastPosX;
       this.lastPosY;
@@ -35,120 +44,36 @@ window.setupMonster = (gameStateService, gameMapService) => {
       this.follower;
       this.duration;
       this.path;
-
       this.direction;
-    }
 
-    init() {
-      this.direction = window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM;
+      this.setDepth(2);
       this.setInteractive();
       this.on("pointerdown", (pointer) => this.pointerdown());
+      this.initDirection();
+      this.prepareSpriteAsset();
+      this.initMovingPath();
+    }
 
-      if (this.getName() == window.getConstants().MONSTER_THIEF) {
-        // register animation for sprite
-        this.Phaserscene.anims.create({
-          key: window.getMonsterAnimationAssetName(
-            this.getName(),
-            window.getConstants().MONSTER_MOVE_DIRECTION_TO_RIGHT
-          ),
-          frames: this.Phaserscene.anims.generateFrameNumbers(
-            window.getConstants().MONSTER_THIEF,
-            {
-              start: 0,
-              end: 5,
-            }
-          ),
-          frameRate: 10,
-          repeat: -1,
-        });
+    /**
+     * @abstract
+     * @void
+     */
+    prepareSpriteAsset() {
+      throw "Abstract method cannot be implemented";
+    }
 
-        this.Phaserscene.anims.create({
-          key: window.getMonsterAnimationAssetName(
-            this.getName(),
-            window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM
-          ),
-          frames: this.Phaserscene.anims.generateFrameNumbers(
-            window.getConstants().MONSTER_THIEF,
-            {
-              start: 0,
-              end: 5,
-            }
-          ),
-          frameRate: 10,
-          repeat: -1,
-        });
-
-        this.Phaserscene.anims.create({
-          key: window.getMonsterAnimationAssetName(
-            this.getName(),
-            window.getConstants().MONSTER_MOVE_DIRECTION_TO_LEFT
-          ),
-          frames: this.Phaserscene.anims.generateFrameNumbers(
-            window.getConstants().MONSTER_THIEF,
-            {
-              start: 6,
-              end: 11,
-            }
-          ),
-          frameRate: 10,
-          repeat: -1,
-        });
-
-        this.Phaserscene.anims.create({
-          key: window.getMonsterAnimationAssetName(
-            this.getName(),
-            window.getConstants().MONSTER_MOVE_DIRECTION_TO_TOP
-          ),
-          frames: this.Phaserscene.anims.generateFrameNumbers(
-            window.getConstants().MONSTER_THIEF,
-            {
-              start: 6,
-              end: 11,
-            }
-          ),
-          frameRate: 10,
-          repeat: -1,
-        });
-
-        this.anims.play(
-          window.getMonsterAnimationAssetName(this.getName(), this.direction),
-          true
-        );
-
-        this.setCircle(10, 3, 15);
-        this.maxHealth = 30 + this._gameStateService.savedData.wave * 100;
-        this.health = 30 + this._gameStateService.savedData.wave * 100;
-        this.speed = 75;
-      } else if (this.getName() == window.getConstants().MONSTER_BUTTERFLY) {
-        this.Phaserscene.anims.create({
-          key: window.getMonsterAnimationAssetName(
-            window.getConstants().MONSTER_BUTTERFLY,
-            window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT
-          ),
-          frames: this.Phaserscene.anims.generateFrameNumbers(
-            window.getConstants().MONSTER_BUTTERFLY,
-            {
-              start: 0,
-              end: 19,
-            }
-          ),
-          frameRate: 20,
-          repeat: -1,
-        });
-
-        this.setDisplaySize(40, 40);
-        this.anims.play(
-          window.getMonsterAnimationAssetName(
-            window.getConstants().MONSTER_BUTTERFLY,
-            window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT
-          )
-        );
-        this.setCircle(15, 30, 28);
-        this.maxHealth = 30 + this._gameStateService.savedData.wave * 100;
-        this.health = 30 + this._gameStateService.savedData.wave * 100;
-        this.speed = 75;
+    initDirection() {
+      if (this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_FLY) {
+        this.direction =
+          window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT;
+      } else if (
+        this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_GROUND
+      ) {
+        this.direction = window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM;
       }
+    }
 
+    initMovingPath() {
       if (this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_FLY) {
         this.updateMonsterPath(null);
       } else if (
@@ -198,11 +123,11 @@ window.setupMonster = (gameStateService, gameMapService) => {
         this.path = new Phaser.Curves.Path(this.x, this.y);
         newMonsterPath.forEach((i) => {
           this.path.lineTo(
-            this._gameMapService.CELL_SIZE * i[1] +
-              this._gameMapService.CELL_SIZE / 2,
-            i[0] * this._gameMapService.CELL_HEIGHT +
-              this._gameMapService.CELL_HEIGHT / 2 +
-              this._gameMapService.GAME_BOARD_PADDING_TOP
+            this._gameMapService.mapConfig.CELL_SIZE * i[1] +
+              this._gameMapService.mapConfig.CELL_SIZE / 2,
+            i[0] * this._gameMapService.mapConfig.CELL_HEIGHT +
+              this._gameMapService.mapConfig.CELL_HEIGHT / 2 +
+              this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP
           );
         });
 
@@ -233,14 +158,14 @@ window.setupMonster = (gameStateService, gameMapService) => {
         this.path = new Phaser.Curves.Path(this.x, this.y);
 
         [
-          this._gameMapService.START_POSITION,
-          this._gameMapService.END_POSITION,
+          this._gameMapService.mapConfig.START_POSITION,
+          this._gameMapService.mapConfig.END_POSITION,
         ].forEach((i) => {
           this.path.lineTo(
-            this._gameMapService.CELL_SIZE * i[1] +
-              this._gameMapService.CELL_SIZE / 2,
-            i[0] * this._gameMapService.CELL_SIZE +
-              this._gameMapService.GAME_BOARD_PADDING_TOP
+            this._gameMapService.mapConfig.CELL_SIZE * i[1] +
+              this._gameMapService.mapConfig.CELL_SIZE / 2,
+            i[0] * this._gameMapService.mapConfig.CELL_SIZE +
+              this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP
           );
         });
 
@@ -342,17 +267,17 @@ window.setupMonster = (gameStateService, gameMapService) => {
       // health draw
       graphics.lineStyle(2, 0xff00, 0.5);
       graphics.strokeRoundedRect(
-        this.x - this._gameMapService.CELL_SIZE / 2.5,
+        this.x - this._gameMapService.mapConfig.CELL_SIZE / 2.5,
         this.y + 22,
-        this._gameMapService.CELL_SIZE,
+        this._gameMapService.mapConfig.CELL_SIZE,
         3,
         0
       );
       graphics.fillStyle(0x00ff00, 1, 0.5);
       graphics.fillRect(
-        this.x - this._gameMapService.CELL_SIZE / 2.5,
+        this.x - this._gameMapService.mapConfig.CELL_SIZE / 2.5,
         this.y + 22,
-        (this._gameMapService.CELL_SIZE * this.health) / this.maxHealth,
+        (this._gameMapService.mapConfig.CELL_SIZE * this.health) / this.maxHealth,
         3
       );
       //end health draw
@@ -371,4 +296,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
       return window.gameCoreConfig.monsters[this.getName()].moveType;
     }
   };
+
+  window.loadMonsterThief();
+  window.loadMonsterButterfly();
 };

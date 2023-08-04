@@ -37,19 +37,19 @@ window.setupTower = (gameStateService, gameMapService) => {
       );
 
       this.col = parseInt(
-        (x - this._gameMapService.CELL_SIZE / 2) /
-          this._gameMapService.CELL_SIZE
+        (x - this._gameMapService.mapConfig.CELL_SIZE / 2) /
+          this._gameMapService.mapConfig.CELL_SIZE
       );
       this.row = parseInt(
         (y -
-          this._gameMapService.GAME_BOARD_PADDING_TOP -
-          this._gameMapService.CELL_HEIGHT / 2) /
-          this._gameMapService.CELL_HEIGHT
+          this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP -
+          this._gameMapService.mapConfig.CELL_HEIGHT / 2) /
+          this._gameMapService.mapConfig.CELL_HEIGHT
       );
 
       this.range =
         window.getTowerAttackRange(this.getName(), this.level) +
-        _gameMapService.CELL_SIZE;
+        _gameMapService.mapConfig.CELL_SIZE;
 
       if (bindEvents) {
         this.bindEvents();
@@ -195,8 +195,8 @@ window.setupTower = (gameStateService, gameMapService) => {
       }
 
       upgradeImage = this.Phaserscene.physics.add.image(
-        this.x + _gameMapService.CELL_SIZE / 2,
-        this.y - _gameMapService.CELL_SIZE / 2,
+        this.x + _gameMapService.mapConfig.CELL_SIZE / 2,
+        this.y - _gameMapService.mapConfig.CELL_SIZE / 2,
         "upgrade"
       );
       if (this.level == 5) {
@@ -277,8 +277,8 @@ window.setupTower = (gameStateService, gameMapService) => {
 
     showSellAction() {
       sellImage = this.Phaserscene.physics.add.sprite(
-        this.x + _gameMapService.CELL_SIZE / 2,
-        this.y + _gameMapService.CELL_SIZE / 2,
+        this.x + _gameMapService.mapConfig.CELL_SIZE / 2,
+        this.y + _gameMapService.mapConfig.CELL_SIZE / 2,
         "sell"
       );
       sellImage.setDepth(3);
@@ -301,7 +301,7 @@ window.setupTower = (gameStateService, gameMapService) => {
         _gameMapService.tryUpdateMap(
           this.col,
           this.row,
-          _gameMapService.CELL_AVAILABLE
+          _gameMapService.mapConfig.CELL_AVAILABLE
         );
 
         isTowerClicked = false;
