@@ -24,10 +24,8 @@ window.setupGame = (appPrefix) => {
   window.sellText = null;
   window.detailText = null;
 
-  window.OFFSET_RIGHT_X = 150;
-  window.OFFSET_DOWN_Y = 60;
-  window.GAME_WIDTH = 520;
-  window.GAME_HEIGHT = 520;
+  window.GAME_WIDTH = 520 + 150;
+  window.GAME_HEIGHT = 60 + 520;
 
   window.isBuying = false;
   window.isTowerClicked = false;
@@ -38,13 +36,13 @@ window.setupGame = (appPrefix) => {
   window.config = {
     type: Phaser.CANVAS,
     canvas: document.getElementById("myCustomCanvas"),
-    width: GAME_WIDTH + OFFSET_RIGHT_X,
-    height: GAME_HEIGHT + _gameMapService.GAME_BOARD_PADDING_TOP + OFFSET_DOWN_Y,
+    width: GAME_WIDTH,
+    height: GAME_HEIGHT + _gameMapService.GAME_BOARD_PADDING_TOP,
     physics: {
       default: "arcade",
-      arcade: {
-        debug: true,
-      },
+      // arcade: {
+      //   debug: true,
+      // },
     },
     scene: {
       preload: preload,
@@ -236,7 +234,7 @@ function create() {
   sampleTower1 = new Tower(
     this,
     640,
-    350,
+    340,
     window.getTowerSnowFlakeData().towerType,
     1,
     true,

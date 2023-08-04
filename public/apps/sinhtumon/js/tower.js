@@ -148,7 +148,7 @@ window.setupTower = (gameStateService, gameMapService) => {
       }
       detailText = this.Phaserscene.add.text(
         150,
-        630,
+        600,
         `Level: ${this.level}\nRange: ${window.getTowerAttackRange(
           this.getName(),
           this.level
@@ -176,8 +176,8 @@ window.setupTower = (gameStateService, gameMapService) => {
         rangeImage.destroy();
       }
       rangeImage = this.Phaserscene.physics.add.image(
-        this.col,
-        this.row,
+        this.x,
+        this.y,
         "tower_range"
       );
       rangeImage.setDisplaySize(
@@ -249,7 +249,7 @@ window.setupTower = (gameStateService, gameMapService) => {
         }
         detailText = this.Phaserscene.add.text(
           150,
-          640,
+          600,
           `Nâng cấp: ${this.getUpgradeCost()}$`,
           {
             fontStyle: "bold",
@@ -318,7 +318,7 @@ window.setupTower = (gameStateService, gameMapService) => {
         }
         detailText = this.Phaserscene.add.text(
           150,
-          640,
+          600,
           `Bán giá: ${window.getTowerSellPrice(this.getName(), this.level)}$`,
           {
             fontStyle: "bold",

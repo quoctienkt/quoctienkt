@@ -57,8 +57,8 @@ class HoTuThanMap {
     let background = this.scene.add.image(-2, 0, "background1").setOrigin(0);
     background.setDepth(-3);
     background.setDisplaySize(
-      window.GAME_WIDTH + window.OFFSET_RIGHT_X,
-      5 + window.GAME_HEIGHT + this.GAME_BOARD_PADDING_TOP + window.OFFSET_DOWN_Y
+      window.GAME_WIDTH,
+      5 + window.GAME_HEIGHT + this.GAME_BOARD_PADDING_TOP
     );
 
     for (let row = 0; row < this.map.length; row++) {
