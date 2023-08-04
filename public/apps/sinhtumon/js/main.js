@@ -199,16 +199,15 @@ function create() {
     towers: [],
     monsters: [],
     bullets: [],
-    wave: 1,
+    wave: 0,
     life: 10,
-    gold: 1000,
+    gold: 650,
   };
 
-  window._gameMapService.init();
   window._gameStateService.init(savedData);
+  window._gameMapService.init();
 
   //Wave
-  monsterRespawn.call(this, 15);
   monsterRespawnEvent = this.time.addEvent({
     delay: waveDelay,
     callback: () => monsterRespawn.call(this, 15),
@@ -219,7 +218,14 @@ function create() {
   nextWave = this.add.text(
     10,
     20,
-    `Đợt kế: ${monsterRespawnEvent.getProgress().toString()}`,
+    `Đợt kế: : ${
+      (waveDelay -
+        waveDelay *
+          parseFloat(
+            monsterRespawnEvent.getProgress().toString().substr(0, 4)
+          )) /
+      1000
+    }`,
     {
       fontSize: "15px",
       fill: "#fff",
@@ -271,7 +277,10 @@ function monsterReachEndpoint(tween, targets, monster) {
     i--;
   }
 
-  _gameStateService.savedData.monsters.splice(_gameStateService.savedData.monsters.indexOf(monster), 1);
+  _gameStateService.savedData.monsters.splice(
+    _gameStateService.savedData.monsters.indexOf(monster),
+    1
+  );
   monster.destroy();
 }
 
@@ -298,7 +307,10 @@ function dealDamage(bullet, monster) {
   // console.log("touch monster")
   monster.health -= bullet.damage;
 
-  _gameStateService.savedData.bullets.splice(_gameStateService.savedData.bullets.indexOf(bullet), 1);
+  _gameStateService.savedData.bullets.splice(
+    _gameStateService.savedData.bullets.indexOf(bullet),
+    1
+  );
   bullet.destroy();
 
   if (monster.health <= 0) {
@@ -336,13 +348,14 @@ function update(time, delta) {
   }
 
   nextWave.setText(
-    "Đợt kế: " +
+    `Đợt kế: : ${
       (waveDelay -
         waveDelay *
           parseFloat(
             monsterRespawnEvent.getProgress().toString().substr(0, 4)
           )) /
-        1000
+      1000
+    }`
   );
 
   //landing monster move
