@@ -14,6 +14,7 @@ class HoTuThanMap {
   map = null;
   startPosition = null;
   endPosition = null;
+  _gameStateService = null;
 
   constructor() {
     // 0 is available slot, 1 is blocked slot
@@ -67,14 +68,14 @@ class HoTuThanMap {
     }
 
     let newMonstersPathList = [];
-    for (let i = 0; i < savedData.monsters.length; i++) {
+    for (let i = 0; i < this._gameStateService.savedData.monsters.length; i++) {
       if (
-        savedData.monsters[i].getMoveType() ==
+        this._gameStateService.savedData.monsters[i].getMoveType() ==
         window.getConstants().MONSTER_MOVE_TYPE_GROUND
       ) {
         let monsterPosition = [
-          parseInt((savedData.monsters[i].y - OFFSET_Y) / CELL_SIZE),
-          parseInt(savedData.monsters[i].x / CELL_SIZE),
+          parseInt((this._gameStateService.savedData.monsters[i].y - OFFSET_Y) / CELL_SIZE),
+          parseInt(this._gameStateService.savedData.monsters[i].x / CELL_SIZE),
         ];
 
         let newMonsterPath = this.getGroundMonsterMovingPath(
@@ -89,20 +90,20 @@ class HoTuThanMap {
         // for moving more smoothly
         if (
           (newMonsterPath[0][1] * CELL_SIZE + CELL_SIZE / 2 >
-            savedData.monsters[i].x &&
-            savedData.monsters[i].x >
+          this._gameStateService.savedData.monsters[i].x &&
+            this._gameStateService.savedData.monsters[i].x >
               newMonsterPath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
           (newMonsterPath[0][1] * CELL_SIZE + CELL_SIZE / 2 <
-            savedData.monsters[i].x &&
-            savedData.monsters[i].x <
+          this._gameStateService.savedData.monsters[i].x &&
+            this._gameStateService.savedData.monsters[i].x <
               newMonsterPath[1][1] * CELL_SIZE + CELL_SIZE / 2) ||
           (newMonsterPath[0][0] * CELL_SIZE + OFFSET_Y >
-            savedData.monsters[i].y &&
-            savedData.monsters[i].y >
+            this._gameStateService.savedData.monsters[i].y &&
+            this._gameStateService.savedData.monsters[i].y >
               newMonsterPath[1][0] * CELL_SIZE + OFFSET_Y) ||
           (newMonsterPath[0][0] * CELL_SIZE + OFFSET_Y <
-            savedData.monsters[i].y &&
-            savedData.monsters[i].y <
+            this._gameStateService.savedData.monsters[i].y &&
+            this._gameStateService.savedData.monsters[i].y <
               newMonsterPath[1][0] * CELL_SIZE + OFFSET_Y)
         ) {
           newMonsterPath.splice(0, 1);
@@ -115,8 +116,7 @@ class HoTuThanMap {
       }
     }
 
-    //Cập nhật lại đường đi quái vật landing
-    savedData.monsters.forEach((monster, i) => {
+    this._gameStateService.savedData.monsters.forEach((monster, i) => {
       monster.updateMonsterPath(newMonstersPathList[i]);
     });
 
@@ -130,6 +130,7 @@ class HoTuThanMap {
   }
 
   preload() {
+    this._gameStateService = window._gameStateService;
     this.scene.add.text(5, 60, "Cửa vào", {
       fontSize: "15px",
       fill: "#ffffff",

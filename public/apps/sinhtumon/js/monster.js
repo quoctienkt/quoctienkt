@@ -113,8 +113,8 @@ window.setupMonster = (gameStateService) => {
         );
 
         this.setCircle(10, 3, 15);
-        this.maxHealth = 30 + savedData.wave * 100;
-        this.health = 30 + savedData.wave * 100;
+        this.maxHealth = 30 + this._gameStateService.savedData.wave * 100;
+        this.health = 30 + this._gameStateService.savedData.wave * 100;
         this.speed = 75;
       } else if (this.getName() == window.getConstants().MONSTER_BUTTERFLY) {
         this.Phaserscene.anims.create({
@@ -141,8 +141,8 @@ window.setupMonster = (gameStateService) => {
           )
         );
         this.setCircle(15, 30, 28);
-        this.maxHealth = 30 + savedData.wave * 100;
-        this.health = 30 + savedData.wave * 100;
+        this.maxHealth = 30 + this._gameStateService.savedData.wave * 100;
+        this.health = 30 + this._gameStateService.savedData.wave * 100;
         this.speed = 75;
       }
 
@@ -253,18 +253,18 @@ window.setupMonster = (gameStateService) => {
     dead() {
       this._gameStateService.setGold((prev) => prev + this.getGoldOnDead());
       this.tween.stop();
-      let index = savedData.monsters.indexOf(this);
+      let index = this._gameStateService.savedData.monsters.indexOf(this);
 
-      let i = savedData.bullets.length - 1;
+      let i = this._gameStateService.savedData.bullets.length - 1;
       while (i >= 0) {
-        if (savedData.bullets[i].target === this) {
-          savedData.bullets[i].destroy();
-          savedData.bullets.splice(i, 1);
+        if (this._gameStateService.savedData.bullets[i].target === this) {
+          this._gameStateService.savedData.bullets[i].destroy();
+          this._gameStateService.savedData.bullets.splice(i, 1);
         }
         i--;
       }
 
-      savedData.monsters.splice(index, 1);
+      this._gameStateService.savedData.monsters.splice(index, 1);
 
       this.anims.play("dead");
       this.setAlpha(0.5);

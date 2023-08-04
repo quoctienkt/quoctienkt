@@ -7,15 +7,6 @@ window.setupGame = (appPrefix) => {
   window.setupSquare(_gameStateService);
   window.setupMonster(_gameStateService);
 
-  window.savedData = {
-    towers: [],
-    monsters: [],
-    bullets: [],
-    wave: -1,
-    gold: -1,
-    life: -1,
-  };
-
   window.graphics = undefined;
   window.tempTower = null;
 
@@ -209,10 +200,6 @@ function preload() {
     )
   );
 
-  savedData.wave = 1;
-  savedData.life = 10;
-  savedData.gold = 1000;
-
   graphics = this.add.graphics();
 }
 
@@ -232,7 +219,17 @@ function create() {
   });
 
   window._gameMapService.preload();
-  window._gameStateService.preload(window.savedData);
+
+  savedData = {
+    towers: [],
+    monsters: [],
+    bullets: [],
+    wave: 1,
+    life: 10,
+    gold: 1000,
+  };
+
+  window._gameStateService.preload(savedData);
 
   // tháp mẫu
   // this.add.text(560, 200, 'Tháp', { fontSize: '20px', fill: '#aaa' });
@@ -310,16 +307,16 @@ function create() {
 
 function monsterReachEndpoint(tween, targets, monster) {
   _gameStateService.setLife((prev) => prev - 1);
-  let i = savedData.bullets.length - 1;
+  let i = _gameStateService.savedData.bullets.length - 1;
   while (i >= 0) {
-    if (savedData.bullets[i].target === monster) {
-      savedData.bullets[i].destroy();
-      savedData.bullets.splice(i, 1);
+    if (_gameStateService.savedData.bullets[i].target === monster) {
+      _gameStateService.savedData.bullets[i].destroy();
+      _gameStateService.savedData.bullets.splice(i, 1);
     }
     i--;
   }
 
-  savedData.monsters.splice(savedData.monsters.indexOf(monster), 1);
+  _gameStateService.savedData.monsters.splice(_gameStateService.savedData.monsters.indexOf(monster), 1);
   monster.destroy();
 }
 
@@ -334,7 +331,7 @@ function monsterRespawn(number) {
       delay: i * 650,
       callback: () => {
         let monster = new Monster(this, 0, 0, name);
-        savedData.monsters.push(monster);
+        _gameStateService.savedData.monsters.push(monster);
       },
       callbackScope: this,
       loop: false,
@@ -346,7 +343,7 @@ function dealDamage(bullet, monster) {
   // console.log("touch monster")
   monster.health -= bullet.damage;
 
-  savedData.bullets.splice(savedData.bullets.indexOf(bullet), 1);
+  _gameStateService.savedData.bullets.splice(_gameStateService.savedData.bullets.indexOf(bullet), 1);
   bullet.destroy();
 
   if (monster.health <= 0) {
@@ -376,10 +373,10 @@ function update(time, delta) {
   graphics.clear();
 
   //end game
-  if (savedData.life < 1) {
+  if (_gameStateService.savedData.life < 1) {
     this.physics.pause();
     monsterRespawnEvent.destroy();
-    savedData.monsters.forEach((m) => m.destroy());
+    _gameStateService.savedData.monsters.forEach((m) => m.destroy());
     return;
   }
 
@@ -394,7 +391,7 @@ function update(time, delta) {
   );
 
   //landing monster move
-  savedData.monsters.forEach((monster) => {
+  _gameStateService.savedData.monsters.forEach((monster) => {
     graphics.lineStyle(2, 0xffffff, 1);
     graphics.lineStyle(1, 0xffffff, 1);
     // monster.path.draw(graphics)
@@ -403,10 +400,10 @@ function update(time, delta) {
   });
 
   //Cập nhật đường đạn
-  savedData.bullets.forEach((bullet) =>
+  _gameStateService.savedData.bullets.forEach((bullet) =>
     moveTo.call(this, bullet, bullet.target, bullet.speed)
   );
 
   //fire
-  savedData.towers.forEach((tower) => tower.shoot());
+  _gameStateService.savedData.towers.forEach((tower) => tower.shoot());
 }

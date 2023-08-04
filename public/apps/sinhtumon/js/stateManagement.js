@@ -1,6 +1,6 @@
 class GameStateService {
   _scene = null;
-
+  savedData = null;
   waveText = null;
   lifeText = null;
   goldText = null;
@@ -14,8 +14,8 @@ class GameStateService {
    * @param {function(prevState): prevState} callback
    */
   setGold(callback) {
-    window.savedData.gold = callback(window.savedData.gold);
-    this.goldText.setText(`${window.savedData.gold}`);
+    this.savedData.gold = callback(this.savedData.gold);
+    this.goldText.setText(`${this.savedData.gold}`);
   }
 
   /**
@@ -23,8 +23,8 @@ class GameStateService {
    * @param {function(prevState): prevState} callback
    */
   setWave(callback) {
-    window.savedData.wave = callback(window.savedData.wave);
-    this.waveText.setText(`Đợt: ${window.savedData.wave}`);
+    this.savedData.wave = callback(this.savedData.wave);
+    this.waveText.setText(`Đợt: ${this.savedData.wave}`);
   }
 
   /**
@@ -32,26 +32,31 @@ class GameStateService {
    * @param {function(prevState): prevState} callback
    */
   setLife(callback) {
-    window.savedData.life = callback(window.savedData.life);
-    this.lifeText.setText(`Máu: ${window.savedData.life}`);
+    this.savedData.life = callback(this.savedData.life);
+    this.lifeText.setText(`Máu: ${this.savedData.life}`);
   }
 
   preload(gameData) {
-    window.savedData = gameData;
+    this.savedData = gameData;
 
-    this.waveText = this._scene.add.text(300, 34, `${savedData.wave}`, {
+    this.waveText = this._scene.add.text(300, 34, `${this.savedData.wave}`, {
       fontSize: "15px",
       fill: "#fff",
       fontFamily: "roboto",
     });
 
-    this.lifeText = this._scene.add.text(360, 150, `Máu ${savedData.life}`, {
-      fontSize: "20px",
-      fill: "#fff",
-      fontFamily: "roboto",
-    });
+    this.lifeText = this._scene.add.text(
+      360,
+      150,
+      `Máu ${this.savedData.life}`,
+      {
+        fontSize: "20px",
+        fill: "#fff",
+        fontFamily: "roboto",
+      }
+    );
 
-    this.goldText = this._scene.add.text(615, 241, `${savedData.gold}`, {
+    this.goldText = this._scene.add.text(615, 241, `${this.savedData.gold}`, {
       fontSize: "13px",
       fill: "#ffd64c",
       fontFamily: "roboto",

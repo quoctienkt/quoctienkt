@@ -29,7 +29,8 @@ window.setupSquare = (gameStateService) => {
         this.setAlpha(0.1);
 
         console.log('clicked square');
-        if (isBuying && savedData.gold >= 70) {
+        // TODO: replace hardcoded 70 with tempTowerPrice
+        if (isBuying && this._gameStateService.savedData.gold >= 70) {
           //Check isOkPath
           let success = _gameMapService.tryUpdateMap(this.posX, this.posY, this._gameStateService.BLOCKED)
           if (!success) {
@@ -47,7 +48,7 @@ window.setupSquare = (gameStateService) => {
           this._gameStateService.setGold((gold) => gold - tempTower.getUpgradeCost());
 
           this.destroy();
-          savedData.towers.push(tower);
+          this._gameStateService.savedData.towers.push(tower);
         }
       });
 
