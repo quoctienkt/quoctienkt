@@ -10,7 +10,7 @@
   --px: 35px;
   --py: 35px;
 
-  @apply flex flex-col w-full overflow-hidden text-black bg-white outer;
+  @apply flex flex-col w-full text-black bg-white outer;
 
   .overview {
     @apply flex-auto basis-48 px-[var(--px)] py-[var(--py)];
