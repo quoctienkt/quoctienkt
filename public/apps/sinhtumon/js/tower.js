@@ -196,7 +196,7 @@ window.setupTower = (gameStateService, gameMapService) => {
 
       upgradeImage = this.Phaserscene.physics.add.image(
         this.x + _gameMapService.mapConfig.CELL_WIDTH / 2,
-        this.y - _gameMapService.mapConfig.CELL_WIDTH / 2,
+        this.y - _gameMapService.mapConfig.CELL_HEIGHT / 2,
         "upgrade"
       );
       if (this.level == 5) {
@@ -278,7 +278,7 @@ window.setupTower = (gameStateService, gameMapService) => {
     showSellAction() {
       sellImage = this.Phaserscene.physics.add.sprite(
         this.x + _gameMapService.mapConfig.CELL_WIDTH / 2,
-        this.y + _gameMapService.mapConfig.CELL_WIDTH / 2,
+        this.y + _gameMapService.mapConfig.CELL_HEIGHT / 2,
         "sell"
       );
       sellImage.setDepth(3);

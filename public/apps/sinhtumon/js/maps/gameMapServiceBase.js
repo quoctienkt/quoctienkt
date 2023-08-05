@@ -116,7 +116,7 @@ class GameMapServiceBase {
           parseInt(
             (this._gameStateService.savedData.monsters[i].y -
               this.mapConfig.GAME_BOARD_PADDING_TOP) /
-              this.mapConfig.CELL_WIDTH
+              this.mapConfig.CELL_HEIGHT
           ),
           parseInt(
             this._gameStateService.savedData.monsters[i].x /
@@ -147,17 +147,17 @@ class GameMapServiceBase {
             this._gameStateService.savedData.monsters[i].x <
               newMonsterPath[1][1] * this.mapConfig.CELL_WIDTH +
                 this.mapConfig.CELL_WIDTH / 2) ||
-          (newMonsterPath[0][0] * this.mapConfig.CELL_WIDTH +
+          (newMonsterPath[0][0] * this.mapConfig.CELL_HEIGHT +
             this.mapConfig.GAME_BOARD_PADDING_TOP >
             this._gameStateService.savedData.monsters[i].y &&
             this._gameStateService.savedData.monsters[i].y >
-              newMonsterPath[1][0] * this.mapConfig.CELL_WIDTH +
+              newMonsterPath[1][0] * this.mapConfig.CELL_HEIGHT +
                 this.mapConfig.GAME_BOARD_PADDING_TOP) ||
-          (newMonsterPath[0][0] * this.CELL_WIDTH +
+          (newMonsterPath[0][0] * this.CELL_HEIGHT +
             this.mapConfig.GAME_BOARD_PADDING_TOP <
             this._gameStateService.savedData.monsters[i].y &&
             this._gameStateService.savedData.monsters[i].y <
-              newMonsterPath[1][0] * this.mapConfig.CELL_WIDTH +
+              newMonsterPath[1][0] * this.mapConfig.CELL_HEIGHT +
                 this.mapConfig.GAME_BOARD_PADDING_TOP)
         ) {
           newMonsterPath.splice(0, 1);
