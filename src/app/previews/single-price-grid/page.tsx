@@ -18,12 +18,8 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <>
-      <section className="flex justify-center sm:items-center w-full h-full bg-[#ffffff] overflow-auto relative">
-        <div className="w-[750px]">
-          <SinglePriceGrid
-            className="sm:shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]"
-          ></SinglePriceGrid>
-        </div>
+      <section className="flex justify-center w-full h-full bg-[#ffffff] overflow-auto relative sm:items-center sm:w-[750px]">
+        <SinglePriceGrid className="sm:shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]"></SinglePriceGrid>
       </section>
     </>
   );
