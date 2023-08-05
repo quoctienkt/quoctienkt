@@ -7,7 +7,7 @@
 }
 
 .wrapper {
-  @apply relative flex flex-row overflow-hidden text-black bg-white outer;
+  @apply flex flex-row overflow-hidden text-black bg-white outer;
 
   .result {
     @apply flex-1 basis-60 outer text-white max-sm:rounded-b-3xl bg-[#5c3dfa]
