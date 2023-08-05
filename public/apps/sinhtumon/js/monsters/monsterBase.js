@@ -19,7 +19,8 @@ window.setupMonster = (gameStateService, gameMapService) => {
     constructor(scene, monsterType, col, row) {
       super(
         scene,
-        col * gameMapService.mapConfig.CELL_WIDTH + gameMapService.mapConfig.CELL_WIDTH / 2,
+        col * gameMapService.mapConfig.CELL_WIDTH +
+          gameMapService.mapConfig.CELL_WIDTH / 2,
         row * gameMapService.mapConfig.CELL_HEIGHT +
           gameMapService.mapConfig.GAME_BOARD_PADDING_TOP,
         monsterType
@@ -121,6 +122,47 @@ window.setupMonster = (gameStateService, gameMapService) => {
         }
 
         this.path = new Phaser.Curves.Path(this.x, this.y);
+
+        // for moving more smoothly
+        let flag = true;
+        while (flag) {
+          if (
+            (newMonsterPath[0][1] * this._gameMapService.mapConfig.CELL_WIDTH +
+              this._gameMapService.mapConfig.CELL_WIDTH / 2 >
+              this.x &&
+              this.x >
+                newMonsterPath[1][1] *
+                  this._gameMapService.mapConfig.CELL_WIDTH +
+                  this._gameMapService.mapConfig.CELL_WIDTH / 2) ||
+            (newMonsterPath[0][1] * this._gameMapService.mapConfig.CELL_WIDTH +
+              this._gameMapService.mapConfig.CELL_WIDTH / 2 <
+              this.x &&
+              this.x <
+                newMonsterPath[1][1] *
+                  this._gameMapService.mapConfig.CELL_WIDTH +
+                  this._gameMapService.mapConfig.CELL_WIDTH / 2) ||
+            (newMonsterPath[0][0] * this._gameMapService.mapConfig.CELL_HEIGHT +
+              this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP >
+              this.y &&
+              this.y >
+                newMonsterPath[1][0] *
+                  this._gameMapService.mapConfig.CELL_HEIGHT +
+                  this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP) ||
+            (newMonsterPath[0][0] * this._gameMapService.mapConfig.CELL_HEIGHT +
+              this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP <
+              this.y &&
+              this.y <
+                newMonsterPath[1][0] *
+                  this._gameMapService.mapConfig.CELL_HEIGHT +
+                  this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP)
+          ) {
+            newMonsterPath.splice(0, 1);
+          }
+          else {
+            flag = false;
+          }
+        }
+
         newMonsterPath.forEach((i) => {
           this.path.lineTo(
             this._gameMapService.mapConfig.CELL_WIDTH * i[1] +
@@ -277,7 +319,8 @@ window.setupMonster = (gameStateService, gameMapService) => {
       graphics.fillRect(
         this.x - this._gameMapService.mapConfig.CELL_WIDTH / 2.5,
         this.y + 22,
-        (this._gameMapService.mapConfig.CELL_WIDTH * this.health) / this.maxHealth,
+        (this._gameMapService.mapConfig.CELL_WIDTH * this.health) /
+          this.maxHealth,
         3
       );
       //end health draw

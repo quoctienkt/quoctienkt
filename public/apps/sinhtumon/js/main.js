@@ -287,11 +287,11 @@ function monsterReachEndpoint(tween, targets, monster) {
 
 function monsterRespawn(number) {
   let name =
-    // parseInt(Math.random() * 10) % 2
-    //   ? window.getConstants().MONSTER_BUTTERFLY
-    //   : window.getConstants().MONSTER_THIEF;
+    parseInt(Math.random() * 10) % 2
+      ? window.getConstants().MONSTER_BUTTERFLY
+      : window.getConstants().MONSTER_THIEF;
+      // window.getConstants().MONSTER_THIEF;
 
-      window.getConstants().MONSTER_THIEF
   window._gameStateService.setWave((wave) => wave + 1);
   for (let i = 0; i < 15; i++) {
     this.time.addEvent({

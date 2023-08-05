@@ -133,36 +133,6 @@ class GameMapServiceBase {
           return false;
         }
 
-        // for moving more smoothly
-        if (
-          (newMonsterPath[0][1] * this.mapConfig.CELL_WIDTH +
-            this.mapConfig.CELL_WIDTH / 2 >
-            this._gameStateService.savedData.monsters[i].x &&
-            this._gameStateService.savedData.monsters[i].x >
-              newMonsterPath[1][1] * this.mapConfig.CELL_WIDTH +
-                this.mapConfig.CELL_WIDTH / 2) ||
-          (newMonsterPath[0][1] * this.CELL_WIDTH +
-            this.mapConfig.CELL_WIDTH / 2 <
-            this._gameStateService.savedData.monsters[i].x &&
-            this._gameStateService.savedData.monsters[i].x <
-              newMonsterPath[1][1] * this.mapConfig.CELL_WIDTH +
-                this.mapConfig.CELL_WIDTH / 2) ||
-          (newMonsterPath[0][0] * this.mapConfig.CELL_HEIGHT +
-            this.mapConfig.GAME_BOARD_PADDING_TOP >
-            this._gameStateService.savedData.monsters[i].y &&
-            this._gameStateService.savedData.monsters[i].y >
-              newMonsterPath[1][0] * this.mapConfig.CELL_HEIGHT +
-                this.mapConfig.GAME_BOARD_PADDING_TOP) ||
-          (newMonsterPath[0][0] * this.CELL_HEIGHT +
-            this.mapConfig.GAME_BOARD_PADDING_TOP <
-            this._gameStateService.savedData.monsters[i].y &&
-            this._gameStateService.savedData.monsters[i].y <
-              newMonsterPath[1][0] * this.mapConfig.CELL_HEIGHT +
-                this.mapConfig.GAME_BOARD_PADDING_TOP)
-        ) {
-          newMonsterPath.splice(0, 1);
-        }
-
         newMonstersPathList.push(newMonsterPath);
       } else {
         // fly monster
@@ -174,7 +144,7 @@ class GameMapServiceBase {
       monster.updateMonsterPath(newMonstersPathList[i]);
     });
 
-    this.map = nextMapState;
+    this.mapConfig.map = nextMapState;
     this.groundMonsterMovingPathDefault = newGroundMonsterMovingPath;
     return true;
   }
