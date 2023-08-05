@@ -14,7 +14,7 @@ export default function AppLayout(props: AppLayoutProps) {
         <div id="basePath" className="hidden">
           {basePath}
         </div>
-        <Script src={getAssetPath("js/utils.js")}></Script>
+        <Script src={getAssetPath("js/utils.js")} strategy="beforeInteractive"></Script>
       </>
       <DefaultLayout basePath={props.basePath}>{props.children}</DefaultLayout>
     </>

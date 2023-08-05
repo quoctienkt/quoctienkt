@@ -1,6 +1,4 @@
 window.setupGame = (appPrefix) => {
-  window.setupGameMapService();
-
   window._gameStateService = new GameStateService();
   window._gameMapService = new HoTuThanMap();
 
