@@ -17,12 +17,14 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <section className="flex justify-center w-full h-full bg-[#ffffff] overflow-auto relative sm:w-[721px] sm:items-center">
-      <ResultSummary
-        className="sm:shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]"
-        basePath={basePath}
-        appPrefix={appPrefix}
-      ></ResultSummary>
+    <section className="flex justify-center w-full h-full bg-[#ffffff] overflow-auto relative sm:items-center">
+      <div className="sm:w-[721px] h-fit">
+        <ResultSummary
+          className="sm:shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]"
+          basePath={basePath}
+          appPrefix={appPrefix}
+        ></ResultSummary>
+      </div>
     </section>
   );
 }
