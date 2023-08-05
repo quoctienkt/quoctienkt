@@ -9,7 +9,7 @@ window.setupSquare = (gameStateService, gameMapService) => {
       // NOTE: position x,y is the central point of square, need to transition to left and bottom
       super(
         scene,
-        x * gameMapService.mapConfig.CELL_SIZE + gameMapService.mapConfig.CELL_SIZE / 2,
+        x * gameMapService.mapConfig.CELL_WIDTH + gameMapService.mapConfig.CELL_WIDTH / 2,
         y * gameMapService.mapConfig.CELL_HEIGHT +
           gameMapService.mapConfig.CELL_HEIGHT / 2 +
           gameMapService.mapConfig.GAME_BOARD_PADDING_TOP,
@@ -25,7 +25,7 @@ window.setupSquare = (gameStateService, gameMapService) => {
       this.posX = x;
       this.posY = y;
       this.setAlpha(0.1);
-      this.setDisplaySize(gameMapService.mapConfig.CELL_SIZE, gameMapService.mapConfig.CELL_HEIGHT);
+      this.setDisplaySize(gameMapService.mapConfig.CELL_WIDTH, gameMapService.mapConfig.CELL_HEIGHT);
       // this.setDepth(2)
       this.init();
     }

@@ -19,7 +19,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
     constructor(scene, monsterType, col, row) {
       super(
         scene,
-        col * gameMapService.mapConfig.CELL_SIZE + gameMapService.mapConfig.CELL_SIZE / 2,
+        col * gameMapService.mapConfig.CELL_WIDTH + gameMapService.mapConfig.CELL_WIDTH / 2,
         row * gameMapService.mapConfig.CELL_HEIGHT +
           gameMapService.mapConfig.GAME_BOARD_PADDING_TOP,
         monsterType
@@ -123,8 +123,8 @@ window.setupMonster = (gameStateService, gameMapService) => {
         this.path = new Phaser.Curves.Path(this.x, this.y);
         newMonsterPath.forEach((i) => {
           this.path.lineTo(
-            this._gameMapService.mapConfig.CELL_SIZE * i[1] +
-              this._gameMapService.mapConfig.CELL_SIZE / 2,
+            this._gameMapService.mapConfig.CELL_WIDTH * i[1] +
+              this._gameMapService.mapConfig.CELL_WIDTH / 2,
             i[0] * this._gameMapService.mapConfig.CELL_HEIGHT +
               this._gameMapService.mapConfig.CELL_HEIGHT / 2 +
               this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP
@@ -162,9 +162,9 @@ window.setupMonster = (gameStateService, gameMapService) => {
           this._gameMapService.mapConfig.END_POSITION,
         ].forEach((i) => {
           this.path.lineTo(
-            this._gameMapService.mapConfig.CELL_SIZE * i[1] +
-              this._gameMapService.mapConfig.CELL_SIZE / 2,
-            i[0] * this._gameMapService.mapConfig.CELL_SIZE +
+            this._gameMapService.mapConfig.CELL_WIDTH * i[1] +
+              this._gameMapService.mapConfig.CELL_WIDTH / 2,
+            i[0] * this._gameMapService.mapConfig.CELL_HEIGHT +
               this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP
           );
         });
@@ -267,17 +267,17 @@ window.setupMonster = (gameStateService, gameMapService) => {
       // health draw
       graphics.lineStyle(2, 0xff00, 0.5);
       graphics.strokeRoundedRect(
-        this.x - this._gameMapService.mapConfig.CELL_SIZE / 2.5,
+        this.x - this._gameMapService.mapConfig.CELL_WIDTH / 2.5,
         this.y + 22,
-        this._gameMapService.mapConfig.CELL_SIZE,
+        this._gameMapService.mapConfig.CELL_WIDTH,
         3,
         0
       );
       graphics.fillStyle(0x00ff00, 1, 0.5);
       graphics.fillRect(
-        this.x - this._gameMapService.mapConfig.CELL_SIZE / 2.5,
+        this.x - this._gameMapService.mapConfig.CELL_WIDTH / 2.5,
         this.y + 22,
-        (this._gameMapService.mapConfig.CELL_SIZE * this.health) / this.maxHealth,
+        (this._gameMapService.mapConfig.CELL_WIDTH * this.health) / this.maxHealth,
         3
       );
       //end health draw

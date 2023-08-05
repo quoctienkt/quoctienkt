@@ -37,8 +37,8 @@ window.setupTower = (gameStateService, gameMapService) => {
       );
 
       this.col = parseInt(
-        (x - this._gameMapService.mapConfig.CELL_SIZE / 2) /
-          this._gameMapService.mapConfig.CELL_SIZE
+        (x - this._gameMapService.mapConfig.CELL_WIDTH / 2) /
+          this._gameMapService.mapConfig.CELL_WIDTH
       );
       this.row = parseInt(
         (y -
@@ -49,7 +49,7 @@ window.setupTower = (gameStateService, gameMapService) => {
 
       this.range =
         window.getTowerAttackRange(this.getName(), this.level) +
-        _gameMapService.mapConfig.CELL_SIZE;
+        _gameMapService.mapConfig.CELL_WIDTH;
 
       if (bindEvents) {
         this.bindEvents();
@@ -195,8 +195,8 @@ window.setupTower = (gameStateService, gameMapService) => {
       }
 
       upgradeImage = this.Phaserscene.physics.add.image(
-        this.x + _gameMapService.mapConfig.CELL_SIZE / 2,
-        this.y - _gameMapService.mapConfig.CELL_SIZE / 2,
+        this.x + _gameMapService.mapConfig.CELL_WIDTH / 2,
+        this.y - _gameMapService.mapConfig.CELL_WIDTH / 2,
         "upgrade"
       );
       if (this.level == 5) {
@@ -277,8 +277,8 @@ window.setupTower = (gameStateService, gameMapService) => {
 
     showSellAction() {
       sellImage = this.Phaserscene.physics.add.sprite(
-        this.x + _gameMapService.mapConfig.CELL_SIZE / 2,
-        this.y + _gameMapService.mapConfig.CELL_SIZE / 2,
+        this.x + _gameMapService.mapConfig.CELL_WIDTH / 2,
+        this.y + _gameMapService.mapConfig.CELL_WIDTH / 2,
         "sell"
       );
       sellImage.setDepth(3);

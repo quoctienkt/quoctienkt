@@ -6,10 +6,10 @@ class GameMapServiceBase {
     mapKey: null,
     map: null,
     GAME_BOARD_PADDING_TOP: null,
-    CELL_SIZE: null,
+    CELL_WIDTH: null,
     CELL_HEIGHT: null,
-    START_POSITION: null,
-    END_POSITION: null,
+    START_POSITION: null, //[row,col]
+    END_POSITION: null, //[row,col]
     CELL_AVAILABLE: null,
     CELL_BLOCKED: null,
   };
@@ -116,11 +116,11 @@ class GameMapServiceBase {
           parseInt(
             (this._gameStateService.savedData.monsters[i].y -
               this.mapConfig.GAME_BOARD_PADDING_TOP) /
-              this.mapConfig.CELL_SIZE
+              this.mapConfig.CELL_WIDTH
           ),
           parseInt(
             this._gameStateService.savedData.monsters[i].x /
-              this.mapConfig.CELL_SIZE
+              this.mapConfig.CELL_WIDTH
           ),
         ];
 
@@ -135,29 +135,29 @@ class GameMapServiceBase {
 
         // for moving more smoothly
         if (
-          (newMonsterPath[0][1] * this.mapConfig.CELL_SIZE +
-            this.mapConfig.CELL_SIZE / 2 >
+          (newMonsterPath[0][1] * this.mapConfig.CELL_WIDTH +
+            this.mapConfig.CELL_WIDTH / 2 >
             this._gameStateService.savedData.monsters[i].x &&
             this._gameStateService.savedData.monsters[i].x >
-              newMonsterPath[1][1] * this.mapConfig.CELL_SIZE +
-                this.mapConfig.CELL_SIZE / 2) ||
-          (newMonsterPath[0][1] * this.CELL_SIZE +
-            this.mapConfig.CELL_SIZE / 2 <
+              newMonsterPath[1][1] * this.mapConfig.CELL_WIDTH +
+                this.mapConfig.CELL_WIDTH / 2) ||
+          (newMonsterPath[0][1] * this.CELL_WIDTH +
+            this.mapConfig.CELL_WIDTH / 2 <
             this._gameStateService.savedData.monsters[i].x &&
             this._gameStateService.savedData.monsters[i].x <
-              newMonsterPath[1][1] * this.mapConfig.CELL_SIZE +
-                this.mapConfig.CELL_SIZE / 2) ||
-          (newMonsterPath[0][0] * this.mapConfig.CELL_SIZE +
+              newMonsterPath[1][1] * this.mapConfig.CELL_WIDTH +
+                this.mapConfig.CELL_WIDTH / 2) ||
+          (newMonsterPath[0][0] * this.mapConfig.CELL_WIDTH +
             this.mapConfig.GAME_BOARD_PADDING_TOP >
             this._gameStateService.savedData.monsters[i].y &&
             this._gameStateService.savedData.monsters[i].y >
-              newMonsterPath[1][0] * this.mapConfig.CELL_SIZE +
+              newMonsterPath[1][0] * this.mapConfig.CELL_WIDTH +
                 this.mapConfig.GAME_BOARD_PADDING_TOP) ||
-          (newMonsterPath[0][0] * this.CELL_SIZE +
+          (newMonsterPath[0][0] * this.CELL_WIDTH +
             this.mapConfig.GAME_BOARD_PADDING_TOP <
             this._gameStateService.savedData.monsters[i].y &&
             this._gameStateService.savedData.monsters[i].y <
-              newMonsterPath[1][0] * this.mapConfig.CELL_SIZE +
+              newMonsterPath[1][0] * this.mapConfig.CELL_WIDTH +
                 this.mapConfig.GAME_BOARD_PADDING_TOP)
         ) {
           newMonsterPath.splice(0, 1);
