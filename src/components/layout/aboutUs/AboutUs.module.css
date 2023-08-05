@@ -1,18 +1,33 @@
 .wrapper {
-  @apply fixed bottom-4 left-1/2 -translate-x-1/2 rounded-lg h-20 py-4 px-6 text-white z-[9999];
-  @apply flex flex-row gap-5 items-center justify-evenly bg-[rgb(var(--primary-rgb),_0.9)] border-[rgb(var(--color-central))] border-4 border-solid text-[rgb(var(--color-central))];
+  @apply fixed bottom-4 w-[420px] left-1/2 -translate-x-1/2 rounded-lg h-20 text-white z-[9999];
+  @apply flex flex-row justify-evenly bg-[rgb(var(--primary-rgb),_0.9)] border-[rgb(var(--color-central))] border-4 border-solid text-[rgb(var(--color-central))];
   @apply transition-all;
-  @apply max-sm:left-0 max-sm:right-0 max-sm:translate-x-0 max-sm:!rounded-t-xl;
+  @apply max-sm:hidden;
   &.wrapperCollapse {
-    @apply bottom-0 border-b-0 py-1 h-11 rounded-none rounded-t-full gap-2;
+    @apply bottom-0 border-b-0 py-1 h-11 rounded-none rounded-t-full gap-2 box-border;
 
     .hideOnCollapse {
       @apply hidden;
     }
   }
 
+  .me,
+  .socialGroup,
+  .settingGroup {
+    @apply relative flex-none pl-3 box-border;
+    @apply flex flex-row items-center gap-3;
+  }
+
+  .me {
+    @apply text-center;
+  }
+  .settingGroup,
+  .socialGroup {
+    @apply basis-24;
+  }
+
   .themeToggle {
-    @apply cursor-pointer p-2 hover:bg-[rgb(var(--primary-rgb),_1)] hover:rounded-full;
+    @apply cursor-pointer hover:bg-[rgb(var(--primary-rgb),_1)] hover:rounded-full;
   }
 
   .aboutUsExpansion {
