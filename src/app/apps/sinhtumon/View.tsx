@@ -29,20 +29,49 @@ export default function Page({ basePath }: ViewProps) {
   const squareScriptStatus: UseScriptStatus = useScript(
     getAssetPathWithBasePath(basePath, appPrefix, "/js/square.js")
   );
-  const monsterScriptStatus: UseScriptStatus = useScript(
-    getAssetPathWithBasePath(basePath, appPrefix, "/js/monster.js")
+
+  const monsterBaseScriptStatus: UseScriptStatus = useScript(
+    getAssetPathWithBasePath(basePath, appPrefix, "/js/monsters/monsterBase.js")
   );
+
+  const monsterButterflyScriptStatus: UseScriptStatus = useScript(
+    getAssetPathWithBasePath(
+      basePath,
+      appPrefix,
+      "/js/monsters/implements/butterfly.js"
+    )
+  );
+
+  const monsterThiefScriptStatus: UseScriptStatus = useScript(
+    getAssetPathWithBasePath(
+      basePath,
+      appPrefix,
+      "/js/monsters/implements/thief.js"
+    )
+  );
+
   const bulletScriptStatus: UseScriptStatus = useScript(
     getAssetPathWithBasePath(basePath, appPrefix, "/js/bullet.js")
   );
   const coreScriptStatus: UseScriptStatus = useScript(
     getAssetPathWithBasePath(basePath, appPrefix, "/js/core.js")
   );
-  const stateManagementScriptStatus: UseScriptStatus = useScript(
-    getAssetPathWithBasePath(basePath, appPrefix, "/js/stateManagement.js")
+  const gameStateServiceScriptStatus: UseScriptStatus = useScript(
+    getAssetPathWithBasePath(basePath, appPrefix, "/js//services/gameStateService.js")
+  );
+  const gameMapServiceBaseScriptStatus: UseScriptStatus = useScript(
+    getAssetPathWithBasePath(
+      basePath,
+      appPrefix,
+      "/js/maps/gameMapServiceBase.js"
+    )
   );
   const HoTuThanScriptStatus: UseScriptStatus = useScript(
-    getAssetPathWithBasePath(basePath, appPrefix, "/js/maps/HoTuThan.js")
+    getAssetPathWithBasePath(
+      basePath,
+      appPrefix,
+      "/js/maps/implements/HoTuThan.js"
+    )
   );
   const mainScriptStatus: UseScriptStatus = useScript(
     getAssetPathWithBasePath(basePath, appPrefix, "/js/main.js")
@@ -54,10 +83,13 @@ export default function Page({ basePath }: ViewProps) {
       mazePuzzleScriptStatus === "ready" &&
       towerScriptStatus === "ready" &&
       squareScriptStatus === "ready" &&
-      monsterScriptStatus === "ready" &&
+      monsterBaseScriptStatus === "ready" &&
+      monsterButterflyScriptStatus === "ready" &&
+      monsterThiefScriptStatus === "ready" &&
       bulletScriptStatus === "ready" &&
       coreScriptStatus === "ready" &&
-      stateManagementScriptStatus === "ready" &&
+      gameStateServiceScriptStatus === "ready" &&
+      gameMapServiceBaseScriptStatus === "ready" &&
       HoTuThanScriptStatus === "ready" &&
       mainScriptStatus === "ready";
 
@@ -69,10 +101,13 @@ export default function Page({ basePath }: ViewProps) {
     mazePuzzleScriptStatus,
     towerScriptStatus,
     squareScriptStatus,
-    monsterScriptStatus,
+    monsterBaseScriptStatus,
+    monsterButterflyScriptStatus,
+    monsterThiefScriptStatus,
     bulletScriptStatus,
     coreScriptStatus,
-    stateManagementScriptStatus,
+    gameStateServiceScriptStatus,
+    gameMapServiceBaseScriptStatus,
     HoTuThanScriptStatus,
     mainScriptStatus,
   ]);

@@ -9,10 +9,10 @@ window.setupSquare = (gameStateService, gameMapService) => {
       // NOTE: position x,y is the central point of square, need to transition to left and bottom
       super(
         scene,
-        x * gameMapService.CELL_SIZE + gameMapService.CELL_SIZE / 2,
-        y * gameMapService.CELL_HEIGHT +
-          gameMapService.CELL_HEIGHT / 2 +
-          gameMapService.GAME_BOARD_PADDING_TOP,
+        x * gameMapService.mapConfig.CELL_SIZE + gameMapService.mapConfig.CELL_SIZE / 2,
+        y * gameMapService.mapConfig.CELL_HEIGHT +
+          gameMapService.mapConfig.CELL_HEIGHT / 2 +
+          gameMapService.mapConfig.GAME_BOARD_PADDING_TOP,
         "square"
       );
 
@@ -25,7 +25,7 @@ window.setupSquare = (gameStateService, gameMapService) => {
       this.posX = x;
       this.posY = y;
       this.setAlpha(0.1);
-      this.setDisplaySize(gameMapService.CELL_SIZE, gameMapService.CELL_HEIGHT);
+      this.setDisplaySize(gameMapService.mapConfig.CELL_SIZE, gameMapService.mapConfig.CELL_HEIGHT);
       // this.setDepth(2)
       this.init();
     }
@@ -44,7 +44,7 @@ window.setupSquare = (gameStateService, gameMapService) => {
           let success = this._gameMapService.tryUpdateMap(
             this.posX,
             this.posY,
-            this._gameMapService.CELL_BLOCKED
+            this._gameMapService.mapConfig.CELL_BLOCKED
           );
           if (!success) {
             return;
