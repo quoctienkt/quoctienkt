@@ -2,8 +2,8 @@
 import { useEffect } from "react";
 import "./style.css";
 import { AppImage } from "@/components/core_components/image/Image";
-import Script from "next/script";
-import { AppScript } from "@/components/core_components/script/Script";
+import { UseScriptStatus, useScript } from "usehooks-ts";
+import { getAssetPathWithBasePath } from "@/utils/assetUtil";
 
 const appPrefix = "/apps/handwritingclassification";
 
@@ -15,34 +15,42 @@ export default function View({ basePath }: ViewProps) {
   useEffect(() => {
     document.title = "Hand writing classification";
   }, []);
+  
+  const jqueryScriptStatus: UseScriptStatus = useScript(
+    "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+  );
+  const tensorflowScriptStatus: UseScriptStatus = useScript(
+    "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"
+  );
+  const chartScriptStatus: UseScriptStatus = useScript(
+    "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"
+  );
+  const painScriptStatus: UseScriptStatus = useScript(
+    getAssetPathWithBasePath(basePath, appPrefix, "/js/paint.js")
+  );
+  const mainScriptStatus: UseScriptStatus = useScript(
+    getAssetPathWithBasePath(basePath, appPrefix, "/js/main.js")
+  );
 
   useEffect(() => {
-    (window as any).setupApp(appPrefix);
-  }, []);
+    const allScriptsReady =
+      jqueryScriptStatus === "ready" &&
+      tensorflowScriptStatus === "ready" &&
+      chartScriptStatus === "ready" &&
+      painScriptStatus === "ready" &&
+      mainScriptStatus === "ready";
+    if (allScriptsReady) {
+      (window as any).setupApp(appPrefix);
+    }
+  }, [
+    tensorflowScriptStatus,
+    chartScriptStatus,
+    painScriptStatus,
+    mainScriptStatus,
+  ]);
 
   return (
     <>
-      <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
-        strategy="beforeInteractive"
-      ></Script>
-      <Script
-        src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"
-        strategy="beforeInteractive"
-      ></Script>
-      <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"
-        strategy="beforeInteractive"
-      ></Script>
-      <AppScript
-        src={`${appPrefix}/js/paint.js`}
-        strategy="beforeInteractive"
-      ></AppScript>
-      <AppScript
-        src={`${appPrefix}/js/main.js`}
-        strategy="beforeInteractive"
-      ></AppScript>
-
       <section className="app_handwritingclassification">
         <div id="notification_container"></div>
         <div className="container">
