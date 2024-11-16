@@ -16,6 +16,7 @@
     "@types/postcss-url": "^10.0.0",
     "@types/react": "18.2.15",
     "@types/react-dom": "18.2.7",
+    "abc-module": "file:../core/abc-module",
     "autoprefixer": "10.4.14",
     "eslint": "8.45.0",
     "eslint-config-next": "13.4.10",
