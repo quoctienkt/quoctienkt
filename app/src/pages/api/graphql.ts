@@ -54,7 +54,9 @@ const resolvers = {
       const user = Users.find((u) => u.id === id);
       return user;
     },
-    getUsers: () => Users,
+    getUsers: () => {
+      return Users;
+    },
   },
 };
 
