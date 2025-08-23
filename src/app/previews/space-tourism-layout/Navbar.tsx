@@ -1,10 +1,10 @@
 "use client";
 
-import { AppImage } from "@/components/core_components/image/Image";
 import styles from "./Navbar.module.css";
 import Link from "next/link";
 import { classes, toggle } from "@/utils/toggle";
 import { useState } from "react";
+import Image from "next/image";
 
 const appPrefix = "/previews/space-tourism-layout";
 
@@ -33,12 +33,12 @@ export function Navbar({ navItemActive }: NavbarProps) {
     <>
       <nav className={styles.navbar}>
         <div className={styles.appLogo}>
-          <AppImage
+          <Image
             src={`${appPrefix}/assets/shared/logo.svg`}
             alt="Space tourism logo"
             width={48}
             height={48}
-          ></AppImage>
+          ></Image>
         </div>
 
         <div className={styles.line}></div>
@@ -48,12 +48,12 @@ export function Navbar({ navItemActive }: NavbarProps) {
             className={styles.hamburger}
             onClick={() => handleHamburgerClicked()}
           >
-            <AppImage
+            <Image
               alt="Icon hamburger"
               src="/previews/space-tourism-layout/assets/shared/icon-hamburger.svg"
               width={24}
               height={22}
-            ></AppImage>
+            ></Image>
           </div>
         )}
         {navbarOpen && (
@@ -62,12 +62,12 @@ export function Navbar({ navItemActive }: NavbarProps) {
               className={styles.navbarToggleClose}
               onClick={() => closeNavbarToggle()}
             >
-              <AppImage
+              <Image
                 alt="Icon close"
                 src="/previews/space-tourism-layout/assets/shared/icon-close.svg"
                 width={24}
                 height={22}
-              ></AppImage>
+              ></Image>
             </div>
             <div
               className={styles.backdrop}

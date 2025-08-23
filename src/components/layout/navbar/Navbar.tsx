@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import styles from "./Navbar.module.css";
-import { AppImage } from "../../core_components/image/Image";
 import { useState } from "react";
 import { classes, toggle } from "@/utils/toggle";
+import Image from "next/image";
 
 type NavbarProps = {
-  basePath: string;
   className: string;
 };
 
@@ -17,7 +16,7 @@ export default function Navbar(props: NavbarProps) {
   return (
     <div className={classes(styles.navbar, props.className)}>
       <Link href="/">
-        <AppImage
+        <Image
           src="/img/next.svg"
           alt="App Logo"
           className={styles.logo}

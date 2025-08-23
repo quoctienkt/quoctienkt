@@ -7,21 +7,14 @@ import { NoLayout } from "./noLayout/NoLayout";
 
 type LayoutProviderProps = {
   children: React.ReactNode;
-  basePath: string;
 };
 
 export function LayoutProvider(props: LayoutProviderProps) {
   const pathname = usePathname();
   return (
     <>
-      {pathname === props.basePath && (
-        <DefaultLayout basePath={props.basePath}>
-          {props.children}
-        </DefaultLayout>
-      )}
-      {pathname?.startsWith(props.basePath + "/previews") && (
-        <>{props.children}</>
-      )}
+      {pathname === "/" && <DefaultLayout>{props.children}</DefaultLayout>}
+      {pathname?.startsWith("/previews") && <>{props.children}</>}
     </>
   );
 }

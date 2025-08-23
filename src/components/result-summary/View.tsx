@@ -3,12 +3,11 @@ import { SummaryItem } from "./SummaryItem";
 import { classes } from "@/utils/toggle";
 
 type ResultSummaryProps = {
-  basePath: string;
   appPrefix: string;
   className: string;
 };
 
-export function ResultSummary({ basePath, appPrefix, className }: ResultSummaryProps) {
+export function ResultSummary({ appPrefix, className }: ResultSummaryProps) {
   return (
     <div className={classes(styles.wrapper, className)}>
       <div className={styles.result}>
@@ -30,7 +29,6 @@ export function ResultSummary({ basePath, appPrefix, className }: ResultSummaryP
           <SummaryItem
             text="Memory"
             variant="red"
-            basePath={basePath}
             appPrefix={appPrefix}
             iconSrc="/assets/images/icon-memory.svg"
             percentValue={80}
@@ -38,7 +36,6 @@ export function ResultSummary({ basePath, appPrefix, className }: ResultSummaryP
           <SummaryItem
             text="Reaction"
             variant="yellow"
-            basePath={basePath}
             appPrefix={appPrefix}
             iconSrc="/assets/images/icon-reaction.svg"
             percentValue={92}
@@ -46,7 +43,6 @@ export function ResultSummary({ basePath, appPrefix, className }: ResultSummaryP
           <SummaryItem
             text="Verbal"
             variant="green"
-            basePath={basePath}
             appPrefix={appPrefix}
             iconSrc="/assets/images/icon-verbal.svg"
             percentValue={61}
@@ -54,7 +50,6 @@ export function ResultSummary({ basePath, appPrefix, className }: ResultSummaryP
           <SummaryItem
             text="Visual"
             variant="blue"
-            basePath={basePath}
             appPrefix={appPrefix}
             iconSrc="/assets/images/icon-visual.svg"
             percentValue={72}

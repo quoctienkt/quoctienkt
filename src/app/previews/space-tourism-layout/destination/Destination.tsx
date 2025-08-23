@@ -2,13 +2,13 @@
 
 import { Suspense, useCallback, useEffect, useState } from "react";
 import styles from "./Destination.module.css";
-import { AppImage } from "@/components/core_components/image/Image";
 import { classes, toggle } from "@/utils/toggle";
 import pageData from "./data.json";
 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useImmer } from "use-immer";
+import Image from "next/image";
 
 const destinationsData = pageData.destinations;
 const appPrefix = "/previews/space-tourism-layout";
@@ -98,7 +98,7 @@ export function Destination() {
                 containerClassName={styles.demoImg}
               />
             )}
-            <AppImage
+            <Image
               className={classes(
                 styles.img,
                 toggle(!demoImgLoading, "block", "hidden")
@@ -113,7 +113,7 @@ export function Destination() {
               onLoadingComplete={() => {
                 setDemoImgLoading(false);
               }}
-            ></AppImage>
+            ></Image>
           </div>
           <div className={styles.content}>
             <div className={styles.tabs}>

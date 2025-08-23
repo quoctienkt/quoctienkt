@@ -1,11 +1,9 @@
 import styles from "./SpaceTourismLayout.module.css";
 import { NavItemActiveTypes, Navbar } from "./Navbar";
 import { classes } from "@/utils/toggle";
-import { Suspense } from "react";
 
 type SpaceTourismLayoutProps = {
   children: React.ReactNode;
-  basePath: string;
   navItemActive: NavItemActiveTypes;
   backgroundMobileUrl: string;
   backgroundTabletUrl: string;
@@ -13,16 +11,15 @@ type SpaceTourismLayoutProps = {
 };
 
 export function SpaceTourismLayout({
-  basePath,
   children,
   navItemActive,
   backgroundMobileUrl,
   backgroundTabletUrl,
   backgroundDesktopUrl,
 }: SpaceTourismLayoutProps) {
-  const backgroundMobileCss = `url(${basePath}${backgroundMobileUrl})`;
-  const backgroundTabletCss = `url(${basePath}${backgroundTabletUrl})`;
-  const backgroundDesktopCss = `url(${basePath}${backgroundDesktopUrl})`;
+  const backgroundMobileCss = `url(${backgroundMobileUrl})`;
+  const backgroundTabletCss = `url(${backgroundTabletUrl})`;
+  const backgroundDesktopCss = `url(${backgroundDesktopUrl})`;
   return (
     <div className={classes(styles.wrapper)}>
       <div>

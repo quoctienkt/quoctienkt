@@ -1,12 +1,9 @@
-import { getAssetPathWithBasePath } from "@/utils/assetUtil";
-import { classes } from "@/utils/toggle";
-import Image from "next/image";
-
 import styles from "./SummaryItem.module.css";
+import Image from "next/image";
+import { classes } from "@/utils/toggle";
 
 type SummaryItemProps = {
   text: string;
-  basePath: string;
   appPrefix: string;
   iconSrc: string;
   percentValue: number;
@@ -19,11 +16,7 @@ export function SummaryItem(props: SummaryItemProps) {
       <div className={classes(styles.item, styles[props.variant])}>
         <div className={styles.itemIcon}>
           <Image
-            src={getAssetPathWithBasePath(
-              props.basePath,
-              props.appPrefix,
-              props.iconSrc
-            )}
+            src={`${props.appPrefix}${props.iconSrc}`}
             height={30}
             width={30}
             alt={props.text}

@@ -159,9 +159,7 @@ async function setupApp(appPrefix) {
     load.innerHTML = "Please wait for loading model!";
     submit.disabled = true;
 
-    dl_model_path = await window.getAssetPath(
-      `${appPrefix}/dl_model/model.json`
-    );
+    dl_model_path = `${appPrefix}/dl_model/model.json`;
     model = await tf.loadLayersModel(dl_model_path);
 
     console.log("Load dl_modal finished");

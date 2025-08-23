@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { AppImage } from "../../core_components/image/Image";
 import styles from "./AboutUs.module.css";
 import { VerticalLine } from "@/components/verticalLine/VerticalLine";
 import { useEffect, useState } from "react";
@@ -9,6 +8,7 @@ import { useTheme } from "next-themes";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { classes, toggle } from "@/utils/toggle";
+import Image from "next/image";
 
 const AboutUsExpansionLocalStorageKey = "about-us-expansion";
 const aboutUsExpansionAtom = atomWithStorage(
@@ -43,21 +43,21 @@ export function AboutUs() {
       <div className={styles.socialGroup}>
         {verticalLine}
         <Link href="https://www.facebook.com/dangquoctienvktl/" target="_blank">
-          <AppImage
+          <Image
             src="/img/icons8-facebook-48.png"
             alt="Facebook Icon"
             width={48}
             height={48}
-          ></AppImage>
+          ></Image>
           <span></span>
         </Link>
         <Link href="https://github.com/quoctienkt/quoctienkt/" target="_blank">
-          <AppImage
+          <Image
             src="/img/github-6980894_1280.png"
             alt="Github Icon"
             width={40}
             height={40}
-          ></AppImage>
+          ></Image>
         </Link>
       </div>
 
@@ -70,12 +70,12 @@ export function AboutUs() {
               setTheme("light");
             }}
           >
-            <AppImage
+            <Image
               src="/img/brightness-and-contrast.png"
               alt="Theme Config Light Icon"
               width={40}
               height={40}
-            ></AppImage>
+            ></Image>
           </div>
         )}
         {theme === "light" && (
@@ -85,12 +85,12 @@ export function AboutUs() {
               setTheme("dark");
             }}
           >
-            <AppImage
+            <Image
               src="/img/moon.png"
               alt="Theme Config Moon Icon"
               width={40}
               height={40}
-            ></AppImage>
+            ></Image>
           </div>
         )}
 
@@ -99,22 +99,22 @@ export function AboutUs() {
           onClick={() => setAboutUsExpansion(!aboutUsExpansion)}
         >
           {aboutUsExpansion && (
-            <AppImage
+            <Image
               className="rotate-180 invert"
               src="/img/to_top.png"
               alt="About Us Collapse Icon"
               width={40}
               height={40}
-            ></AppImage>
+            ></Image>
           )}
           {!aboutUsExpansion && (
-            <AppImage
+            <Image
               className="invert"
               src="/img/to_top.png"
               alt="About Us Expansion Icon"
               width={40}
               height={40}
-            ></AppImage>
+            ></Image>
           )}
         </div>
       </div>
