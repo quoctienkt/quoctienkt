@@ -1,6 +1,6 @@
 window.setupGame = (appPrefix) => {
   window.loadGameMapService();
-  
+
   window._gameStateService = new GameStateService();
   window._gameMapService = new HoTuThanMap();
 
@@ -57,89 +57,48 @@ function preload() {
 
   const snowflakeTower = window.getTowerSnowFlakeData();
 
-  this.load.image(
-    "background",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/background.png")
-  );
-  this.load.image(
-    "background1",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/background1.png")
-  );
-  this.load.image(
-    "square",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/square2.png")
-  );
-  this.load.image(
-    "arrow",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/arrow.png")
-  );
+  this.load.image("background", `${window.appPrefix}/img/background.png"`);
+  this.load.image("background1", `${window.appPrefix}/img/background1.png`);
+  this.load.image("square", `${window.appPrefix}/img/square2.png`);
+  this.load.image("arrow", `${window.appPrefix}/img/arrow.png`);
 
-  this.load.image(
-    "tower_range",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/circle_2.png")
-  );
+  this.load.image("tower_range", `${window.appPrefix}/img/circle_2.png`);
 
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 1),
-    window.getAssetPathWithAppPrefix(
-      window.appPrefix,
-      "/img/tower/frozen_bullet/1.png"
-    )
+    `${window.appPrefix}/img/tower/frozen_bullet/1.png`
   );
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 2),
-    window.getAssetPathWithAppPrefix(
-      window.appPrefix,
-      "/img/tower/frozen_bullet/2.png"
-    )
+    `${window.appPrefix}/img/tower/frozen_bullet/2.png`
   );
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 3),
-    window.getAssetPathWithAppPrefix(
-      window.appPrefix,
-      "/img/tower/frozen_bullet/3.png"
-    )
+    `${window.appPrefix}/img/tower/frozen_bullet/3.png`
   );
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 4),
-    window.getAssetPathWithAppPrefix(
-      window.appPrefix,
-      "/img/tower/frozen_bullet/4.png"
-    )
+    `${window.appPrefix}/img/tower/frozen_bullet/4.png`
   );
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 5),
-    window.getAssetPathWithAppPrefix(
-      window.appPrefix,
-      "/img/tower/frozen_bullet/5.png"
-    )
+    `${window.appPrefix}/img/tower/frozen_bullet/5.png`
   );
 
-  this.load.image(
-    "upgrade",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/loop.png")
-  );
-  this.load.spritesheet(
-    "sell",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/coin.png"),
-    {
-      frameWidth: 32,
-      frameHeight: 32,
-    }
-  );
+  this.load.image("upgrade", `${window.appPrefix}/img/loop.png`);
+  this.load.spritesheet("sell", `${window.appPrefix}/img/coin.png`, {
+    frameWidth: 32,
+    frameHeight: 32,
+  });
 
-  this.load.spritesheet(
-    "onDead",
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/explosion.png"),
-    {
-      frameWidth: 64,
-      frameHeight: 64,
-    }
-  );
+  this.load.spritesheet("onDead", `${window.appPrefix}/img/explosion.png`, {
+    frameWidth: 64,
+    frameHeight: 64,
+  });
 
   this.load.spritesheet(
     window.getConstants().MONSTER_THIEF,
-    window.getAssetPathWithAppPrefix(window.appPrefix, "/img/ani_beast.png"),
+    `${window.appPrefix}/img/ani_beast.png`,
     {
       frameWidth: 32,
       frameHeight: 53,
@@ -147,10 +106,7 @@ function preload() {
   );
   this.load.spritesheet(
     window.getConstants().MONSTER_BUTTERFLY,
-    window.getAssetPathWithAppPrefix(
-      window.appPrefix,
-      "/img/monster/flying/butterfly.png"
-    ),
+    `${window.appPrefix}/img/monster/flying/butterfly.png`,
     {
       frameWidth: 70,
       frameHeight: 65,
@@ -159,38 +115,23 @@ function preload() {
 
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 1),
-    window.getAssetPathWithAppPrefix(
-      window.appPrefix,
-      "/img/tower/frozen/1.png"
-    )
+    `${window.appPrefix}/img/tower/frozen/1.png`
   );
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 2),
-    window.getAssetPathWithAppPrefix(
-      window.appPrefix,
-      "/img/tower/frozen/2.png"
-    )
+    `${window.appPrefix}/img/tower/frozen/2.png`
   );
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 3),
-    window.getAssetPathWithAppPrefix(
-      window.appPrefix,
-      "/img/tower/frozen/3.png"
-    )
+    `${window.appPrefix}/img/tower/frozen/3.png`
   );
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 4),
-    window.getAssetPathWithAppPrefix(
-      window.appPrefix,
-      "/img/tower/frozen/4.png"
-    )
+    `${window.appPrefix}/img/tower/frozen/4.png`
   );
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 5),
-    window.getAssetPathWithAppPrefix(
-      window.appPrefix,
-      "/img/tower/frozen/5.png"
-    )
+    `${window.appPrefix}/img/tower/frozen/5.png`
   );
 
   graphics = this.add.graphics();
@@ -292,7 +233,6 @@ function monsterRespawn(number) {
     parseInt(Math.random() * 10) % 2
       ? window.getConstants().MONSTER_BUTTERFLY
       : window.getConstants().MONSTER_THIEF;
-      // window.getConstants().MONSTER_THIEF;
 
   window._gameStateService.setWave((wave) => wave + 1);
   for (let i = 0; i < 15; i++) {
@@ -372,7 +312,7 @@ function update(time, delta) {
     monster.setPosWithHealth(monster.follower.vec.x, monster.follower.vec.y);
   });
 
-  //Cập nhật đường đạn
+  // update bullet trajectory
   _gameStateService.savedData.bullets.forEach((bullet) =>
     moveTo.call(this, bullet, bullet.target, bullet.speed)
   );
