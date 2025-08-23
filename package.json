@@ -4,11 +4,11 @@
   "homepage": "https://quoctienkt.github.io/quoctienkt",
   "private": true,
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "npm run predeploy && gh-pages -d build -b main",
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
+    "predeploy": "npm run build",
+    "deploy": "npm run predeploy && gh-pages -d build -b main",
     "lint": "next lint"
   },
   "dependencies": {
@@ -21,7 +21,7 @@
     "eslint-config-next": "13.4.10",
     "immer": "^10.0.2",
     "jotai": "^2.2.2",
-    "next": "13.4.10",
+    "next": "^15.5.0",
     "next-themes": "^0.2.1",
     "postcss": "^8.4.26",
     "postcss-url": "^10.1.3",
