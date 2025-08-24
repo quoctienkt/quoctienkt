@@ -1,128 +1,125 @@
 /* General Styles */
 .app_handwritingclassification {
   position: relative;
+  display: flex;
+  flex-direction: column;
   max-width: 1000px;
   margin: 0 auto;
-  padding: 25px;
   text-align: center;
   background: linear-gradient(to bottom, #2ebf91, #8360c3);
   background-repeat: no-repeat;
   background-attachment: fixed;
   font-size: 16px;
-  padding-top: 50px;
-  padding-bottom: 15px;
-  color: white;
-}
-
-/* Notification Styles */
-#notification_container {
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 0;
-  text-align: center;
-  margin: 0;
-  padding: 5px;
-}
-
-.alert {
   padding: 15px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-.alert-info {
-  color: #31708f;
-  background-color: #d9edf7;
-  border-color: #bce8f1;
-}
-
-.alert-danger {
-  color: #a94442;
-  background-color: #f2dede;
-  border-color: #ebccd1;
-}
-
-/* Container */
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-/* Canvas and Chart */
-#myCanvas {
-  background: black;
-  border: 2px solid #2ebf91;
-  border-radius: 8px;
-  touch-action: none;
-}
-
-.chart-container {
-  border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 10px;
-}
-
-/* Actions */
-.actions {
-  margin-top: 20px;
-}
-
-.action-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-}
-
-.predict-btn {
-  background-color: #f50057;
   color: white;
-  margin-right: 10px;
+  height: fit-content;
+
+  .information {
+    padding: 2px;
+
+    .info-icon {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .info-icon:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  #notification_container {
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    padding: 5px;
+  }
+
+  .alert {
+    padding: 15px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+
+  .alert-info {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+  }
+
+  .alert-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+  }
+
+  /* Container */
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  /* Canvas and Chart */
+  #myCanvas {
+    background: black;
+    border: 2px solid #2ebf91;
+    border-radius: 8px;
+    touch-action: none;
+  }
+
+  .chart-container {
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+  }
+
+  /* Actions */
+  .actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .action-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+
+  .predict-btn {
+    background-color: #f50057;
+    color: white;
+    margin-right: 10px;
+  }
+
+  .predict-btn:hover {
+    background-color: #c51162;
+  }
+
+  .predict-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+
+  .clear-btn {
+    background-color: #4a4a4a;
+    color: white;
+  }
+
+  .clear-btn:hover {
+    background-color: #6d6d6d;
+  }
 }
 
-.predict-btn:hover {
-  background-color: #c51162;
-}
-
-.predict-btn:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-.clear-btn {
-  background-color: #4a4a4a;
-  color: white;
-}
-
-.clear-btn:hover {
-  background-color: #6d6d6d;
-}
-
-/* Information Icon */
-.information {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-}
-
-.info-icon {
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.info-icon:hover {
-  transform: scale(1.1);
-}
-
-/* Modal */
 .modal {
   display: block;
   position: fixed;

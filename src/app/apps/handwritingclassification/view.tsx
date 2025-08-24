@@ -2,253 +2,49 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import * as tf from "@tensorflow/tfjs";
-import { Chart, registerables } from "chart.js";
+import type { LayersModel } from "@tensorflow/tfjs";
 import infoIcon from "@/assets/img/information.png";
 import "./style.css";
 import Modal from "./Modal";
+import { HandwritingClassifier } from "./logic";
 
 const handWritingAIModelPath = `${process.env.NEXT_PUBLIC_BASE_URL}/handwritingclassification/model.json`;
 
-Chart.register(...registerables);
-
 export default function View() {
-  const [model, setModel] = useState<tf.LayersModel | null>(null);
-  const [chart, setChart] = useState<Chart | null>(null);
-  const [notification, setNotification] = useState("");
+  const [model, setModel] = useState<LayersModel | null>(null);
+  const [notification, setNotification] = useState(
+    "Please wait for loading model!"
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [classifier, setClassifier] = useState<HandwritingClassifier | null>(
+    null
+  );
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<HTMLCanvasElement>(null);
-  const isDrawing = useRef(false);
-  const lastX = useRef(0);
-  const lastY = useRef(0);
 
   useEffect(() => {
-    const loadModel = async () => {
-      setNotification("Please wait for loading model!");
-      try {
-        const loadedModel = await tf.loadLayersModel(handWritingAIModelPath);
-        setModel(loadedModel);
-        setNotification("Load finish, use model to guess hand writing number");
-      } catch (error) {
-        console.error("Error loading model:", error);
-        setNotification("Error loading model.");
-      }
-    };
-    loadModel();
+    if (canvasRef.current && chartRef.current) {
+      const newClassifier = new HandwritingClassifier(
+        handWritingAIModelPath,
+        canvasRef.current,
+        chartRef.current,
+        setModel,
+        setNotification
+      );
+      setClassifier(newClassifier);
+    }
   }, []);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const startDrawing = (e: PointerEvent) => {
-      isDrawing.current = true;
-      [lastX.current, lastY.current] = [e.offsetX, e.offsetY];
-    };
-
-    const draw = (e: PointerEvent) => {
-      if (!isDrawing.current) return;
-      if (ctx) {
-        ctx.beginPath();
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 11;
-        ctx.lineJoin = "round";
-        ctx.moveTo(lastX.current, lastY.current);
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.closePath();
-        ctx.stroke();
-      }
-      [lastX.current, lastY.current] = [e.offsetX, e.offsetY];
-    };
-
-    const stopDrawing = () => {
-      isDrawing.current = false;
-    };
-
-    canvas.addEventListener("pointerdown", startDrawing);
-    canvas.addEventListener("pointermove", draw);
-    canvas.addEventListener("pointerup", stopDrawing);
-    canvas.addEventListener("pointerout", stopDrawing);
-
-    return () => {
-      canvas.removeEventListener("pointerdown", startDrawing);
-      canvas.removeEventListener("pointermove", draw);
-      canvas.removeEventListener("pointerup", stopDrawing);
-      canvas.removeEventListener("pointerout", stopDrawing);
-    };
-  }, []);
-
-  const crop_top_bottom = (
-    flat_color: Uint8ClampedArray,
-    width: number,
-    height: number
-  ) => {
-    let result = [];
-    let itRow = 0;
-
-    let it = 0;
-    while (itRow < height) {
-      let row = [];
-      let itCol = 0;
-      while (itCol < width) {
-        if (
-          flat_color[it] +
-            flat_color[it + 1] +
-            flat_color[it + 2] +
-            flat_color[it + 3] >
-          0
-        ) {
-          row.push([255, 255, 255]);
-        } else {
-          row.push([0, 0, 0]);
-        }
-        it += 4;
-        itCol += 1;
-      }
-      for (let i in row) {
-        if (row[i][0]) {
-          result.push(row);
-          break;
-        }
-      }
-
-      itRow += 1;
+  const onPredict = () => {
+    if (classifier) {
+      classifier.handlePredict();
     }
-    return result;
   };
 
-  const crop_left_right = (pixel: number[][][]) => {
-    let width = pixel[0].length;
-    let crop_right = 0;
-    let crop_left = 0;
-    let height = pixel.length;
-
-    //Crop left
-    let condition = 0;
-    while (width--) {
-      let i = height;
-      while (i--) {
-        if (pixel[i][crop_left][0] != 0) {
-          condition = 1;
-          break;
-        }
-      }
-
-      if (condition) {
-        break;
-      } else {
-        crop_left += 1;
-      }
-    }
-
-    let i = height;
-    if (crop_left) {
-      while (i--) {
-        pixel[i].splice(0, crop_left);
-      }
-    }
-
-    //end crop left
-
-    //Crop right
-    condition = 0;
-    while (width--) {
-      let i = height;
-      while (i--) {
-        if (pixel[i][width][0] != 0) {
-          condition = 1;
-          break;
-        }
-      }
-
-      if (condition) {
-        break;
-      } else {
-        crop_right += 1;
-      }
-    }
-
-    i = height;
-    if (crop_right) {
-      while (i--) {
-        pixel[i].splice(-1 - crop_right, crop_right);
-      }
-    }
-
-    return pixel;
-  };
-
-  const handlePredict = async () => {
-    if (!model || !canvasRef.current) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const input_width = canvas.width;
-    const input_height = canvas.height;
-
-    const raw = ctx.getImageData(0, 0, input_width, input_height).data;
-    const img_crop_top_bottom = crop_top_bottom(raw, input_width, input_height);
-    const crop_full = crop_left_right(img_crop_top_bottom);
-
-    const width = crop_full[0].length;
-    const height = crop_full.length;
-    const newImg = tf
-      .tensor(crop_full, [height, width, 3])
-      .resizeNearestNeighbor([28, 28])
-      .mean(2)
-      .expandDims(2)
-      .expandDims()
-      .toFloat()
-      .div(255.0);
-
-    const result = ((await model.predict(newImg)) as tf.Tensor).dataSync();
-    displayChart(Array.from(result));
-  };
-
-  const displayChart = (data: number[]) => {
-    if (!chartRef.current) return;
-    const label = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-
-    if (chart) {
-      chart.destroy();
-    }
-
-    const newChart = new Chart(chartRef.current, {
-      type: "bar",
-      data: {
-        labels: label,
-        datasets: [
-          {
-            label: "prediction",
-            backgroundColor: "#f50057",
-            borderColor: "rgb(255, 99, 132)",
-            data: data,
-          },
-        ],
-      },
-      options: {},
-    });
-    setChart(newChart);
-  };
-
-  const handleClear = () => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-    }
-    if (chart) {
-      chart.destroy();
-      setChart(null);
+  const onClear = () => {
+    if (classifier) {
+      classifier.handleClear();
     }
   };
 
@@ -262,45 +58,48 @@ export default function View() {
       >
         {notification}
       </div>
-      <div className="container">
-        <div>
-          <canvas
-            id="myCanvas"
-            className="active"
-            ref={canvasRef}
-            width={300}
-            height={350}
-          ></canvas>
+
+      <div>
+        <div className="container">
+          <div>
+            <canvas
+              id="myCanvas"
+              className="active"
+              ref={canvasRef}
+              width={300}
+              height={350}
+            ></canvas>
+          </div>
+          <div className="chart-container">
+            <canvas ref={chartRef} width={400} height={350}></canvas>
+          </div>
         </div>
-        <div className="chart-container">
-          <canvas ref={chartRef} width={400} height={350}></canvas>
+
+        <hr className="hr_footer" />
+
+        <div className="actions">
+          <button
+            className="action-btn predict-btn"
+            onClick={onPredict}
+            disabled={!model}
+          >
+            Predict
+          </button>
+          <button onClick={onClear} className="action-btn clear-btn">
+            Clear
+          </button>
+
+          <div className="information">
+            <Image
+              src={infoIcon}
+              alt="App's info icon"
+              className="info-icon"
+              width={50}
+              height={50}
+              onClick={() => setIsModalOpen(true)}
+            />
+          </div>
         </div>
-      </div>
-
-      <hr className="hr_footer" />
-
-      <div className="actions">
-        <button
-          className="action-btn predict-btn"
-          onClick={handlePredict}
-          disabled={!model}
-        >
-          Predict
-        </button>
-        <button onClick={handleClear} className="action-btn clear-btn">
-          Clear
-        </button>
-      </div>
-
-      <div className="information">
-        <Image
-          src={infoIcon}
-          alt="App's info icon"
-          className="info-icon"
-          width={50}
-          height={50}
-          onClick={() => setIsModalOpen(true)}
-        />
       </div>
 
       {isModalOpen && <Modal setIsModalOpen={setIsModalOpen} />}

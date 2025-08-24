@@ -7,7 +7,7 @@
   }
 
   .mainPage {
-    @apply relative flex flex-col w-full h-full overflow-auto p-0;
+    @apply relative flex flex-col w-full h-full overflow-auto p-0 mb-[100px];
     @apply max-lg:p-0 max-lg:overflow-x-hidden;
 
     .main {
