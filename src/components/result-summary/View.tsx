@@ -7,11 +7,10 @@ import VerbalIcon from "@/assets/apps/result-summary/assets/images/icon-verbal.s
 import VisualIcon from "@/assets/apps/result-summary/assets/images/icon-visual.svg";
 
 type ResultSummaryProps = {
-  appPrefix: string;
   className: string;
 };
 
-export function ResultSummary({ appPrefix, className }: ResultSummaryProps) {
+export function ResultSummary({ className }: ResultSummaryProps) {
   return (
     <div className={classes(styles.wrapper, className)}>
       <div className={styles.result}>

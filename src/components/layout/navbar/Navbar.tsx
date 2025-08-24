@@ -56,17 +56,17 @@ export default function Navbar(props: NavbarProps) {
       <div
         className={classes(styles.navLinks, toggle(navbarOpen, styles.active))}
       >
-        <Link href="/apps/handwritingclassification">
+        <Link href="/apps/handwritingclassification" target="_self">
           Hand-writing classification
         </Link>
         <Link href="/apps/sinhtumon">Sinh tử môn</Link>
-        <Link href="/previews/single-price-grid" target="_blank">
+        <Link href="/previews/single-price-grid" target="_self">
           Single Price Grid
         </Link>
-        <Link href="/previews/result-summary" target="_blank">
+        <Link href="/previews/result-summary" target="_self">
           Result summary
         </Link>
-        <Link href="/previews/space-tourism-layout" target="_blank">
+        <Link href="/previews/space-tourism-layout" target="_self">
           Space Tourism Layout
         </Link>
       </div>
