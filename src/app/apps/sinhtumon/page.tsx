@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { UseScriptStatus, useScript } from "usehooks-ts";
 import urlJoin from "url-join";
 
-const appPrefix = "/apps/sinhtumon";
+const appPrefix = `${process.env.NEXT_PUBLIC_BASE_URL}/sinhtumon`;
 
 export default function Page() {
   useEffect(() => {
@@ -17,21 +17,21 @@ export default function Page() {
   );
 
   const mazePuzzleScriptStatus: UseScriptStatus = useScript(
-    urlJoin( appPrefix, "/js/mazePuzzle.js")
+    urlJoin(appPrefix, "/js/mazePuzzle.js")
   );
   const towerScriptStatus: UseScriptStatus = useScript(
-    urlJoin( appPrefix, "/js/tower.js")
+    urlJoin(appPrefix, "/js/tower.js")
   );
   const squareScriptStatus: UseScriptStatus = useScript(
-    urlJoin( appPrefix, "/js/square.js")
+    urlJoin(appPrefix, "/js/square.js")
   );
 
   const monsterBaseScriptStatus: UseScriptStatus = useScript(
-    urlJoin( appPrefix, "/js/monsters/monsterBase.js")
+    urlJoin(appPrefix, "/js/monsters/monsterBase.js")
   );
 
   const monsterButterflyScriptStatus: UseScriptStatus = useScript(
-    urlJoin( appPrefix, "/js/monsters/implements/butterfly.js")
+    urlJoin(appPrefix, "/js/monsters/implements/butterfly.js")
   );
 
   const monsterThiefScriptStatus: UseScriptStatus = useScript(
@@ -45,7 +45,7 @@ export default function Page() {
     urlJoin(appPrefix, "/js/core.js")
   );
   const gameStateServiceScriptStatus: UseScriptStatus = useScript(
-    urlJoin( appPrefix, "/js//services/gameStateService.js")
+    urlJoin(appPrefix, "/js//services/gameStateService.js")
   );
   const gameMapServiceBaseScriptStatus: UseScriptStatus = useScript(
     urlJoin(appPrefix, "/js/maps/gameMapServiceBase.js")

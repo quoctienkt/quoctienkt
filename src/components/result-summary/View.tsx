@@ -1,10 +1,10 @@
 import styles from "./View.module.css";
 import { SummaryItem } from "./SummaryItem";
 import { classes } from "@/utils/toggle";
-import MemoryIcon from "@/assets/apps/result-summary/assets/images/icon-memory.svg";
-import ReactionIcon from "@/assets/apps/result-summary/assets/images/icon-reaction.svg";
-import VerbalIcon from "@/assets/apps/result-summary/assets/images/icon-verbal.svg";
-import VisualIcon from "@/assets/apps/result-summary/assets/images/icon-visual.svg";
+import MemoryIcon from "@/assets/previews/result-summary/assets/images/icon-memory.svg";
+import ReactionIcon from "@/assets/previews/result-summary/assets/images/icon-reaction.svg";
+import VerbalIcon from "@/assets/previews/result-summary/assets/images/icon-verbal.svg";
+import VisualIcon from "@/assets/previews/result-summary/assets/images/icon-visual.svg";
 
 type ResultSummaryProps = {
   className: string;
