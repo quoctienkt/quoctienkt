@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Destination.module.css";
 import { classes, toggle } from "@/utils/toggle";
 import pageData from "./data.json";
@@ -10,8 +10,19 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { useImmer } from "use-immer";
 import Image from "next/image";
 
+import moonPng from "@/assets/previews/space-tourism-layout/assets/destination/image-moon.png";
+import marsPng from "@/assets/previews/space-tourism-layout/assets/destination/image-mars.png";
+import europaPng from "@/assets/previews/space-tourism-layout/assets/destination/image-europa.png";
+import titanPng from "@/assets/previews/space-tourism-layout/assets/destination/image-titan.png";
+
 const destinationsData = pageData.destinations;
-const appPrefix = "/previews/space-tourism-layout";
+
+const destinationImages = {
+  Moon: moonPng,
+  Mars: marsPng,
+  Europa: europaPng,
+  Titan: titanPng,
+};
 
 type TabTypes = "Moon" | "Mars" | "Europa" | "Titan";
 type TabStatus =
@@ -34,11 +45,6 @@ const defaultState: DestinationStates = {
 
 export function Destination() {
   const [state, setState] = useImmer<DestinationStates>(defaultState);
-  const [demoImgLoading, setDemoImgLoading] = useState(false);
-
-  useEffect(() => {
-    setDemoImgLoading(true);
-  }, []);
 
   const getTabStatus = (tab: TabTypes): TabStatus => {
     if (tab === state.tabTransitioningInStart) {
@@ -70,7 +76,6 @@ export function Destination() {
 
   const handleTabClicked = (tab: TabTypes) => {
     if (tab !== state.tabActive) {
-      setDemoImgLoading(true);
       setState((prev) => {
         prev.tabTransitioningInStart = tab;
       });
@@ -90,30 +95,13 @@ export function Destination() {
         <header>Pick your destination</header>
         <section className={styles.contentWrapper}>
           <div className={styles.demoImg}>
-            {demoImgLoading && (
-              <Skeleton
-                circle
-                baseColor="#00000038"
-                className={styles.img}
-                containerClassName={styles.demoImg}
-              />
-            )}
             <Image
-              className={classes(
-                styles.img,
-                toggle(!demoImgLoading, "block", "hidden")
-              )}
-              src={`${appPrefix}${
-                destinationsData.find((i) => i.name === state.tabActive)?.images
-                  .png ?? "undefined"
-              }`}
-              alt="Moon image"
+              className={classes(styles.img)}
+              src={destinationImages[state.tabActive]}
+              alt={`${state.tabActive} image`}
               width="430"
               height="430"
-              onLoadingComplete={() => {
-                setDemoImgLoading(false);
-              }}
-            ></Image>
+            />
           </div>
           <div className={styles.content}>
             <div className={styles.tabs}>

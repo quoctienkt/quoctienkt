@@ -4,8 +4,7 @@ import { classes } from "@/utils/toggle";
 
 type SummaryItemProps = {
   text: string;
-  appPrefix: string;
-  iconSrc: string;
+  iconSrc: any;
   percentValue: number;
   variant: "red" | "yellow" | "green" | "blue";
 };
@@ -16,7 +15,7 @@ export function SummaryItem(props: SummaryItemProps) {
       <div className={classes(styles.item, styles[props.variant])}>
         <div className={styles.itemIcon}>
           <Image
-            src={`${props.appPrefix}${props.iconSrc}`}
+            src={props.iconSrc}
             height={30}
             width={30}
             alt={props.text}

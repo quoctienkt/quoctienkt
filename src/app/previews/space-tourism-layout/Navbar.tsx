@@ -5,6 +5,9 @@ import Link from "next/link";
 import { classes, toggle } from "@/utils/toggle";
 import { useState } from "react";
 import Image from "next/image";
+import Logo from "@/assets/previews/space-tourism-layout/assets/shared/logo.svg";
+import HamburgerIcon from "@/assets/previews/space-tourism-layout/assets/shared/icon-hamburger.svg";
+import CloseIcon from "@/assets/previews/space-tourism-layout/assets/shared/icon-close.svg";
 
 const appPrefix = "/previews/space-tourism-layout";
 
@@ -34,7 +37,7 @@ export function Navbar({ navItemActive }: NavbarProps) {
       <nav className={styles.navbar}>
         <div className={styles.appLogo}>
           <Image
-            src={`${appPrefix}/assets/shared/logo.svg`}
+            src={Logo}
             alt="Space tourism logo"
             width={48}
             height={48}
@@ -50,7 +53,7 @@ export function Navbar({ navItemActive }: NavbarProps) {
           >
             <Image
               alt="Icon hamburger"
-              src="/previews/space-tourism-layout/assets/shared/icon-hamburger.svg"
+              src={HamburgerIcon}
               width={24}
               height={22}
             ></Image>
@@ -64,7 +67,7 @@ export function Navbar({ navItemActive }: NavbarProps) {
             >
               <Image
                 alt="Icon close"
-                src="/previews/space-tourism-layout/assets/shared/icon-close.svg"
+                src={CloseIcon}
                 width={24}
                 height={22}
               ></Image>

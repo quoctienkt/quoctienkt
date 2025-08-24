@@ -9,6 +9,11 @@ import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { classes, toggle } from "@/utils/toggle";
 import Image from "next/image";
+import FacebookIcon from "@/assets/img/icons8-facebook-48.png";
+import GithubIcon from "@/assets/img/github-6980894_1280.png";
+import BrightnessIcon from "@/assets/img/brightness-and-contrast.png";
+import MoonIcon from "@/assets/img/moon.png";
+import ToTopIcon from "@/assets/img/to_top.png";
 
 const AboutUsExpansionLocalStorageKey = "about-us-expansion";
 const aboutUsExpansionAtom = atomWithStorage(
@@ -21,7 +26,7 @@ export function AboutUs() {
   const { theme, setTheme } = useTheme();
   const [aboutUsExpansion, setAboutUsExpansion] = useAtom(aboutUsExpansionAtom);
   const verticalLine = (
-    <VerticalLine background="bg-[rgb(var(--color-central))]"></VerticalLine>
+    <VerticalLine background="bg-[rgb(var(--color-central)))]"></VerticalLine>
   );
 
   useEffect(() => {
@@ -44,7 +49,7 @@ export function AboutUs() {
         {verticalLine}
         <Link href="https://www.facebook.com/dangquoctienvktl/" target="_blank">
           <Image
-            src="/img/icons8-facebook-48.png"
+            src={FacebookIcon}
             alt="Facebook Icon"
             width={48}
             height={48}
@@ -53,7 +58,7 @@ export function AboutUs() {
         </Link>
         <Link href="https://github.com/quoctienkt/quoctienkt/" target="_blank">
           <Image
-            src="/img/github-6980894_1280.png"
+            src={GithubIcon}
             alt="Github Icon"
             width={40}
             height={40}
@@ -71,7 +76,7 @@ export function AboutUs() {
             }}
           >
             <Image
-              src="/img/brightness-and-contrast.png"
+              src={BrightnessIcon}
               alt="Theme Config Light Icon"
               width={40}
               height={40}
@@ -86,7 +91,7 @@ export function AboutUs() {
             }}
           >
             <Image
-              src="/img/moon.png"
+              src={MoonIcon}
               alt="Theme Config Moon Icon"
               width={40}
               height={40}
@@ -101,7 +106,7 @@ export function AboutUs() {
           {aboutUsExpansion && (
             <Image
               className="rotate-180 invert"
-              src="/img/to_top.png"
+              src={ToTopIcon}
               alt="About Us Collapse Icon"
               width={40}
               height={40}
@@ -110,7 +115,7 @@ export function AboutUs() {
           {!aboutUsExpansion && (
             <Image
               className="invert"
-              src="/img/to_top.png"
+              src={ToTopIcon}
               alt="About Us Expansion Icon"
               width={40}
               height={40}

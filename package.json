@@ -8,7 +8,7 @@
     "dev": "next dev",
     "start": "next start",
     "predeploy": "npm run build",
-    "deploy": "npm run predeploy && gh-pages -d build -b main",
+    "deploy": "npm run predeploy && gh-pages -d out -b main",
     "lint": "next lint"
   },
   "dependencies": {

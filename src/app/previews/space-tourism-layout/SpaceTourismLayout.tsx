@@ -1,25 +1,22 @@
 import styles from "./SpaceTourismLayout.module.css";
 import { NavItemActiveTypes, Navbar } from "./Navbar";
 import { classes } from "@/utils/toggle";
+import backgroundMobile from "@/assets/previews/space-tourism-layout/assets/destination/background-destination-mobile.jpg";
+import backgroundTablet from "@/assets/previews/space-tourism-layout/assets/destination/background-destination-tablet.jpg";
+import backgroundDesktop from "@/assets/previews/space-tourism-layout/assets/destination/background-destination-desktop.jpg";
 
 type SpaceTourismLayoutProps = {
   children: React.ReactNode;
   navItemActive: NavItemActiveTypes;
-  backgroundMobileUrl: string;
-  backgroundTabletUrl: string;
-  backgroundDesktopUrl: string;
 };
 
 export function SpaceTourismLayout({
   children,
   navItemActive,
-  backgroundMobileUrl,
-  backgroundTabletUrl,
-  backgroundDesktopUrl,
 }: SpaceTourismLayoutProps) {
-  const backgroundMobileCss = `url(${backgroundMobileUrl})`;
-  const backgroundTabletCss = `url(${backgroundTabletUrl})`;
-  const backgroundDesktopCss = `url(${backgroundDesktopUrl})`;
+  const backgroundMobileCss = `url(${backgroundMobile.src})`;
+  const backgroundTabletCss = `url(${backgroundTablet.src})`;
+  const backgroundDesktopCss = `url(${backgroundDesktop.src})`;
   return (
     <div className={classes(styles.wrapper)}>
       <div>
@@ -45,9 +42,7 @@ export function SpaceTourismLayout({
           style={{ backgroundImage: backgroundDesktopCss }}
         ></div>
         <Navbar navItemActive={navItemActive}></Navbar>
-        {/* <Suspense fallback={<>loading....</>}> */}
         {children}
-        {/* </Suspense> */}
       </div>
     </div>
   );

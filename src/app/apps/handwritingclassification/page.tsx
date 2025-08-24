@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect } from "react";
 import "./style.css";
 import { UseScriptStatus, useScript } from "usehooks-ts";
