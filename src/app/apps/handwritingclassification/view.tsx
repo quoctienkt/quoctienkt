@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import * as tf from "@tensorflow/tfjs";
 import { Chart, registerables } from "chart.js";
-import Canvas from "./Canvas";
 import infoIcon from "@/assets/img/information.png";
 import "./style.css";
 import Modal from "./Modal";
@@ -18,10 +17,12 @@ export default function View() {
   const [chart, setChart] = useState<Chart | null>(null);
   const [notification, setNotification] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPredicting, setIsPredicting] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<HTMLCanvasElement>(null);
+  const isDrawing = useRef(false);
+  const lastX = useRef(0);
+  const lastY = useRef(0);
 
   useEffect(() => {
     const loadModel = async () => {
@@ -36,6 +37,49 @@ export default function View() {
       }
     };
     loadModel();
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const startDrawing = (e: PointerEvent) => {
+      isDrawing.current = true;
+      [lastX.current, lastY.current] = [e.offsetX, e.offsetY];
+    };
+
+    const draw = (e: PointerEvent) => {
+      if (!isDrawing.current) return;
+      if (ctx) {
+        ctx.beginPath();
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 11;
+        ctx.lineJoin = "round";
+        ctx.moveTo(lastX.current, lastY.current);
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.closePath();
+        ctx.stroke();
+      }
+      [lastX.current, lastY.current] = [e.offsetX, e.offsetY];
+    };
+
+    const stopDrawing = () => {
+      isDrawing.current = false;
+    };
+
+    canvas.addEventListener("pointerdown", startDrawing);
+    canvas.addEventListener("pointermove", draw);
+    canvas.addEventListener("pointerup", stopDrawing);
+    canvas.addEventListener("pointerout", stopDrawing);
+
+    return () => {
+      canvas.removeEventListener("pointerdown", startDrawing);
+      canvas.removeEventListener("pointermove", draw);
+      canvas.removeEventListener("pointerup", stopDrawing);
+      canvas.removeEventListener("pointerout", stopDrawing);
+    };
   }, []);
 
   const crop_top_bottom = (
@@ -141,8 +185,6 @@ export default function View() {
   const handlePredict = async () => {
     if (!model || !canvasRef.current) return;
 
-    setIsPredicting(true);
-
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -197,12 +239,13 @@ export default function View() {
 
   const handleClear = () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    setIsPredicting(false);
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
     if (chart) {
       chart.destroy();
       setChart(null);
@@ -220,17 +263,17 @@ export default function View() {
         {notification}
       </div>
       <div className="container">
-        <div className={isPredicting ? "" : "active"}>
-          <Canvas
-            canvasRef={canvasRef}
+        <div>
+          <canvas
+            id="myCanvas"
+            className="active"
+            ref={canvasRef}
             width={300}
             height={350}
-            chartColor="white"
-            chartWidth={11}
-          />
+          ></canvas>
         </div>
-        <div className={`chart-container ${isPredicting ? "active" : ""}`}>
-          <canvas ref={chartRef} width="400" height="350"></canvas>
+        <div className="chart-container">
+          <canvas ref={chartRef} width={400} height={350}></canvas>
         </div>
       </div>
 
@@ -244,10 +287,7 @@ export default function View() {
         >
           Predict
         </button>
-        <button
-          onClick={handleClear}
-          className="action-btn clear-btn"
-        >
+        <button onClick={handleClear} className="action-btn clear-btn">
           Clear
         </button>
       </div>

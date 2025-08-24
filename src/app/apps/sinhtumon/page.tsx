@@ -8,7 +8,7 @@ const appPrefix = `${process.env.NEXT_PUBLIC_BASE_URL}/sinhtumon`;
 
 export default function Page() {
   useEffect(() => {
-    document.title = "Game: Sinh tử môn";
+    document.title = "Game: Tower Defense";
     (window as any).appPrefix = appPrefix;
   }, []);
 
