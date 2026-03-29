@@ -1,9 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import styles from "./Navbar.module.css";
 import { useState } from "react";
-import { classes, toggle } from "@/utils/toggle";
 import Image from "next/image";
 import NextLogo from "@/assets/img/next.svg";
 
@@ -15,12 +13,21 @@ export default function Navbar(props: NavbarProps) {
   const [navbarOpen, setNavbarOpen] = useState(false);
 
   return (
-    <div className={classes(styles.navbar, props.className)}>
+    <div
+      className={[
+        "relative flex flex-row flex-wrap items-center w-full h-fit border-none p-4",
+        "shadow-[rgba(0,0,0,0.35)_0px_5px_15px]",
+        "bg-gradient-to-l from-[rgb(var(--background-end-rgb))] to-[rgb(var(--background-start-rgb))]",
+        "lg:flex-[0_0_300px] lg:gap-2 lg:flex-col",
+        "max-lg:px-[15px] max-lg:justify-between max-lg:py-[8px]",
+        props.className,
+      ].join(" ")}
+    >
       <Link href="/">
         <Image
           src={NextLogo}
           alt="App Logo"
-          className={styles.logo}
+          className="mt-1 lg:mt-8 lg:mb-8 lg:m-auto max-lg:w-[100px] dark:invert"
           width={200}
           height={50}
           priority
@@ -54,7 +61,15 @@ export default function Navbar(props: NavbarProps) {
       </button>
 
       <div
-        className={classes(styles.navLinks, toggle(navbarOpen, styles.active))}
+        className={[
+          "flex flex-col w-full",
+          "lg:block max-lg:hidden",
+          "[&>*]:flex [&>*]:w-full [&>*]:p-2 [&>*]:border-amber-500",
+          "[&>*]:border-t [&>*]:border-b [&>*]:border-white",
+          "[&>*]:lg:block [&>*]:max-lg:bg-[#f8f9fa] [&>*]:max-lg:text-stone-900",
+          "[&>*]:hover:text-[rgb(var(--vivid-rgb))] [&>*]:hover:font-bold",
+          navbarOpen ? "p-2 mt-3 max-lg:flex bg-slate-300" : "",
+        ].join(" ")}
       >
         <Link href="/apps/handwritingclassification" target="_self">
           Hand-writing classification

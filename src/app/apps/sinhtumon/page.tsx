@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { UseScriptStatus, useScript } from "usehooks-ts";
+import { UseScriptStatus, useScript } from "@/utils/useScript";
 import urlJoin from "url-join";
 
 const appPrefix = `${process.env.NEXT_PUBLIC_BASE_URL}/sinhtumon`;
