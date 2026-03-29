@@ -1,15 +1,15 @@
 import { classes } from "@/utils/toggle";
-import styles from "./VerticalLine.module.css";
 
 type VerticalLineProps = {
   className?: string;
   background: string;
 };
+
 export function VerticalLine({ className, background }: VerticalLineProps) {
   return (
     <div
       className={classes(
-        styles.wrapper,
+        "w-0.5 h-full",
         className ?? "",
         background ?? "bg-white"
       )}

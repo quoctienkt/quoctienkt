@@ -1,6 +1,9 @@
 {
   "name": "tiendang.app",
   "version": "0.1.0",
+  "engines": {
+    "node": ">=25.0.0"
+  },
   "homepage": "https://quoctienkt.github.io/quoctienkt",
   "private": true,
   "scripts": {
@@ -9,38 +12,34 @@
     "start": "next start",
     "predeploy": "npm run build",
     "deploy": "npm run predeploy && gh-pages -d out -b main",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write ."
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
     "@tensorflow/tfjs": "^4.22.0",
-    "@types/node": "20.4.2",
-    "@types/postcss-url": "^10.0.0",
-    "@types/react": "18.2.15",
-    "@types/react-dom": "18.2.7",
-    "autoprefixer": "10.4.14",
+    "@types/node": "25.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "chart.js": "^4.5.0",
-    "eslint": "8.45.0",
-    "eslint-config-next": "13.4.10",
     "immer": "^10.0.2",
-    "jotai": "^2.2.2",
-    "next": "^15.5.0",
+    "next": "latest",
     "next-themes": "^0.2.1",
-    "postcss": "^8.4.26",
-    "postcss-url": "^10.1.3",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-loading-skeleton": "^3.3.1",
     "sass": "^1.63.6",
-    "tailwindcss": "3.3.3",
-    "typescript": "5.1.6",
-    "url-join": "^5.0.0",
-    "use-immer": "^0.9.0",
-    "usehooks-ts": "^2.9.1"
+    "tailwindcss": "^4.2.2",
+    "url-join": "^5.0.0"
   },
   "devDependencies": {
-    "@swc-jotai/react-refresh": "^0.0.8",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "latest",
+    "eslint-plugin-prettier": "latest",
     "gh-pages": "^5.0.0",
-    "postcss-nesting": "^12.0.0",
-    "serve": "^14.2.0"
+    "postcss": "^8.5.8",
+    "prettier": "latest",
+    "serve": "^14.2.0",
+    "typescript": "latest"
   }
 }

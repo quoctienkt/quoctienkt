@@ -44,7 +44,3 @@
   /* rgb(179, 177, 88) */
   --vivid-rgb: 179, 177, 88;
 }
-
-html.asdfasdf { 
-  @apply text-slate-700;
-}

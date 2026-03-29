@@ -1,7 +1,0 @@
-.wrapper {
-  @apply flex flex-row w-full h-full;
-
-  & > * {
-    @apply flex-auto p-3 basis-96;
-  }
-}
