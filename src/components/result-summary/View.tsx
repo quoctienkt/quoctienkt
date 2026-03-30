@@ -1,9 +1,13 @@
 import { SummaryItem } from './SummaryItem';
 import { classes } from '@/utils/toggle';
-const MemoryIcon = '/quoctienkt/previews/result-summary/assets/images/icon-memory.svg';
-const ReactionIcon = '/quoctienkt/previews/result-summary/assets/images/icon-reaction.svg';
-const VerbalIcon = '/quoctienkt/previews/result-summary/assets/images/icon-verbal.svg';
-const VisualIcon = '/quoctienkt/previews/result-summary/assets/images/icon-visual.svg';
+const MemoryIcon =
+  '/quoctienkt/previews/result-summary/assets/images/icon-memory.svg';
+const ReactionIcon =
+  '/quoctienkt/previews/result-summary/assets/images/icon-reaction.svg';
+const VerbalIcon =
+  '/quoctienkt/previews/result-summary/assets/images/icon-verbal.svg';
+const VisualIcon =
+  '/quoctienkt/previews/result-summary/assets/images/icon-visual.svg';
 
 type ResultSummaryProps = {
   className: string;

@@ -165,3 +165,16 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+/* App Centering */
+section[class^='app_'] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 95%;
+  height: fit-content;
+  margin: auto;
+  z-index: 10;
+}

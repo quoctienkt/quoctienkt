@@ -13,7 +13,9 @@ export function DefaultLayout({ children }: LayoutProps) {
       <Sidebar />
 
       <div className="flex-1 h-screen overflow-hidden relative">
-        <main className="h-full w-full overflow-y-auto">{children}</main>
+        <main className="h-full w-full overflow-y-auto flex flex-col items-center justify-center">
+          {children}
+        </main>
       </div>
     </div>
   );
