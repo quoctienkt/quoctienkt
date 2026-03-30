@@ -8,10 +8,14 @@ import Image from 'next/image';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-const moonPng = '/quoctienkt/previews/space-tourism-layout/assets/destination/image-moon.png';
-const marsPng = '/quoctienkt/previews/space-tourism-layout/assets/destination/image-mars.png';
-const europaPng = '/quoctienkt/previews/space-tourism-layout/assets/destination/image-europa.png';
-const titanPng = '/quoctienkt/previews/space-tourism-layout/assets/destination/image-titan.png';
+const moonPng =
+  '/quoctienkt/previews/space-tourism-layout/assets/destination/image-moon.png';
+const marsPng =
+  '/quoctienkt/previews/space-tourism-layout/assets/destination/image-mars.png';
+const europaPng =
+  '/quoctienkt/previews/space-tourism-layout/assets/destination/image-europa.png';
+const titanPng =
+  '/quoctienkt/previews/space-tourism-layout/assets/destination/image-titan.png';
 
 const destinationsData = pageData.destinations;
 
