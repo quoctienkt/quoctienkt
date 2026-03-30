@@ -1,11 +1,11 @@
-import { SinglePriceGrid } from "@/components/single-price-grid/View";
-import { Metadata } from "next";
+import { SinglePriceGrid } from '@/components/single-price-grid/View';
+import { Metadata } from 'next';
 
-const routeDir = "/apps/single-price-grid";
-const favicon = "/favicon-32x32.png";
+const routeDir = '/apps/single-price-grid';
+const favicon = '/favicon-32x32.png';
 
 export const metadata: Metadata = {
-  title: "Frontend Mentor | Single Price Grid Component",
+  title: 'Frontend Mentor | Single Price Grid Component',
   description: "All TienDang's app",
   icons: {
     icon: routeDir + favicon,

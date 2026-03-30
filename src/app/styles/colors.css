@@ -1,4 +1,4 @@
-[data-theme="light"] {
+[data-theme='light'] {
   color-scheme: light;
   /* rgb(255,255,255) */
   --foreground-rgb: 255, 255, 255;
@@ -21,7 +21,7 @@
   /* rgb(231, 111, 81) */
   --vivid-rgb: 231, 111, 81;
 }
-[data-theme="dark"] {
+[data-theme='dark'] {
   color-scheme: dark;
   /* rgb( 0, 0, 0) */
   --foreground-rgb: 0, 0, 0;

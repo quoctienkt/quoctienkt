@@ -1,6 +1,6 @@
-import * as tf from "@tensorflow/tfjs";
-import { Chart, registerables } from "chart.js";
-import type { LayersModel } from "@tensorflow/tfjs";
+import * as tf from '@tensorflow/tfjs';
+import { Chart, registerables } from 'chart.js';
+import type { LayersModel } from '@tensorflow/tfjs';
 
 Chart.register(...registerables);
 
@@ -22,12 +22,12 @@ export class HandwritingClassifier {
     canvas: HTMLCanvasElement,
     chartCanvas: HTMLCanvasElement,
     setModel: (model: LayersModel | null) => void,
-    setNotification: (notification: string) => void
+    setNotification: (notification: string) => void,
   ) {
     this.aiModelPath = aiModelPath;
     this.canvas = canvas;
     this.chartCanvas = chartCanvas;
-    this.ctx = this.canvas.getContext("2d");
+    this.ctx = this.canvas.getContext('2d');
     this.setModel = setModel;
     this.setNotification = setNotification;
     this.loadModel();
@@ -35,16 +35,16 @@ export class HandwritingClassifier {
   }
 
   private async loadModel() {
-    this.setNotification("Please wait for loading model!");
+    this.setNotification('Please wait for loading model!');
     try {
       this.model = await tf.loadLayersModel(this.aiModelPath);
       this.setModel(this.model);
       this.setNotification(
-        "Load finish, use model to guess hand writing number"
+        'Load finish, use model to guess hand writing number',
       );
     } catch (error) {
-      console.error("Error loading model:", error);
-      this.setNotification("Error loading model.");
+      console.error('Error loading model:', error);
+      this.setNotification('Error loading model.');
       this.setModel(null);
     }
   }
@@ -52,7 +52,7 @@ export class HandwritingClassifier {
   public async handlePredict() {
     if (!this.model || !this.canvas || !this.chartCanvas) return;
 
-    const ctx = this.canvas.getContext("2d");
+    const ctx = this.canvas.getContext('2d');
     if (!ctx) return;
 
     const input_width = this.canvas.width;
@@ -62,7 +62,7 @@ export class HandwritingClassifier {
     const img_crop_top_bottom = this.cropTopAndBottom(
       raw,
       input_width,
-      input_height
+      input_height,
     );
     const crop_full = this.cropLeftAndRight(img_crop_top_bottom);
 
@@ -85,7 +85,7 @@ export class HandwritingClassifier {
 
   public handleClear() {
     if (this.canvas) {
-      const ctx = this.canvas.getContext("2d");
+      const ctx = this.canvas.getContext('2d');
       if (ctx) {
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -109,9 +109,9 @@ export class HandwritingClassifier {
       if (!this.isDrawing) return;
       if (this.ctx) {
         this.ctx.beginPath();
-        this.ctx.strokeStyle = "white";
+        this.ctx.strokeStyle = 'white';
         this.ctx.lineWidth = 11;
-        this.ctx.lineJoin = "round";
+        this.ctx.lineJoin = 'round';
         this.ctx.moveTo(this.lastX, this.lastY);
         this.ctx.lineTo(e.offsetX, e.offsetY);
         this.ctx.closePath();
@@ -124,23 +124,23 @@ export class HandwritingClassifier {
       this.isDrawing = false;
     };
 
-    this.canvas.addEventListener("pointerdown", startDrawing);
-    this.canvas.addEventListener("pointermove", draw);
-    this.canvas.addEventListener("pointerup", stopDrawing);
-    this.canvas.addEventListener("pointerout", stopDrawing);
+    this.canvas.addEventListener('pointerdown', startDrawing);
+    this.canvas.addEventListener('pointermove', draw);
+    this.canvas.addEventListener('pointerup', stopDrawing);
+    this.canvas.addEventListener('pointerout', stopDrawing);
 
     return () => {
-      this.canvas.removeEventListener("pointerdown", startDrawing);
-      this.canvas.removeEventListener("pointermove", draw);
-      this.canvas.removeEventListener("pointerup", stopDrawing);
-      this.canvas.removeEventListener("pointerout", stopDrawing);
+      this.canvas.removeEventListener('pointerdown', startDrawing);
+      this.canvas.removeEventListener('pointermove', draw);
+      this.canvas.removeEventListener('pointerup', stopDrawing);
+      this.canvas.removeEventListener('pointerout', stopDrawing);
     };
   }
 
   private cropTopAndBottom(
     flat_color: Uint8ClampedArray,
     width: number,
-    height: number
+    height: number,
   ): number[][][] {
     const result: number[][][] = [];
     let itRow = 0;
@@ -165,7 +165,7 @@ export class HandwritingClassifier {
         itCol += 1;
       }
       const hasContent = row.some(
-        (pixel) => pixel[0] !== 0 || pixel[1] !== 0 || pixel[2] !== 0
+        (pixel) => pixel[0] !== 0 || pixel[1] !== 0 || pixel[2] !== 0,
       );
       if (hasContent) {
         result.push(row);
@@ -205,21 +205,21 @@ export class HandwritingClassifier {
 
   private displayChart(data: number[]) {
     if (!this.chartCanvas) return;
-    const label = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+    const label = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
     if (this.currentChart) {
       this.currentChart.destroy();
     }
 
     const newChart = new Chart(this.chartCanvas, {
-      type: "bar",
+      type: 'bar',
       data: {
         labels: label,
         datasets: [
           {
-            label: "prediction",
-            backgroundColor: "#f50057",
-            borderColor: "rgb(255, 99, 132)",
+            label: 'prediction',
+            backgroundColor: '#f50057',
+            borderColor: 'rgb(255, 99, 132)',
             data: data,
           },
         ],

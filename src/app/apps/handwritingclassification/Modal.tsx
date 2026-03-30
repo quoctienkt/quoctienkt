@@ -1,7 +1,11 @@
 import React from 'react';
 
-const Modal = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }) => (
-  <div id="myModal" className="modal" style={{ display: "block" }}>
+const Modal = ({
+  setIsModalOpen,
+}: {
+  setIsModalOpen: (isOpen: boolean) => void;
+}) => (
+  <div id="myModal" className="modal" style={{ display: 'block' }}>
     <div className="modal-content">
       <div className="modal-header">
         <div className="author">Made by: Tien Dang</div>
@@ -12,7 +16,8 @@ const Modal = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }
       <div className="modal-body">
         <ul>
           <li>
-            Hand Writing Classification using CNN with Keras, Tensorflowjs, Nextjs CSR.
+            Hand Writing Classification using CNN with Keras, Tensorflowjs,
+            Nextjs CSR.
           </li>
           <li>Train data: mnist. </li>
           <li>Result is pretty good! </li>

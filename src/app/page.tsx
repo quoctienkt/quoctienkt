@@ -1,8 +1,8 @@
-import SpaceTourismLayoutDestinationPage from "./previews/space-tourism-layout/destination/page";
-import { Metadata } from "next";
+import SpaceTourismLayoutDestinationPage from './previews/space-tourism-layout/destination/page';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Tiến Đặng collection",
+  title: 'Tiến Đặng collection',
   description: "All TienDang's app",
 };
 

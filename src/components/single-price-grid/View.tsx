@@ -1,4 +1,4 @@
-import { classes } from "@/utils/toggle";
+import { classes } from '@/utils/toggle';
 
 type SinglePriceGridProps = {
   className: string;
@@ -6,10 +6,17 @@ type SinglePriceGridProps = {
 
 export function SinglePriceGrid(props: SinglePriceGridProps) {
   return (
-    <div className={classes("flex flex-col w-full text-black bg-white rounded shadow-[rgba(0,0,0,0.24)_0px_3px_8px]", props.className)}>
+    <div
+      className={classes(
+        'flex flex-col w-full text-black bg-white rounded shadow-[rgba(0,0,0,0.24)_0px_3px_8px]',
+        props.className,
+      )}
+    >
       {/* Overview */}
       <div className="flex-auto basis-48 px-[35px] py-[35px]">
-        <div className="text-[#3cb2ac] font-bold text-3xl mb-3">Join our community</div>
+        <div className="text-[#3cb2ac] font-bold text-3xl mb-3">
+          Join our community
+        </div>
         <div className="text-[#c1d275] font-bold text-xl mb-2">
           30-day, hassle-free money back guarantee
         </div>
@@ -29,7 +36,9 @@ export function SinglePriceGrid(props: SinglePriceGridProps) {
       <div className="flex flex-row flex-auto text-[#e9ffff] basis-56 max-sm:flex-col">
         {/* Subscription */}
         <div className="bg-[#2ab1b5] flex-1 basis-1/2 px-[35px] py-[35px]">
-          <div className="mb-5 text-xl font-bold text-white">Monthly Subscription</div>
+          <div className="mb-5 text-xl font-bold text-white">
+            Monthly Subscription
+          </div>
           <div className="flex flex-row items-center mb-4">
             <div className="mr-4 text-3xl font-bold">&#36;29</div>
             <div className="text-[#90dadd]">per month</div>

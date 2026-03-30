@@ -1,17 +1,17 @@
 window.constants = {
-  TOWER_SNOWFLAKE_NAME: "Tower_Snowflake",
+  TOWER_SNOWFLAKE_NAME: 'Tower_Snowflake',
 
-  MONSTER_MOVE_TYPE_GROUND: "Monster_ground",
-  MONSTER_MOVE_TYPE_FLY: "Monster_fly",
+  MONSTER_MOVE_TYPE_GROUND: 'Monster_ground',
+  MONSTER_MOVE_TYPE_FLY: 'Monster_fly',
 
-  MONSTER_MOVE_DIRECTION_TO_TOP: "TO_TOP",
-  MONSTER_MOVE_DIRECTION_TO_RIGHT: "TO_RIGHT",
-  MONSTER_MOVE_DIRECTION_TO_BOTTOM: "TO_BOTTOM",
-  MONSTER_MOVE_DIRECTION_TO_LEFT: "TO_LEFT",
-  MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT: "TO_BOTTOM_RIGHT",
+  MONSTER_MOVE_DIRECTION_TO_TOP: 'TO_TOP',
+  MONSTER_MOVE_DIRECTION_TO_RIGHT: 'TO_RIGHT',
+  MONSTER_MOVE_DIRECTION_TO_BOTTOM: 'TO_BOTTOM',
+  MONSTER_MOVE_DIRECTION_TO_LEFT: 'TO_LEFT',
+  MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT: 'TO_BOTTOM_RIGHT',
 
-  MONSTER_THIEF: "Monster_Thief",
-  MONSTER_BUTTERFLY: "Monster_Butterfly",
+  MONSTER_THIEF: 'Monster_Thief',
+  MONSTER_BUTTERFLY: 'Monster_Butterfly',
 };
 
 window.gameCoreConfig = {
@@ -33,7 +33,7 @@ window.gameCoreConfig = {
         [40, 40],
       ],
       ammoDisplaySizePerLevel: [null, null, null, [20, 15], [20, 15]],
-      ammoDisplayTintPerLevel: [null, null, null, "0xffa500", "0xffa500"],
+      ammoDisplayTintPerLevel: [null, null, null, '0xffa500', '0xffa500'],
     },
   },
   monsters: {

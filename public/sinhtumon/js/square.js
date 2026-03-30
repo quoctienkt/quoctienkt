@@ -9,11 +9,12 @@ window.setupSquare = (gameStateService, gameMapService) => {
       // NOTE: position x,y is the central point of square, need to transition to left and bottom
       super(
         scene,
-        x * gameMapService.mapConfig.CELL_WIDTH + gameMapService.mapConfig.CELL_WIDTH / 2,
+        x * gameMapService.mapConfig.CELL_WIDTH +
+          gameMapService.mapConfig.CELL_WIDTH / 2,
         y * gameMapService.mapConfig.CELL_HEIGHT +
           gameMapService.mapConfig.CELL_HEIGHT / 2 +
           gameMapService.mapConfig.GAME_BOARD_PADDING_TOP,
-        "square"
+        'square',
       );
 
       scene.add.existing(this);
@@ -25,7 +26,10 @@ window.setupSquare = (gameStateService, gameMapService) => {
       this.posX = x;
       this.posY = y;
       this.setAlpha(0.1);
-      this.setDisplaySize(gameMapService.mapConfig.CELL_WIDTH, gameMapService.mapConfig.CELL_HEIGHT);
+      this.setDisplaySize(
+        gameMapService.mapConfig.CELL_WIDTH,
+        gameMapService.mapConfig.CELL_HEIGHT,
+      );
       // this.setDepth(2)
       this.init();
     }
@@ -34,17 +38,17 @@ window.setupSquare = (gameStateService, gameMapService) => {
       //decide buy
       this.setInteractive();
 
-      this.on("pointerdown", (pointer) => {
+      this.on('pointerdown', (pointer) => {
         this.setAlpha(0.1);
 
-        console.log("clicked square");
+        console.log('clicked square');
         // TODO: replace hardcoded 70 with tempTowerPrice
         if (isBuying && this._gameStateService.savedData.gold >= 70) {
           //Check isOkPath
           let success = this._gameMapService.tryUpdateMap(
             this.posX,
             this.posY,
-            this._gameMapService.mapConfig.CELL_BLOCKED
+            this._gameMapService.mapConfig.CELL_BLOCKED,
           );
           if (!success) {
             return;
@@ -55,11 +59,11 @@ window.setupSquare = (gameStateService, gameMapService) => {
             this.x,
             this.y,
             tempTower.getName(),
-            1
+            1,
           );
 
           this._gameStateService.setGold(
-            (gold) => gold - tempTower.getUpgradeCost()
+            (gold) => gold - tempTower.getUpgradeCost(),
           );
 
           this.destroy();
@@ -67,13 +71,13 @@ window.setupSquare = (gameStateService, gameMapService) => {
         }
       });
 
-      this.on("pointerover", (pointer) => {
+      this.on('pointerover', (pointer) => {
         if (isBuying) {
           this.setAlpha(1);
         }
       });
 
-      this.on("pointerout", (pointer) => {
+      this.on('pointerout', (pointer) => {
         if (isBuying) {
           this.setAlpha(0.1);
         }

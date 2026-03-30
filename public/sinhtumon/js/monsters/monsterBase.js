@@ -23,7 +23,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
           gameMapService.mapConfig.CELL_WIDTH / 2,
         row * gameMapService.mapConfig.CELL_HEIGHT +
           gameMapService.mapConfig.GAME_BOARD_PADDING_TOP,
-        monsterType
+        monsterType,
       );
       scene.add.existing(this);
       scene.physics.add.existing(this);
@@ -49,7 +49,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
 
       this.setDepth(2);
       this.setInteractive();
-      this.on("pointerdown", (pointer) => this.pointerdown());
+      this.on('pointerdown', (pointer) => this.pointerdown());
       this.initDirection();
       this.prepareSpriteAsset();
       this.initMovingPath();
@@ -60,7 +60,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
      * @void
      */
     prepareSpriteAsset() {
-      throw "Abstract method cannot be implemented";
+      throw 'Abstract method cannot be implemented';
     }
 
     initDirection() {
@@ -81,7 +81,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
         this.getMoveType() === window.getConstants().MONSTER_MOVE_TYPE_GROUND
       ) {
         this.updateMonsterPath(
-          this._gameMapService.groundMonsterMovingPathDefault
+          this._gameMapService.groundMonsterMovingPathDefault,
         );
       }
     }
@@ -98,11 +98,11 @@ window.setupMonster = (gameStateService, gameMapService) => {
           this.speed
         }km/h\nVàng: ${this.getGoldOnDead()}`,
         {
-          fontStyle: "bold",
-          fontSize: "20px",
-          fill: "#ff0000",
-          fontFamily: "roboto",
-        }
+          fontStyle: 'bold',
+          fontSize: '20px',
+          fill: '#ff0000',
+          fontFamily: 'roboto',
+        },
       );
       detailTextClicked = false;
       this.Phaserscene.time.addEvent({
@@ -157,8 +157,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
                   this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP)
           ) {
             newMonsterPath.splice(0, 1);
-          }
-          else {
+          } else {
             flag = false;
           }
         }
@@ -169,7 +168,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
               this._gameMapService.mapConfig.CELL_WIDTH / 2,
             i[0] * this._gameMapService.mapConfig.CELL_HEIGHT +
               this._gameMapService.mapConfig.CELL_HEIGHT / 2 +
-              this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP
+              this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP,
           );
         });
 
@@ -182,7 +181,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
         this.tween = this.Phaserscene.tweens.add({
           targets: this.follower,
           t: 1,
-          ease: "start",
+          ease: 'start',
           duration: this.duration, // change
           yoyo: false,
           repeat: -2,
@@ -207,7 +206,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
             this._gameMapService.mapConfig.CELL_WIDTH * i[1] +
               this._gameMapService.mapConfig.CELL_WIDTH / 2,
             i[0] * this._gameMapService.mapConfig.CELL_HEIGHT +
-              this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP
+              this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP,
           );
         });
 
@@ -220,7 +219,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
         this.tween = this.Phaserscene.tweens.add({
           targets: this.follower,
           t: 1,
-          ease: "start",
+          ease: 'start',
           duration: this.duration, // change
           yoyo: false,
           repeat: -2,
@@ -246,7 +245,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
 
       this._gameStateService.savedData.monsters.splice(index, 1);
 
-      this.anims.play("dead");
+      this.anims.play('dead');
       this.setAlpha(0.5);
       this.setDisplaySize(30, 40);
 
@@ -269,7 +268,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
         ) {
           this.direction = window.getConstants().MONSTER_MOVE_DIRECTION_TO_LEFT;
           this.anims.play(
-            window.getMonsterAnimationAssetName(this.getName(), this.direction)
+            window.getMonsterAnimationAssetName(this.getName(), this.direction),
           );
         } else if (
           this.lastPosX < this.x &&
@@ -279,7 +278,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
           this.direction =
             window.getConstants().MONSTER_MOVE_DIRECTION_TO_RIGHT;
           this.anims.play(
-            window.getMonsterAnimationAssetName(this.getName(), this.direction)
+            window.getMonsterAnimationAssetName(this.getName(), this.direction),
           );
         } else if (
           this.lastPosY > this.y &&
@@ -287,7 +286,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
         ) {
           this.direction = window.getConstants().MONSTER_MOVE_DIRECTION_TO_TOP;
           this.anims.play(
-            window.getMonsterAnimationAssetName(this.getName(), this.direction)
+            window.getMonsterAnimationAssetName(this.getName(), this.direction),
           );
         } else if (
           this.lastPosY < this.y &&
@@ -297,7 +296,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
           this.direction =
             window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM;
           this.anims.play(
-            window.getMonsterAnimationAssetName(this.getName(), this.direction)
+            window.getMonsterAnimationAssetName(this.getName(), this.direction),
           );
         }
       } else if (
@@ -313,7 +312,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
         this.y + 22,
         this._gameMapService.mapConfig.CELL_WIDTH,
         3,
-        0
+        0,
       );
       graphics.fillStyle(0x00ff00, 1, 0.5);
       graphics.fillRect(
@@ -321,7 +320,7 @@ window.setupMonster = (gameStateService, gameMapService) => {
         this.y + 22,
         (this._gameMapService.mapConfig.CELL_WIDTH * this.health) /
           this.maxHealth,
-        3
+        3,
       );
       //end health draw
     }

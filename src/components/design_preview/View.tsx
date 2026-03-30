@@ -1,4 +1,4 @@
-import Image, { StaticImageData } from "next/image";
+import Image, { StaticImageData } from 'next/image';
 
 type DesignPreviewProps = {
   designImgSrc: StaticImageData;

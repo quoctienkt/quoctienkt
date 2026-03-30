@@ -1,9 +1,9 @@
-import { Home } from "./Home";
-import { SpaceTourismLayout } from "./SpaceTourismLayout";
+import { Home } from './Home';
+import { SpaceTourismLayout } from './SpaceTourismLayout';
 
 export default function Page() {
   return (
-    <SpaceTourismLayout navItemActive={"home"}>
+    <SpaceTourismLayout navItemActive={'home'}>
       <Home />
     </SpaceTourismLayout>
   );

@@ -1,23 +1,24 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
-import type { LayersModel } from "@tensorflow/tfjs";
-import infoIcon from "@/assets/img/information.png";
-import "./style.css";
-import Modal from "./Modal";
-import { HandwritingClassifier } from "./logic";
+import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
+import type { LayersModel } from '@tensorflow/tfjs';
+import './style.css';
+import Modal from './Modal';
+import { HandwritingClassifier } from './logic';
+
+const infoIcon = '/quoctienkt/img/information.png';
 
 const handWritingAIModelPath = `${process.env.NEXT_PUBLIC_BASE_URL}/handwritingclassification/model.json`;
 
 export default function View() {
   const [model, setModel] = useState<LayersModel | null>(null);
   const [notification, setNotification] = useState(
-    "Please wait for loading model!"
+    'Please wait for loading model!',
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [classifier, setClassifier] = useState<HandwritingClassifier | null>(
-    null
+    null,
   );
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -30,7 +31,7 @@ export default function View() {
         canvasRef.current,
         chartRef.current,
         setModel,
-        setNotification
+        setNotification,
       );
       setClassifier(newClassifier);
     }
@@ -53,7 +54,7 @@ export default function View() {
       <div
         id="notification_container"
         className={`alert ${
-          notification.includes("Error") ? "alert-danger" : "alert-info"
+          notification.includes('Error') ? 'alert-danger' : 'alert-info'
         }`}
       >
         {notification}

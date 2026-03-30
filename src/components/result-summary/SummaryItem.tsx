@@ -1,24 +1,29 @@
-import Image from "next/image";
-import { classes } from "@/utils/toggle";
+import Image from 'next/image';
+import { classes } from '@/utils/toggle';
 
 type SummaryItemProps = {
   text: string;
   iconSrc: any;
   percentValue: number;
-  variant: "red" | "yellow" | "green" | "blue";
+  variant: 'red' | 'yellow' | 'green' | 'blue';
 };
 
-const variantBg: Record<SummaryItemProps["variant"], string> = {
-  red: "bg-[#fff6f5]",
-  yellow: "bg-[#fffbf2]",
-  green: "bg-[#f2fafa]",
-  blue: "bg-[#f3f3fd]",
+const variantBg: Record<SummaryItemProps['variant'], string> = {
+  red: 'bg-[#fff6f5]',
+  yellow: 'bg-[#fffbf2]',
+  green: 'bg-[#f2fafa]',
+  blue: 'bg-[#f3f3fd]',
 };
 
 export function SummaryItem(props: SummaryItemProps) {
   return (
     <>
-      <div className={classes("flex flex-row items-center p-3 mt-3 rounded-lg", variantBg[props.variant])}>
+      <div
+        className={classes(
+          'flex flex-row items-center p-3 mt-3 rounded-lg',
+          variantBg[props.variant],
+        )}
+      >
         <div className="w-8">
           <Image src={props.iconSrc} height={30} width={30} alt={props.text} />
         </div>

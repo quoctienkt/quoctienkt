@@ -31,35 +31,35 @@ window.loadGameMapService = () => {
       this._gameStateService = window._gameStateService;
 
       this.scene.anims.create({
-        key: "dead",
-        frames: "onDead",
+        key: 'dead',
+        frames: 'onDead',
         frameRate: 500,
         repeat: 0,
       });
 
       this.scene.anims.create({
-        key: "rotate",
-        frames: "sell",
+        key: 'rotate',
+        frames: 'sell',
         frameRate: 10,
         repeat: -1,
       });
 
-      this.scene.add.text(5, 60, "Cửa vào", {
-        fontSize: "15px",
-        fill: "#ffffff",
-        fontFamily: "roboto",
+      this.scene.add.text(5, 60, 'Cửa vào', {
+        fontSize: '15px',
+        fill: '#ffffff',
+        fontFamily: 'roboto',
       });
-      this.scene.add.text(445, 635, "Cửa ra", {
-        fontSize: "20px",
-        fill: "#ffffff",
-        fontFamily: "roboto",
+      this.scene.add.text(445, 635, 'Cửa ra', {
+        fontSize: '20px',
+        fill: '#ffffff',
+        fontFamily: 'roboto',
       });
 
-      let background = this.scene.add.image(-2, 0, "background1").setOrigin(0);
+      let background = this.scene.add.image(-2, 0, 'background1').setOrigin(0);
       background.setDepth(-3);
       background.setDisplaySize(
         window.GAME_WIDTH,
-        5 + window.GAME_HEIGHT + this.mapConfig.GAME_BOARD_PADDING_TOP
+        5 + window.GAME_HEIGHT + this.mapConfig.GAME_BOARD_PADDING_TOP,
       );
 
       for (let row = 0; row < this.mapConfig.map.length; row++) {
@@ -77,19 +77,19 @@ window.loadGameMapService = () => {
         window.getTowerSnowFlakeData().towerType,
         1,
         true,
-        true
+        true,
       );
     }
 
     getGroundMonsterMovingPath(
       map = null,
       startPosition = null,
-      endPosition = null
+      endPosition = null,
     ) {
       return findWay(
         map ?? this.mapConfig.map,
         startPosition ?? this.currentStartPosition,
-        endPosition ?? this.currentEndPosition
+        endPosition ?? this.currentEndPosition,
       );
     }
 
@@ -108,7 +108,11 @@ window.loadGameMapService = () => {
       }
 
       let newMonstersPathList = [];
-      for (let i = 0; i < this._gameStateService.savedData.monsters.length; i++) {
+      for (
+        let i = 0;
+        i < this._gameStateService.savedData.monsters.length;
+        i++
+      ) {
         if (
           this._gameStateService.savedData.monsters[i].getMoveType() ==
           window.getConstants().MONSTER_MOVE_TYPE_GROUND
@@ -117,18 +121,18 @@ window.loadGameMapService = () => {
             parseInt(
               (this._gameStateService.savedData.monsters[i].y -
                 this.mapConfig.GAME_BOARD_PADDING_TOP) /
-              this.mapConfig.CELL_HEIGHT
+                this.mapConfig.CELL_HEIGHT,
             ),
             parseInt(
               this._gameStateService.savedData.monsters[i].x /
-              this.mapConfig.CELL_WIDTH
+                this.mapConfig.CELL_WIDTH,
             ),
           ];
 
           let newMonsterPath = this.getGroundMonsterMovingPath(
             nextMapState,
             monsterPosition,
-            this.mapConfig.END_POSITION
+            this.mapConfig.END_POSITION,
           );
           if (!newMonsterPath) {
             return false;
@@ -153,7 +157,7 @@ window.loadGameMapService = () => {
     setScene(scene) {
       this.scene = scene;
     }
-  }
+  };
 
   window.loadHoTuThanMap();
-}
+};

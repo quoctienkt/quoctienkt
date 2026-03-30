@@ -9,7 +9,7 @@ window.setupTower = (gameStateService, gameMapService) => {
       towerType,
       level,
       bindEvents = true,
-      isSampleTower = false
+      isSampleTower = false,
     ) {
       super(scene, x, y, window.getTowerAssetName(towerType, level));
       scene.add.existing(this);
@@ -26,25 +26,25 @@ window.setupTower = (gameStateService, gameMapService) => {
       this.setInteractive();
       const [towerWidth, towerHeight] = window.getTowerDisplaySize(
         this.getName(),
-        this.level
+        this.level,
       );
       this.setDisplaySize(towerWidth, towerHeight);
 
       this.isReady = true;
       this.upgradeCost = window.getTowerUpgradeCost(
         this.getName(),
-        this.isSampleTower ? 1 : this.level + 1
+        this.isSampleTower ? 1 : this.level + 1,
       );
 
       this.col = parseInt(
         (x - this._gameMapService.mapConfig.CELL_WIDTH / 2) /
-          this._gameMapService.mapConfig.CELL_WIDTH
+          this._gameMapService.mapConfig.CELL_WIDTH,
       );
       this.row = parseInt(
         (y -
           this._gameMapService.mapConfig.GAME_BOARD_PADDING_TOP -
           this._gameMapService.mapConfig.CELL_HEIGHT / 2) /
-          this._gameMapService.mapConfig.CELL_HEIGHT
+          this._gameMapService.mapConfig.CELL_HEIGHT,
       );
 
       this.range =
@@ -59,7 +59,7 @@ window.setupTower = (gameStateService, gameMapService) => {
     bindEvents() {
       //buy sample tower
       if (this.isSampleTower) {
-        this.on("pointerdown", (pointer) => {
+        this.on('pointerdown', (pointer) => {
           // console.log('sampleTower clicked');
           //tạo tháp từ con trỏ chuột
           if (this._gameStateService.savedData.gold >= this.getUpgradeCost()) {
@@ -84,7 +84,7 @@ window.setupTower = (gameStateService, gameMapService) => {
               this.getName(),
               1,
               false,
-              true
+              true,
             );
 
             tempTower.setDepth(-1);
@@ -96,7 +96,7 @@ window.setupTower = (gameStateService, gameMapService) => {
       //upgrade or sell
       else {
         //upgrade clicked
-        this.on("pointerdown", (pointer) => {
+        this.on('pointerdown', (pointer) => {
           this.handleTowerFocus();
         });
 
@@ -105,19 +105,19 @@ window.setupTower = (gameStateService, gameMapService) => {
         //     this.pointerover(pointer);
         // });
 
-        this.on("pointermove", (pointer) => {
+        this.on('pointermove', (pointer) => {
           this.pointermove(pointer);
         });
 
         //destroy info
-        this.on("pointerout", (pointer) => {
+        this.on('pointerout', (pointer) => {
           this.pointerout(pointer);
         });
       }
     }
 
     handleTowerFocus() {
-      console.log("tower clicked");
+      console.log('tower clicked');
 
       if (!isBuying) {
         if (upgradeImage) upgradeImage.destroy();
@@ -151,16 +151,16 @@ window.setupTower = (gameStateService, gameMapService) => {
         600,
         `Level: ${this.level}\nRange: ${window.getTowerAttackRange(
           this.getName(),
-          this.level
+          this.level,
         )}\nReload:${
           window.getTowerAttackReload(this.getName(), this.level) / 1000
         }/s`,
         {
-          fontStyle: "bold",
-          fontSize: "20px",
-          fill: "#ff0000",
-          fontFamily: "roboto",
-        }
+          fontStyle: 'bold',
+          fontSize: '20px',
+          fill: '#ff0000',
+          fontFamily: 'roboto',
+        },
       );
       detailTextClicked = false;
       this.Phaserscene.time.addEvent({
@@ -178,15 +178,15 @@ window.setupTower = (gameStateService, gameMapService) => {
       rangeImage = this.Phaserscene.physics.add.image(
         this.x,
         this.y,
-        "tower_range"
+        'tower_range',
       );
       rangeImage.setDisplaySize(
         window.getTowerAttackRange(this.getName(), this.level) * 2,
-        window.getTowerAttackRange(this.getName(), this.level) * 2
+        window.getTowerAttackRange(this.getName(), this.level) * 2,
       );
       rangeImage.setAlpha(0.4);
       rangeImage.setDepth(3);
-      rangeImage.setTint("0xfff000");
+      rangeImage.setTint('0xfff000');
     }
 
     showUpgradeAction() {
@@ -197,7 +197,7 @@ window.setupTower = (gameStateService, gameMapService) => {
       upgradeImage = this.Phaserscene.physics.add.image(
         this.x + _gameMapService.mapConfig.CELL_WIDTH / 2,
         this.y - _gameMapService.mapConfig.CELL_HEIGHT / 2,
-        "upgrade"
+        'upgrade',
       );
       if (this.level == 5) {
         upgradeImage.setAlpha(0.5);
@@ -205,8 +205,8 @@ window.setupTower = (gameStateService, gameMapService) => {
 
       upgradeImage.setInteractive();
 
-      upgradeImage.on("pointerdown", (pointer) => {
-        console.log("tower upgrade clicked");
+      upgradeImage.on('pointerdown', (pointer) => {
+        console.log('tower upgrade clicked');
 
         if (this._gameStateService.savedData.gold < this.getUpgradeCost()) {
           return;
@@ -220,7 +220,7 @@ window.setupTower = (gameStateService, gameMapService) => {
 
         this._gameStateService.savedData.towers.splice(
           this._gameStateService.savedData.towers.indexOf(this),
-          1
+          1,
         );
 
         let tower = new Tower(
@@ -228,7 +228,7 @@ window.setupTower = (gameStateService, gameMapService) => {
           this.x,
           this.y,
           this.getName(),
-          this.level + 1
+          this.level + 1,
         );
 
         if (detailText) {
@@ -243,7 +243,7 @@ window.setupTower = (gameStateService, gameMapService) => {
         this.destroy();
       });
 
-      upgradeImage.on("pointerover", (pointer) => {
+      upgradeImage.on('pointerover', (pointer) => {
         if (detailText) {
           detailText.destroy();
         }
@@ -252,11 +252,11 @@ window.setupTower = (gameStateService, gameMapService) => {
           600,
           `Nâng cấp: ${this.getUpgradeCost()}$`,
           {
-            fontStyle: "bold",
-            fontSize: "20px",
-            fill: "#ff0000",
-            fontFamily: "roboto",
-          }
+            fontStyle: 'bold',
+            fontSize: '20px',
+            fill: '#ff0000',
+            fontFamily: 'roboto',
+          },
         );
         detailTextClicked = false;
         this.Phaserscene.time.addEvent({
@@ -267,7 +267,7 @@ window.setupTower = (gameStateService, gameMapService) => {
         });
       });
 
-      upgradeImage.on("pointerout", (pointer) => {
+      upgradeImage.on('pointerout', (pointer) => {
         detailText.destroy();
       });
 
@@ -279,29 +279,29 @@ window.setupTower = (gameStateService, gameMapService) => {
       sellImage = this.Phaserscene.physics.add.sprite(
         this.x + _gameMapService.mapConfig.CELL_WIDTH / 2,
         this.y + _gameMapService.mapConfig.CELL_HEIGHT / 2,
-        "sell"
+        'sell',
       );
       sellImage.setDepth(3);
-      sellImage.play("rotate");
+      sellImage.play('rotate');
       sellImage.setInteractive();
 
-      sellImage.on("pointerdown", (pointer) => {
+      sellImage.on('pointerdown', (pointer) => {
         detailText.destroy();
         // console.log('sell clicked');
 
         this._gameStateService.setGold(
-          (prev) => prev + window.getTowerSellPrice(this.getName(), this.level)
+          (prev) => prev + window.getTowerSellPrice(this.getName(), this.level),
         );
         this._gameStateService.savedData.towers.splice(
           this._gameStateService.savedData.towers.indexOf(this),
-          1
+          1,
         );
 
         let square = new Square(this.Phaserscene, this.col, this.row);
         _gameMapService.tryUpdateMap(
           this.col,
           this.row,
-          _gameMapService.mapConfig.CELL_AVAILABLE
+          _gameMapService.mapConfig.CELL_AVAILABLE,
         );
 
         isTowerClicked = false;
@@ -312,7 +312,7 @@ window.setupTower = (gameStateService, gameMapService) => {
         this.destroy();
       });
 
-      sellImage.on("pointerover", (pointer) => {
+      sellImage.on('pointerover', (pointer) => {
         if (detailText) {
           detailText.destroy();
         }
@@ -321,11 +321,11 @@ window.setupTower = (gameStateService, gameMapService) => {
           600,
           `Bán giá: ${window.getTowerSellPrice(this.getName(), this.level)}$`,
           {
-            fontStyle: "bold",
-            fontSize: "20px",
-            fill: "#ff0000",
-            fontFamily: "roboto",
-          }
+            fontStyle: 'bold',
+            fontSize: '20px',
+            fill: '#ff0000',
+            fontFamily: 'roboto',
+          },
         );
         detailTextClicked = false;
         this.Phaserscene.time.addEvent({
@@ -336,7 +336,7 @@ window.setupTower = (gameStateService, gameMapService) => {
         });
       });
 
-      sellImage.on("pointerout", (pointer) => {
+      sellImage.on('pointerout', (pointer) => {
         detailText.destroy();
       });
 
@@ -371,7 +371,7 @@ window.setupTower = (gameStateService, gameMapService) => {
     }
 
     shoot() {
-      if (this.getName().slice(0, -1) == "power") {
+      if (this.getName().slice(0, -1) == 'power') {
         return;
       }
 
@@ -411,7 +411,7 @@ window.setupTower = (gameStateService, gameMapService) => {
           this.x,
           this.y,
           this,
-          this.level
+          this.level,
         );
         bullet.target = this.target;
         this.target.aimed.push(bullet);
@@ -421,7 +421,7 @@ window.setupTower = (gameStateService, gameMapService) => {
           bullet.target,
           dealDamage,
           null,
-          this.Phaserscene
+          this.Phaserscene,
         );
 
         this._gameStateService.savedData.bullets.push(bullet);

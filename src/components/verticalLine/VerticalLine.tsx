@@ -1,4 +1,4 @@
-import { classes } from "@/utils/toggle";
+import { classes } from '@/utils/toggle';
 
 type VerticalLineProps = {
   className?: string;
@@ -9,9 +9,9 @@ export function VerticalLine({ className, background }: VerticalLineProps) {
   return (
     <div
       className={classes(
-        "w-0.5 h-full",
-        className ?? "",
-        background ?? "bg-white"
+        'w-0.5 h-full',
+        className ?? '',
+        background ?? 'bg-white',
       )}
     ></div>
   );

@@ -27,7 +27,7 @@ window.setupBullet = (gameStateService, gameMapService) => {
       if (ammoData.ammoDisplaySize !== null) {
         this.setDisplaySize(
           ammoData.ammoDisplaySize[0],
-          ammoData.ammoDisplaySize[1]
+          ammoData.ammoDisplaySize[1],
         );
       }
     }

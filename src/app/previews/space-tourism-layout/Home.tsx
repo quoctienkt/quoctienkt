@@ -13,8 +13,8 @@ export function Home() {
           <div className="text-justify font-['Barlow'] text-[#D0D6F9] max-lg:text-center max-sm:leading-[25px]">
             Let&apos;s face it; if you want to go to space, you might as well
             genuinely go to outer space and not hover kind of on the edge of it.
-            Well sit back, and relax because we&apos;ll give you a truly out of this
-            world experience!
+            Well sit back, and relax because we&apos;ll give you a truly out of
+            this world experience!
           </div>
         </section>
 

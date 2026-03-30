@@ -8,7 +8,7 @@ window.loadMonsterButterfly = () => {
       this.Phaserscene.anims.create({
         key: window.getMonsterAnimationAssetName(
           this.getName(),
-          window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT
+          window.getConstants().MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT,
         ),
         frames: this.Phaserscene.anims.generateFrameNumbers(this.getName(), {
           start: 0,
@@ -20,7 +20,7 @@ window.loadMonsterButterfly = () => {
 
       this.setDisplaySize(40, 40);
       this.anims.play(
-        window.getMonsterAnimationAssetName(this.getName(), this.direction)
+        window.getMonsterAnimationAssetName(this.getName(), this.direction),
       );
       this.setCircle(15, 30, 28);
       this.maxHealth = 30 + this._gameStateService.savedData.wave * 100;

@@ -43,9 +43,9 @@ class GameStateService {
     this.savedData = gameData;
 
     this.waveText = this.scene.add.text(290, 29, `${this.savedData.wave}`, {
-      fontSize: "15px",
-      fill: "#fff",
-      fontFamily: "roboto",
+      fontSize: '15px',
+      fill: '#fff',
+      fontFamily: 'roboto',
     });
 
     this.lifeText = this.scene.add.text(
@@ -53,20 +53,20 @@ class GameStateService {
       150,
       `Máu ${this.savedData.life}`,
       {
-        fontSize: "20px",
-        fill: "#fff",
-        fontFamily: "roboto",
-      }
+        fontSize: '20px',
+        fill: '#fff',
+        fontFamily: 'roboto',
+      },
     );
 
     this.goldText = this.scene.add.text(615, 230, `${this.savedData.gold}`, {
-      fontSize: "13px",
-      fill: "#ffd64c",
-      fontFamily: "roboto",
+      fontSize: '13px',
+      fill: '#ffd64c',
+      fontFamily: 'roboto',
     });
   }
 
   test() {
-    console.log("Game State enter");
+    console.log('Game State enter');
   }
 }

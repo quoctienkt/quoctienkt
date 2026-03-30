@@ -1,8 +1,8 @@
-import { ResultSummary } from "@/components/result-summary/View";
-import { Metadata } from "next";
+import { ResultSummary } from '@/components/result-summary/View';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Frontend Mentor | Results summary component",
+  title: 'Frontend Mentor | Results summary component',
 };
 
 export default function Page() {

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from 'next-themes';
 
-export const ThemeModeLocalStorageKey = "theme-mode";
+export const ThemeModeLocalStorageKey = 'theme-mode';
 
 type GlobalProviderProps = {
   children: React.ReactNode;

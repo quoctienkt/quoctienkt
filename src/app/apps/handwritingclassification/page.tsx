@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import View from "./view";
+import type { Metadata } from 'next';
+import View from './view';
 
 export const metadata: Metadata = {
-  title: "Hand Writing Classification",
+  title: 'Hand Writing Classification',
 };
 
 export default function Page() {

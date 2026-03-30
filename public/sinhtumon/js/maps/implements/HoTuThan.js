@@ -2,7 +2,7 @@ window.loadHoTuThanMap = () => {
   window.HoTuThanMap = class extends GameMapServiceBase {
     constructor() {
       const mapConfig = {
-        mapKey: "MAP_HOTUTHAN",
+        mapKey: 'MAP_HOTUTHAN',
         map: [
           [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
           [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -31,4 +31,4 @@ window.loadHoTuThanMap = () => {
       super(mapConfig);
     }
   };
-}
+};

@@ -32,11 +32,11 @@ window.setupGame = (appPrefix) => {
 
   window.config = {
     type: Phaser.CANVAS,
-    canvas: document.getElementById("myCustomCanvas"),
+    canvas: document.getElementById('myCustomCanvas'),
     width: GAME_WIDTH,
     height: GAME_HEIGHT + _gameMapService.mapConfig.GAME_BOARD_PADDING_TOP,
     physics: {
-      default: "arcade",
+      default: 'arcade',
       // arcade: {
       //   debug: true,
       // },
@@ -57,41 +57,41 @@ function preload() {
 
   const snowflakeTower = window.getTowerSnowFlakeData();
 
-  this.load.image("background", `${window.appPrefix}/img/background.png"`);
-  this.load.image("background1", `${window.appPrefix}/img/background1.png`);
-  this.load.image("square", `${window.appPrefix}/img/square2.png`);
-  this.load.image("arrow", `${window.appPrefix}/img/arrow.png`);
+  this.load.image('background', `${window.appPrefix}/img/background.png"`);
+  this.load.image('background1', `${window.appPrefix}/img/background1.png`);
+  this.load.image('square', `${window.appPrefix}/img/square2.png`);
+  this.load.image('arrow', `${window.appPrefix}/img/arrow.png`);
 
-  this.load.image("tower_range", `${window.appPrefix}/img/circle_2.png`);
+  this.load.image('tower_range', `${window.appPrefix}/img/circle_2.png`);
 
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 1),
-    `${window.appPrefix}/img/tower/frozen_bullet/1.png`
+    `${window.appPrefix}/img/tower/frozen_bullet/1.png`,
   );
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 2),
-    `${window.appPrefix}/img/tower/frozen_bullet/2.png`
+    `${window.appPrefix}/img/tower/frozen_bullet/2.png`,
   );
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 3),
-    `${window.appPrefix}/img/tower/frozen_bullet/3.png`
+    `${window.appPrefix}/img/tower/frozen_bullet/3.png`,
   );
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 4),
-    `${window.appPrefix}/img/tower/frozen_bullet/4.png`
+    `${window.appPrefix}/img/tower/frozen_bullet/4.png`,
   );
   this.load.image(
     window.getTowerAmmoAssetName(snowflakeTower.towerType, 5),
-    `${window.appPrefix}/img/tower/frozen_bullet/5.png`
+    `${window.appPrefix}/img/tower/frozen_bullet/5.png`,
   );
 
-  this.load.image("upgrade", `${window.appPrefix}/img/loop.png`);
-  this.load.spritesheet("sell", `${window.appPrefix}/img/coin.png`, {
+  this.load.image('upgrade', `${window.appPrefix}/img/loop.png`);
+  this.load.spritesheet('sell', `${window.appPrefix}/img/coin.png`, {
     frameWidth: 32,
     frameHeight: 32,
   });
 
-  this.load.spritesheet("onDead", `${window.appPrefix}/img/explosion.png`, {
+  this.load.spritesheet('onDead', `${window.appPrefix}/img/explosion.png`, {
     frameWidth: 64,
     frameHeight: 64,
   });
@@ -102,7 +102,7 @@ function preload() {
     {
       frameWidth: 32,
       frameHeight: 53,
-    }
+    },
   );
   this.load.spritesheet(
     window.getConstants().MONSTER_BUTTERFLY,
@@ -110,28 +110,28 @@ function preload() {
     {
       frameWidth: 70,
       frameHeight: 65,
-    }
+    },
   );
 
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 1),
-    `${window.appPrefix}/img/tower/frozen/1.png`
+    `${window.appPrefix}/img/tower/frozen/1.png`,
   );
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 2),
-    `${window.appPrefix}/img/tower/frozen/2.png`
+    `${window.appPrefix}/img/tower/frozen/2.png`,
   );
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 3),
-    `${window.appPrefix}/img/tower/frozen/3.png`
+    `${window.appPrefix}/img/tower/frozen/3.png`,
   );
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 4),
-    `${window.appPrefix}/img/tower/frozen/4.png`
+    `${window.appPrefix}/img/tower/frozen/4.png`,
   );
   this.load.image(
     window.getTowerAssetName(snowflakeTower.towerType, 5),
-    `${window.appPrefix}/img/tower/frozen/5.png`
+    `${window.appPrefix}/img/tower/frozen/5.png`,
   );
 
   graphics = this.add.graphics();
@@ -166,19 +166,19 @@ function create() {
       (waveDelay -
         waveDelay *
           parseFloat(
-            monsterRespawnEvent.getProgress().toString().substr(0, 4)
+            monsterRespawnEvent.getProgress().toString().substr(0, 4),
           )) /
       1000
     }`,
     {
-      fontSize: "15px",
-      fill: "#fff",
-      fontFamily: "roboto",
-    }
+      fontSize: '15px',
+      fill: '#fff',
+      fontFamily: 'roboto',
+    },
   );
 
   //is buying
-  this.input.on("pointermove", (pointer) => {
+  this.input.on('pointermove', (pointer) => {
     if (isBuying) {
       tempTower.x = pointer.x;
       tempTower.y = pointer.y;
@@ -186,7 +186,7 @@ function create() {
   });
 
   // Huỷ chọn mua tháp khi click ra ngoài
-  this.input.on("pointerdown", (pointer) => {
+  this.input.on('pointerdown', (pointer) => {
     if (detailTextClicked) {
       detailText.destroy();
     }
@@ -223,7 +223,7 @@ function monsterReachEndpoint(tween, targets, monster) {
 
   _gameStateService.savedData.monsters.splice(
     _gameStateService.savedData.monsters.indexOf(monster),
-    1
+    1,
   );
   monster.destroy();
 }
@@ -254,7 +254,7 @@ function dealDamage(bullet, monster) {
 
   _gameStateService.savedData.bullets.splice(
     _gameStateService.savedData.bullets.indexOf(bullet),
-    1
+    1,
   );
   bullet.destroy();
 
@@ -266,7 +266,7 @@ function dealDamage(bullet, monster) {
 function getDistance(objectA, objectB) {
   return Math.sqrt(
     (objectA.x - objectB.x) * (objectA.x - objectB.x) +
-      (objectA.y - objectB.y) * (objectA.y - objectB.y)
+      (objectA.y - objectB.y) * (objectA.y - objectB.y),
   );
 }
 
@@ -276,7 +276,7 @@ function moveTo(source, target, speed) {
 
   source.setAngle(
     Phaser.Math.RAD_TO_DEG *
-      Phaser.Math.Angle.Between(source.x, source.y, target.x, target.y)
+      Phaser.Math.Angle.Between(source.x, source.y, target.x, target.y),
   );
   source.setVelocity(Math.sin(angle) * speed, Math.cos(angle) * speed);
 }
@@ -297,10 +297,10 @@ function update(time, delta) {
       (waveDelay -
         waveDelay *
           parseFloat(
-            monsterRespawnEvent.getProgress().toString().substr(0, 4)
+            monsterRespawnEvent.getProgress().toString().substr(0, 4),
           )) /
       1000
-    }`
+    }`,
   );
 
   //landing monster move
@@ -314,7 +314,7 @@ function update(time, delta) {
 
   // update bullet trajectory
   _gameStateService.savedData.bullets.forEach((bullet) =>
-    moveTo.call(this, bullet, bullet.target, bullet.speed)
+    moveTo.call(this, bullet, bullet.target, bullet.speed),
   );
 
   //fire

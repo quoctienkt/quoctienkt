@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { classes, toggle } from "@/utils/toggle";
-import pageData from "./data.json";
-import Image from "next/image";
+import { useEffect, useState } from 'react';
+import { classes, toggle } from '@/utils/toggle';
+import pageData from './data.json';
+import Image from 'next/image';
 
-import moonPng from "@/assets/previews/space-tourism-layout/assets/destination/image-moon.png";
-import marsPng from "@/assets/previews/space-tourism-layout/assets/destination/image-mars.png";
-import europaPng from "@/assets/previews/space-tourism-layout/assets/destination/image-europa.png";
-import titanPng from "@/assets/previews/space-tourism-layout/assets/destination/image-titan.png";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
+const moonPng = '/quoctienkt/previews/space-tourism-layout/assets/destination/image-moon.png';
+const marsPng = '/quoctienkt/previews/space-tourism-layout/assets/destination/image-mars.png';
+const europaPng = '/quoctienkt/previews/space-tourism-layout/assets/destination/image-europa.png';
+const titanPng = '/quoctienkt/previews/space-tourism-layout/assets/destination/image-titan.png';
 
 const destinationsData = pageData.destinations;
 
@@ -22,12 +22,12 @@ const destinationImages = {
   Titan: titanPng,
 };
 
-type TabTypes = "Moon" | "Mars" | "Europa" | "Titan";
+type TabTypes = 'Moon' | 'Mars' | 'Europa' | 'Titan';
 type TabStatus =
-  | "hidden"
-  | "transitioning-in-start"
-  | "active"
-  | "transitioning-out";
+  | 'hidden'
+  | 'transitioning-in-start'
+  | 'active'
+  | 'transitioning-out';
 
 type DestinationStates = {
   tabActive: TabTypes;
@@ -36,7 +36,7 @@ type DestinationStates = {
 };
 
 const defaultState: DestinationStates = {
-  tabActive: "Moon",
+  tabActive: 'Moon',
   tabTransitioningInStart: null,
   tabTransitioningOut: null,
 };
@@ -45,21 +45,21 @@ export function Destination() {
   const [state, setState] = useState<DestinationStates>(defaultState);
 
   const getTabStatus = (tab: TabTypes): TabStatus => {
-    if (tab === state.tabTransitioningInStart) return "transitioning-in-start";
-    if (tab === state.tabActive) return "active";
-    if (tab === state.tabTransitioningOut) return "transitioning-out";
-    return "hidden";
+    if (tab === state.tabTransitioningInStart) return 'transitioning-in-start';
+    if (tab === state.tabActive) return 'active';
+    if (tab === state.tabTransitioningOut) return 'transitioning-out';
+    return 'hidden';
   };
 
   const getTabCss = (tab: string): string => {
     const status = getTabStatus(tab as TabTypes);
-    if (status === "transitioning-in-start")
-      return "!block translate-x-[100%] transition-none";
-    if (status === "active")
-      return "!block translate-x-0 [transition:transform_0.6s_ease] [transition-delay:350ms]";
-    if (status === "transitioning-out")
-      return "!block -translate-x-[100%] [transition:transform_0.6s_ease-in-out]";
-    return "hidden";
+    if (status === 'transitioning-in-start')
+      return '!block translate-x-[100%] transition-none';
+    if (status === 'active')
+      return '!block translate-x-0 [transition:transform_0.6s_ease] [transition-delay:350ms]';
+    if (status === 'transitioning-out')
+      return '!block -translate-x-[100%] [transition:transform_0.6s_ease-in-out]';
+    return 'hidden';
   };
 
   const handleTabClicked = (tab: TabTypes) => {
@@ -80,8 +80,13 @@ export function Destination() {
     <>
       <main className="flex-1 z-10 flex flex-col w-full relative max-lg:gap-10">
         {/* Header */}
-        <header className="flex-none pt-[7%] pb-[5%] flex flex-row items-center justify-center uppercase text-center text-white w-[55%] max-lg:basis-0 max-sm:text-center max-sm:w-full max-sm:text-base"
-          style={{ fontFamily: "Barlow Condensed", fontSize: 28, letterSpacing: "4.725px" }}
+        <header
+          className="flex-none pt-[7%] pb-[5%] flex flex-row items-center justify-center uppercase text-center text-white w-[55%] max-lg:basis-0 max-sm:text-center max-sm:w-full max-sm:text-base"
+          style={{
+            fontFamily: 'Barlow Condensed',
+            fontSize: 28,
+            letterSpacing: '4.725px',
+          }}
         >
           Pick your destination
         </header>
@@ -103,21 +108,23 @@ export function Destination() {
           <div className="h-full w-[448px] relative max-lg:w-8/12 max-lg:flex max-lg:flex-col max-lg:items-center">
             {/* Tabs */}
             <div className="flex flex-row gap-8 max-sm:gap-4">
-              {(["Moon", "Mars", "Europa", "Titan"] as TabTypes[]).map((tab) => (
-                <div
-                  key={tab}
-                  className={classes(
-                    "relative py-2 cursor-pointer select-none uppercase",
-                    toggle(
-                      state.tabActive === tab,
-                      "after:content-[''] after:block after:absolute after:left-0 after:right-0 after:bottom-0 after:h-0.5 after:bg-white"
-                    )
-                  )}
-                  onClick={() => handleTabClicked(tab)}
-                >
-                  {tab}
-                </div>
-              ))}
+              {(['Moon', 'Mars', 'Europa', 'Titan'] as TabTypes[]).map(
+                (tab) => (
+                  <div
+                    key={tab}
+                    className={classes(
+                      'relative py-2 cursor-pointer select-none uppercase',
+                      toggle(
+                        state.tabActive === tab,
+                        "after:content-[''] after:block after:absolute after:left-0 after:right-0 after:bottom-0 after:h-0.5 after:bg-white",
+                      ),
+                    )}
+                    onClick={() => handleTabClicked(tab)}
+                  >
+                    {tab}
+                  </div>
+                ),
+              )}
             </div>
 
             {/* Tab contents */}
@@ -127,13 +134,22 @@ export function Destination() {
                   key={destination.name}
                   onTransitionEnd={() => {
                     if (state.tabTransitioningInStart !== destination.name) {
-                      setState((prev) => ({ ...prev, tabTransitioningInStart: null }));
+                      setState((prev) => ({
+                        ...prev,
+                        tabTransitioningInStart: null,
+                      }));
                     }
                     if (state.tabTransitioningOut !== destination.name) {
-                      setState((prev) => ({ ...prev, tabTransitioningOut: null }));
+                      setState((prev) => ({
+                        ...prev,
+                        tabTransitioningOut: null,
+                      }));
                     }
                   }}
-                  className={classes("w-full float-left mr-[-100%]", getTabCss(destination.name))}
+                  className={classes(
+                    'w-full float-left mr-[-100%]',
+                    getTabCss(destination.name),
+                  )}
                 >
                   {/* Name */}
                   <div className="text-[100px] uppercase font-['Bellefair'] max-lg:text-7xl max-lg:mt-8 max-lg:mb-5 max-sm:text-6xl max-sm:mt-6 max-sm:mb-3">
@@ -143,7 +159,7 @@ export function Destination() {
                   {/* Description */}
                   <div
                     className="text-justify font-['Barlow'] text-[#D0D6F9] max-lg:text-center"
-                    style={{ lineHeight: "32px" }}
+                    style={{ lineHeight: '32px' }}
                   >
                     {destination.description}
                   </div>
@@ -156,7 +172,7 @@ export function Destination() {
                     <div className="max-sm:mb-8">
                       <div
                         className="uppercase font-['Barlow_Condensed'] text-[#D0D6F9]"
-                        style={{ letterSpacing: "2.362px" }}
+                        style={{ letterSpacing: '2.362px' }}
                       >
                         AVG. DISTANCE
                       </div>
@@ -167,7 +183,7 @@ export function Destination() {
                     <div className="max-sm:mb-8">
                       <div
                         className="uppercase font-['Barlow_Condensed'] text-[#D0D6F9]"
-                        style={{ letterSpacing: "2.362px" }}
+                        style={{ letterSpacing: '2.362px' }}
                       >
                         Est. travel time
                       </div>
