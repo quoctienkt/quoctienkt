@@ -27,21 +27,23 @@ export abstract class GameMapServiceBase {
   init(gameStateService: GameStateService): void {
     this.gameStateService = gameStateService;
 
-    // Dead animation
-    this.scene!.anims.create({
-      key: 'dead',
-      frames: 'onDead',
-      frameRate: 500,
-      repeat: 0,
-    });
-
-    // Coin spin animation (sell button)
-    this.scene!.anims.create({
-      key: 'rotate',
-      frames: 'sell',
-      frameRate: 10,
-      repeat: -1,
-    });
+    // Global animations registered once at scene init
+    if (!this.scene!.anims.exists('dead')) {
+      this.scene!.anims.create({
+        key: 'dead',
+        frames: 'onDead',
+        frameRate: 500,
+        repeat: 0,
+      });
+    }
+    if (!this.scene!.anims.exists('rotate')) {
+      this.scene!.anims.create({
+        key: 'rotate',
+        frames: 'sell',
+        frameRate: 10,
+        repeat: -1,
+      });
+    }
 
     this.scene!.add.text(5, 60, 'Entrance', {
       fontSize: '15px',
@@ -54,7 +56,9 @@ export abstract class GameMapServiceBase {
       fontFamily: 'Roboto, sans-serif',
     });
 
-    const background = this.scene!.add.image(-2, 0, 'background1').setOrigin(0);
+    // Background — use mapConfig.backgroundKey if available, else fallback
+    const bgKey = this.mapConfig.backgroundKey ?? 'background1';
+    const background = this.scene!.add.image(-2, 0, bgKey).setOrigin(0);
     background.setDepth(-3);
     background.setDisplaySize(
       this.scene!.game.config.width as number,

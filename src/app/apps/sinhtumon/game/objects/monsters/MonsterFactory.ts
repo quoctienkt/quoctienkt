@@ -1,9 +1,18 @@
 import * as Phaser from 'phaser';
-import { MonsterBase } from './MonsterBase';
-import { MonsterGrunt } from './implements/MonsterGrunt';
-import { MonsterHarpy } from './implements/MonsterHarpy';
+import { MonsterBase, type MonsterContext } from './MonsterBase';
+import { MonsterGrunt } from './implements/ground/MonsterGrunt';
+import { MonsterOrc } from './implements/ground/MonsterOrc';
+import { MonsterTroll } from './implements/ground/MonsterTroll';
+import { MonsterMummy } from './implements/ground/MonsterMummy';
+import { MonsterSpider } from './implements/ground/MonsterSpider';
+import { MonsterHarpy } from './implements/flying/MonsterHarpy';
+import { MonsterBat } from './implements/flying/MonsterBat';
+import { MonsterDragon } from './implements/flying/MonsterDragon';
+import { BossGolem } from './implements/boss/BossGolem';
+import { BossDemon } from './implements/boss/BossDemon';
 import { GameStateService } from '../../services/GameStateService';
 import { GameMapServiceBase } from '../../maps/GameMapServiceBase';
+import { EventBus } from '../../services/EventBus';
 import * as C from '../../constants';
 
 export class MonsterFactory {
@@ -12,21 +21,44 @@ export class MonsterFactory {
     monsterType: string,
     col: number,
     row: number,
-    gameStateService: GameStateService,
-    gameMapService: GameMapServiceBase,
+    stateService: GameStateService,
+    mapService: GameMapServiceBase,
     onReachEndpoint: (monster: MonsterBase) => void,
-    getGraphics: () => Phaser.GameObjects.Graphics,
-    getDetailText: () => any,
-    setDetailText: (t: any) => void,
+    eventBus: EventBus,
   ): MonsterBase {
-    const args: [
-      Phaser.Scene, string, number, number, GameStateService, GameMapServiceBase,
-      (m: MonsterBase) => void, () => Phaser.GameObjects.Graphics, () => any, (t: any) => void
-    ] = [scene, monsterType, col, row, gameStateService, gameMapService, onReachEndpoint, getGraphics, getDetailText, setDetailText];
+    const ctx: MonsterContext = {
+      monsterType,
+      col,
+      row,
+      stateService,
+      mapService,
+      eventBus,
+      onReachEndpoint,
+    };
 
-    if (monsterType === C.MONSTER_GRUNT) return new MonsterGrunt(...args);
-    if (monsterType === C.MONSTER_HARPY) return new MonsterHarpy(...args);
-
-    throw new Error(`Unknown monster type: ${monsterType}`);
+    switch (monsterType) {
+      case C.MONSTER_GRUNT:
+        return new MonsterGrunt(scene, ctx);
+      case C.MONSTER_ORC:
+        return new MonsterOrc(scene, ctx);
+      case C.MONSTER_TROLL:
+        return new MonsterTroll(scene, ctx);
+      case C.MONSTER_MUMMY:
+        return new MonsterMummy(scene, ctx);
+      case C.MONSTER_SPIDER:
+        return new MonsterSpider(scene, ctx);
+      case C.MONSTER_HARPY:
+        return new MonsterHarpy(scene, ctx);
+      case C.MONSTER_BAT:
+        return new MonsterBat(scene, ctx);
+      case C.MONSTER_DRAGON:
+        return new MonsterDragon(scene, ctx);
+      case C.BOSS_GOLEM:
+        return new BossGolem(scene, ctx);
+      case C.BOSS_DEMON:
+        return new BossDemon(scene, ctx);
+      default:
+        throw new Error(`Unknown monster type: ${monsterType}`);
+    }
   }
 }

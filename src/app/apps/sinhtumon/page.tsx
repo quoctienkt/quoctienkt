@@ -2,8 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 
-const ASSET_PATH_PREFIX = `${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/sinhtumon/img`;
-
 export default function Page() {
   const gameRef = useRef<any>(null);
 
@@ -19,7 +17,7 @@ export default function Page() {
     // It only loads when the user visits this page.
     import('./game').then(({ createGame }) => {
       if (!gameRef.current) {
-        gameRef.current = createGame(canvas, ASSET_PATH_PREFIX);
+        gameRef.current = createGame(canvas);
       }
     });
 
@@ -30,7 +28,7 @@ export default function Page() {
   }, []);
 
   return (
-    <section className="app_sinhtumon">
+    <section className="app_sinhtumon justify-center flex items-center min-h-screen">
       <canvas id="myCustomCanvas" />
     </section>
   );

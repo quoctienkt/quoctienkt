@@ -83,15 +83,19 @@ export class Tower extends Phaser.Physics.Arcade.Sprite {
     );
 
     this.col = Math.floor(
-      (x - gameMapService.mapConfig.CELL_WIDTH / 2) / gameMapService.mapConfig.CELL_WIDTH,
+      (x - gameMapService.mapConfig.CELL_WIDTH / 2) /
+        gameMapService.mapConfig.CELL_WIDTH,
     );
     this.row = Math.floor(
-      (y - gameMapService.mapConfig.GAME_BOARD_PADDING_TOP - gameMapService.mapConfig.CELL_HEIGHT / 2) /
+      (y -
+        gameMapService.mapConfig.GAME_BOARD_PADDING_TOP -
+        gameMapService.mapConfig.CELL_HEIGHT / 2) /
         gameMapService.mapConfig.CELL_HEIGHT,
     );
 
     this.range =
-      getTowerAttackRange(this.getName(), this.level) + gameMapService.mapConfig.CELL_WIDTH;
+      getTowerAttackRange(this.getName(), this.level) +
+      gameMapService.mapConfig.CELL_WIDTH;
 
     if (bindEvents) this.bindEvents();
   }
@@ -264,7 +268,11 @@ export class Tower extends Phaser.Physics.Arcade.Sprite {
       const towers = this.gameStateService.savedData!.towers;
       towers.splice(towers.indexOf(this), 1);
       this.cb.createSquare(this.col, this.row);
-      this.gameMapService.tryUpdateMap(this.col, this.row, this.gameMapService.mapConfig.CELL_AVAILABLE);
+      this.gameMapService.tryUpdateMap(
+        this.col,
+        this.row,
+        this.gameMapService.mapConfig.CELL_AVAILABLE,
+      );
       this.cb.setIsTowerClicked(false);
       this.cb.getRangeImage()?.destroy();
       this.cb.getSellImage()?.destroy();
@@ -344,7 +352,13 @@ export class Tower extends Phaser.Physics.Arcade.Sprite {
       bullet.target = this.target;
       this.target.aimed.push(bullet);
 
-      this.scene.physics.add.overlap(bullet, bullet.target, dealDamage as any, undefined, this.scene);
+      this.scene.physics.add.overlap(
+        bullet,
+        bullet.target,
+        dealDamage as any,
+        undefined,
+        this.scene,
+      );
       this.gameStateService.savedData!.bullets.push(bullet);
     }
   }

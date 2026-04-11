@@ -18,19 +18,38 @@ export class MonsterHarpy extends MonsterBase {
     getDetailText: () => any,
     setDetailText: (t: any) => void,
   ) {
-    super(scene, monsterType, col, row, gameStateService, gameMapService, onReachEndpoint, getGraphics, getDetailText, setDetailText);
+    super(
+      scene,
+      monsterType,
+      col,
+      row,
+      gameStateService,
+      gameMapService,
+      onReachEndpoint,
+      getGraphics,
+      getDetailText,
+      setDetailText,
+    );
   }
 
   protected prepareSpriteAsset(): void {
     this.scene.anims.create({
-      key: getMonsterAnimationAssetName(this.getName(), C.MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT),
-      frames: this.scene.anims.generateFrameNumbers(this.getName(), { start: 0, end: 19 }),
+      key: getMonsterAnimationAssetName(
+        this.getName(),
+        C.MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT,
+      ),
+      frames: this.scene.anims.generateFrameNumbers(this.getName(), {
+        start: 0,
+        end: 19,
+      }),
       frameRate: 20,
       repeat: -1,
     });
 
     this.setDisplaySize(40, 40);
-    this.anims.play(getMonsterAnimationAssetName(this.getName(), this.direction));
+    this.anims.play(
+      getMonsterAnimationAssetName(this.getName(), this.direction),
+    );
     this.setCircle(15, 30, 28);
 
     this.maxHealth = 30 + this.gameStateService.savedData!.wave * 100;

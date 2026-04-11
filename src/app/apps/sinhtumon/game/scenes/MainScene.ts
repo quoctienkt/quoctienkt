@@ -1,10 +1,11 @@
 import * as Phaser from 'phaser';
 import { GameStateService } from '../services/GameStateService';
 import { GameMapServiceBase } from '../maps/GameMapServiceBase';
-import { CrossroadsMap } from '../maps/implements/CrossroadsMap';
+import { CrossroadsMapService } from '../maps/implements/CrossroadsMap';
 import { Tower, TowerCallbacks } from '../objects/Tower';
 import { Bullet } from '../objects/Bullet';
 import { Square } from '../objects/Square';
+import { EventBus } from '../services/EventBus';
 import { MonsterBase } from '../objects/monsters/MonsterBase';
 import { MonsterFactory } from '../objects/monsters/MonsterFactory';
 import * as C from '../constants';
@@ -22,6 +23,7 @@ export class MainScene extends Phaser.Scene {
   private graphics!: Phaser.GameObjects.Graphics;
   private nextWaveText!: Phaser.GameObjects.Text;
   private monsterRespawnEvent!: Phaser.Time.TimerEvent;
+  private eventBus!: EventBus;
 
   private readonly GAME_WIDTH = 520 + 150;
   private readonly GAME_HEIGHT = 60 + 520;
@@ -47,62 +49,22 @@ export class MainScene extends Phaser.Scene {
     this.gameStateService = new GameStateService();
     this.gameStateService.setScene(this);
 
-    this.gameMapService = new CrossroadsMap();
+    this.gameMapService = new CrossroadsMapService();
     this.gameMapService.setScene(this);
-
-    const assetPathPrefix: string = this.game.registry.get('assetPathPrefix');
-
-    const frostData = getTowerFrostData();
-    const tt = frostData.towerType;
-
-    this.load.image('background', `${assetPathPrefix}/background.png`);
-    this.load.image('background1', `${assetPathPrefix}/background1.png`);
-    this.load.image('square', `${assetPathPrefix}/square2.png`);
-    this.load.image('arrow', `${assetPathPrefix}/arrow.png`);
-    this.load.image('tower_range', `${assetPathPrefix}/circle_2.png`);
-    this.load.image('upgrade', `${assetPathPrefix}/loop.png`);
-
-    this.load.spritesheet('sell', `${assetPathPrefix}/coin.png`, {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
-    this.load.spritesheet('onDead', `${assetPathPrefix}/explosion.png`, {
-      frameWidth: 64,
-      frameHeight: 64,
-    });
-    this.load.spritesheet(C.MONSTER_GRUNT, `${assetPathPrefix}/ani_beast.png`, {
-      frameWidth: 32,
-      frameHeight: 53,
-    });
-    this.load.spritesheet(
-      C.MONSTER_HARPY,
-      `${assetPathPrefix}/monster/flying/butterfly.png`,
-      {
-        frameWidth: 70,
-        frameHeight: 65,
-      },
-    );
-
-    // Frost tower levels
-    for (let lvl = 1; lvl <= 5; lvl++) {
-      this.load.image(
-        getTowerAssetName(tt, lvl),
-        `${assetPathPrefix}/tower/frozen/${lvl}.png`,
-      );
-      this.load.image(
-        getTowerAmmoAssetName(tt, lvl),
-        `${assetPathPrefix}/tower/frozen_bullet/${lvl}.png`,
-      );
-    }
 
     this.graphics = this.add.graphics();
   }
 
   create(): void {
+    this.eventBus = new EventBus();
+
     const savedData = {
       towers: [],
       monsters: [],
       bullets: [],
+      heroes: [],
+      score: 0,
+      mapKey: C.MAP_CROSSROADS,
       wave: 0,
       life: 10,
       gold: 650,
@@ -302,11 +264,7 @@ export class MainScene extends Phaser.Scene {
             this.gameStateService,
             this.gameMapService,
             (m) => this.monsterReachEndpoint(m),
-            () => this.graphics,
-            () => this._detailText,
-            (t) => {
-              this._detailText = t;
-            },
+            this.eventBus,
           );
           this.gameStateService.savedData!.monsters.push(monster);
         },

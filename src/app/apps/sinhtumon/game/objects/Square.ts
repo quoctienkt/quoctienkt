@@ -23,7 +23,8 @@ export class Square extends Phaser.Physics.Arcade.Sprite {
   ) {
     super(
       scene,
-      col * gameMapService.mapConfig.CELL_WIDTH + gameMapService.mapConfig.CELL_WIDTH / 2,
+      col * gameMapService.mapConfig.CELL_WIDTH +
+        gameMapService.mapConfig.CELL_WIDTH / 2,
       row * gameMapService.mapConfig.CELL_HEIGHT +
         gameMapService.mapConfig.CELL_HEIGHT / 2 +
         gameMapService.mapConfig.GAME_BOARD_PADDING_TOP,

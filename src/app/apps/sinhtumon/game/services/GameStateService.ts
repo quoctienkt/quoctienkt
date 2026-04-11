@@ -1,52 +1,48 @@
 import * as Phaser from 'phaser';
 import type { SavedData } from '../types';
+import { EventBus } from './EventBus';
+import * as C from '../constants';
 
+/**
+ * Pure state container — NO text rendering.
+ * All UI text is handled by HUDScene listening to EventBus events.
+ */
 export class GameStateService {
   scene: Phaser.Scene | null = null;
   savedData: SavedData | null = null;
-
-  private waveText: Phaser.GameObjects.Text | null = null;
-  private lifeText: Phaser.GameObjects.Text | null = null;
-  private goldText: Phaser.GameObjects.Text | null = null;
+  private eventBus: EventBus | null = null;
 
   setScene(scene: Phaser.Scene): void {
     this.scene = scene;
-  }
-
-  setGold(callback: (prev: number) => number): void {
-    this.savedData!.gold = callback(this.savedData!.gold);
-    this.goldText?.setText(`${this.savedData!.gold}`);
-  }
-
-  setWave(callback: (prev: number) => number): void {
-    this.savedData!.wave = callback(this.savedData!.wave);
-    this.waveText?.setText(`Wave: ${this.savedData!.wave}`);
-  }
-
-  setLife(callback: (prev: number) => number): void {
-    this.savedData!.life = callback(this.savedData!.life);
-    this.lifeText?.setText(`Lives: ${this.savedData!.life}`);
+    this.eventBus = scene.game.registry.get('eventBus') as EventBus;
   }
 
   init(gameData: SavedData): void {
     this.savedData = gameData;
+    // Notify HUDScene of initial values
+    this.eventBus?.emit(C.EVT_GOLD_CHANGED, { gold: gameData.gold });
+    this.eventBus?.emit(C.EVT_LIFE_CHANGED, { life: gameData.life });
+  }
 
-    this.waveText = this.scene!.add.text(290, 29, `Wave: ${gameData.wave}`, {
-      fontSize: '15px',
-      color: '#ffffff',
-      fontFamily: 'Roboto, sans-serif',
-    });
+  setGold(callback: (prev: number) => number): void {
+    this.savedData!.gold = callback(this.savedData!.gold);
+    this.eventBus?.emit(C.EVT_GOLD_CHANGED, { gold: this.savedData!.gold });
+  }
 
-    this.lifeText = this.scene!.add.text(360, 150, `Lives: ${gameData.life}`, {
-      fontSize: '20px',
-      color: '#ffffff',
-      fontFamily: 'Roboto, sans-serif',
-    });
+  setWave(callback: (prev: number) => number): void {
+    this.savedData!.wave = callback(this.savedData!.wave);
+  }
 
-    this.goldText = this.scene!.add.text(615, 230, `${gameData.gold}`, {
-      fontSize: '13px',
-      color: '#ffd64c',
-      fontFamily: 'Roboto, sans-serif',
-    });
+  setLife(callback: (prev: number) => number): void {
+    this.savedData!.life = callback(this.savedData!.life);
+    this.eventBus?.emit(C.EVT_LIFE_CHANGED, { life: this.savedData!.life });
+    if (this.savedData!.life <= 0) {
+      this.eventBus?.emit(C.EVT_GAME_OVER, { victory: false });
+    }
+  }
+
+  addScore(amount: number): void {
+    this.savedData!.score += amount;
+    this.eventBus?.emit(C.EVT_SCORE_CHANGED, { score: this.savedData!.score });
   }
 }

@@ -18,25 +18,70 @@ export class MonsterGrunt extends MonsterBase {
     getDetailText: () => any,
     setDetailText: (t: any) => void,
   ) {
-    super(scene, monsterType, col, row, gameStateService, gameMapService, onReachEndpoint, getGraphics, getDetailText, setDetailText);
+    super(
+      scene,
+      monsterType,
+      col,
+      row,
+      gameStateService,
+      gameMapService,
+      onReachEndpoint,
+      getGraphics,
+      getDetailText,
+      setDetailText,
+    );
   }
 
   protected prepareSpriteAsset(): void {
     const createAnim = (key: string, start: number, end: number) => {
       this.scene.anims.create({
         key,
-        frames: this.scene.anims.generateFrameNumbers(C.MONSTER_GRUNT, { start, end }),
+        frames: this.scene.anims.generateFrameNumbers(C.MONSTER_GRUNT, {
+          start,
+          end,
+        }),
         frameRate: 10,
         repeat: -1,
       });
     };
 
-    createAnim(getMonsterAnimationAssetName(this.getName(), C.MONSTER_MOVE_DIRECTION_TO_RIGHT), 0, 5);
-    createAnim(getMonsterAnimationAssetName(this.getName(), C.MONSTER_MOVE_DIRECTION_TO_BOTTOM), 0, 5);
-    createAnim(getMonsterAnimationAssetName(this.getName(), C.MONSTER_MOVE_DIRECTION_TO_LEFT), 6, 11);
-    createAnim(getMonsterAnimationAssetName(this.getName(), C.MONSTER_MOVE_DIRECTION_TO_TOP), 6, 11);
+    createAnim(
+      getMonsterAnimationAssetName(
+        this.getName(),
+        C.MONSTER_MOVE_DIRECTION_TO_RIGHT,
+      ),
+      0,
+      5,
+    );
+    createAnim(
+      getMonsterAnimationAssetName(
+        this.getName(),
+        C.MONSTER_MOVE_DIRECTION_TO_BOTTOM,
+      ),
+      0,
+      5,
+    );
+    createAnim(
+      getMonsterAnimationAssetName(
+        this.getName(),
+        C.MONSTER_MOVE_DIRECTION_TO_LEFT,
+      ),
+      6,
+      11,
+    );
+    createAnim(
+      getMonsterAnimationAssetName(
+        this.getName(),
+        C.MONSTER_MOVE_DIRECTION_TO_TOP,
+      ),
+      6,
+      11,
+    );
 
-    this.anims.play(getMonsterAnimationAssetName(this.getName(), this.direction), true);
+    this.anims.play(
+      getMonsterAnimationAssetName(this.getName(), this.direction),
+      true,
+    );
     this.setCircle(10, 3, 15);
 
     this.maxHealth = 30 + this.gameStateService.savedData!.wave * 100;

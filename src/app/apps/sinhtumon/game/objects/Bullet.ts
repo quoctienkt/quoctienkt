@@ -40,7 +40,10 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
       this.setTint(parseInt(ammoData.ammoDisplayTint));
     }
     if (ammoData.ammoDisplaySize !== null) {
-      this.setDisplaySize(ammoData.ammoDisplaySize[0], ammoData.ammoDisplaySize[1]);
+      this.setDisplaySize(
+        ammoData.ammoDisplaySize[0],
+        ammoData.ammoDisplaySize[1],
+      );
     }
   }
 
