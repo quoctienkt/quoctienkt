@@ -71,7 +71,7 @@ export const monstersConfig: Record<string, MonsterConfig> = {
     armor: 0,
     regenPerSec: 8, // regenerates HP while alive
     spriteKey: C.MONSTER_MUMMY,
-    assetPath: '/assets/monsters/ground/mummy/walk.png',
+    assetPath: '/monsters/metalslug_mummy37x45.png',
     frameWidth: 37,
     frameHeight: 45,
     displayWidth: 37,
@@ -111,7 +111,7 @@ export const monstersConfig: Record<string, MonsterConfig> = {
     isFlying: true,
     armor: 0,
     spriteKey: C.MONSTER_HARPY,
-    assetPath: '/monsters/flying/harpy/fly.png',
+    assetPath: '/monsters/butterfly.png',
     frameWidth: 70,
     frameHeight: 65,
     displayWidth: 44,

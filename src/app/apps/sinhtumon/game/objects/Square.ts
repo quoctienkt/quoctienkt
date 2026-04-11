@@ -8,7 +8,6 @@ export class Square extends Phaser.Physics.Arcade.Sprite {
   posX: number;
   posY: number;
 
-  // References injected by MainScene to support tower placement
   private onBuyTower: (square: Square) => void;
   private isBuying: () => boolean;
 

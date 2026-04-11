@@ -15,11 +15,9 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
-    // ─── Register EventBus ─────────────────────────────────────────────────
     const bus = new EventBus();
     this.game.registry.set('eventBus', bus);
 
-    // ─── Loading bar ───────────────────────────────────────────────────────
     const W = this.cameras.main.width;
     const H = this.cameras.main.height;
     const bar = this.add.graphics();
@@ -74,31 +72,14 @@ export class BootScene extends Phaser.Scene {
     this.load.image('skill_hero_rally', '/quoctienkt/sinhtumon/img/snow.png');
     this.load.image('menu_bg', '/quoctienkt/sinhtumon/img/background1.png');
 
-    // ─── Legacy / existing assets first (keep for backward compat) ─────────
-    this.load.spritesheet(
-      C.MONSTER_GRUNT,
-      '/quoctienkt/sinhtumon/monsters/ani_beast.png',
-      { frameWidth: 32, frameHeight: 53 },
-    );
-    this.load.spritesheet(
-      C.MONSTER_MUMMY,
-      '/quoctienkt/sinhtumon/monsters/metalslug_mummy37x45.png',
-      { frameWidth: 37, frameHeight: 45 },
-    );
-    this.load.spritesheet(
-      C.MONSTER_HARPY,
-      '/quoctienkt/sinhtumon/monsters/butterfly.png',
-      { frameWidth: 70, frameHeight: 65 },
-    );
-
     // ─── Tower assets (per level) ──────────────────────────────────────────
     for (const [type, cfg] of Object.entries(towersConfig)) {
       for (let lvl = 1; lvl <= cfg.maxLevel; lvl++) {
-        this.loadImageFallback(
+        this.load.image(
           `${type}_level_${lvl}`,
           `/quoctienkt/sinhtumon${cfg.assetPathFn(lvl)}`,
         );
-        this.loadImageFallback(
+        this.load.image(
           `${type}_level_${lvl}_ammo`,
           `/quoctienkt/sinhtumon${cfg.ammoAssetPathFn(lvl)}`,
         );
@@ -107,9 +88,6 @@ export class BootScene extends Phaser.Scene {
 
     // ─── Monster sprite sheets ─────────────────────────────────────────────
     for (const [mt, mcfg] of Object.entries(monstersConfig)) {
-      // Only load new monsters not already loaded under legacy keys
-      if ([C.MONSTER_GRUNT, C.MONSTER_MUMMY, C.MONSTER_HARPY].includes(mt))
-        continue;
       this.load.spritesheet(
         mcfg.spriteKey,
         `/quoctienkt/sinhtumon${mcfg.assetPath}`,
@@ -129,10 +107,5 @@ export class BootScene extends Phaser.Scene {
 
   create(): void {
     this.scene.start(C.SCENE_MENU);
-  }
-
-  /** Try loading an asset path; if the server 404s, Phaser uses the fallback texture. */
-  private loadImageFallback(key: string, path: string): void {
-    this.load.image(key, path);
   }
 }

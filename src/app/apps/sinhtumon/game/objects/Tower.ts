@@ -12,7 +12,6 @@ import {
 import { Bullet } from './Bullet';
 import type { Square } from './Square';
 
-// Callback types injected from MainScene to avoid circular imports
 export interface TowerCallbacks {
   isBuying: () => boolean;
   setIsBuying: (v: boolean) => void;
