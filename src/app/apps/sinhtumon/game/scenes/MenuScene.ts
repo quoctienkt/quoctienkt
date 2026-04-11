@@ -108,7 +108,7 @@ export class MenuScene extends Phaser.Scene {
       border.setStrokeStyle(2, 0xffd700, 1);
       txt.setColor('#ffd700');
     });
-    bg.on('pointerdown', onClick);
+    bg.on('pointerup', onClick);
   }
 
   private showHowToPlay(): void {
@@ -116,36 +116,40 @@ export class MenuScene extends Phaser.Scene {
     const H = this.cameras.main.height;
     const panel = this.add
       .rectangle(W / 2, H / 2, 460, 340, 0x110800, 0.97)
-      .setStrokeStyle(2, 0xffd700);
+      .setStrokeStyle(2, 0xffd700)
+      .setDepth(1000);
+
+    const helpText = [
+      '🗺  Select a map to start',
+      '🏰  Click a square to build a tower',
+      '⬆  Click a tower to upgrade or sell',
+      '💰  Kill enemies to earn gold',
+      '⚡  Use skills to turn the tide',
+      '🧙  Your hero respawns automatically',
+      '',
+      '      Press anywhere to close',
+    ];
+
     const text = this.add
-      .text(
-        W / 2,
-        H / 2 - 40,
-        [
-          '🗺  Select a map to start',
-          '🏰  Click a square to build a tower',
-          '⬆  Click a tower to upgrade or sell',
-          '💰  Kill enemies to earn gold',
-          '⚡  Use skills to turn the tide',
-          '🧙  Your hero respawns automatically',
-          '',
-          '      Press anywhere to close',
-        ].join('\n'),
-        {
-          fontSize: '14px',
-          fontFamily: 'Roboto, sans-serif',
-          color: '#ffe066',
-          align: 'left',
-          lineSpacing: 6,
-        },
-      )
-      .setOrigin(0.5);
+      .text(W / 2, H / 2, helpText.join('\n'), {
+        fontSize: '15px',
+        fontFamily: 'Roboto, sans-serif',
+        color: '#ffe066',
+        align: 'left',
+        lineSpacing: 10,
+      })
+      .setOrigin(0.5)
+      .setDepth(1001);
 
     const close = () => {
       panel.destroy();
       text.destroy();
     };
-    this.input.once('pointerdown', close);
+
+    // Use a tiny delay to prevent the current click from immediately closing the panel
+    this.time.delayedCall(100, () => {
+      this.input.once('pointerdown', close);
+    });
   }
 
   private createEmbers(W: number, H: number): void {
