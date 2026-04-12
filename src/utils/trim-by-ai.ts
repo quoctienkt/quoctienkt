@@ -29,14 +29,14 @@ async function processImage(filePath: string) {
 
     // Convert absolute path to file:// URL for the library to correctly handle it on Windows
     const fileUrl = pathToFileURL(path.resolve(filePath)).href;
-    
+
     // removeBackground handles the AI detection and background removal.
     const blob = await removeBackground(fileUrl);
     const buffer = Buffer.from(await blob.arrayBuffer());
 
     // Overwrite the original
     fs.writeFileSync(filePath, buffer);
-    
+
     console.log(`✅ AI Refined: ${fileName}`);
   } catch (error) {
     console.error(`❌ AI Error processing ${filePath}:`, error);

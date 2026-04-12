@@ -30,43 +30,46 @@ async function processImage(filePath: string) {
     // Use readFileSync to avoid file locking issues on Windows
     const inputBuffer = fs.readFileSync(filePath);
     const img = sharp(inputBuffer);
-    const { data, info } = await img.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-    
+    const { data, info } = await img
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
     // Convert near-white pixels to transparent
     const threshold = 230;
     let count = 0;
-    
+
     for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i+1];
-        const b = data[i+2];
-        
-        if (r > threshold && g > threshold && b > threshold) {
-            const diffRG = Math.abs(r - g);
-            const diffGB = Math.abs(g - b);
-            const diffRB = Math.abs(r - b);
-            
-            // Checks if R, G, and B are close to each other (neutral gray/white)
-            if (diffRG < 15 && diffGB < 15 && diffRB < 15) {
-                data[i+3] = 0; // Set alpha to 0 (transparent)
-                count++;
-            }
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+
+      if (r > threshold && g > threshold && b > threshold) {
+        const diffRG = Math.abs(r - g);
+        const diffGB = Math.abs(g - b);
+        const diffRB = Math.abs(r - b);
+
+        // Checks if R, G, and B are close to each other (neutral gray/white)
+        if (diffRG < 15 && diffGB < 15 && diffRB < 15) {
+          data[i + 3] = 0; // Set alpha to 0 (transparent)
+          count++;
         }
+      }
     }
 
     const processedBuffer = await sharp(data, {
-        raw: {
-            width: info.width,
-            height: info.height,
-            channels: 4,
-        }
+      raw: {
+        width: info.width,
+        height: info.height,
+        channels: 4,
+      },
     })
-    .png()
-    .toBuffer();
+      .png()
+      .toBuffer();
 
     // Use writeFileSync to ensure the write is clean
     fs.writeFileSync(filePath, processedBuffer);
-    
+
     console.log(`✅ Color Fixed: ${fileName} (${count} pixels cleared)`);
   } catch (error) {
     console.error(`❌ Color Error processing ${filePath}:`, error);

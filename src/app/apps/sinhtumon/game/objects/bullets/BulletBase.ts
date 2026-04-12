@@ -49,7 +49,10 @@ export class BulletBase extends Phaser.Physics.Arcade.Sprite {
     if (ammo.ammoDisplaySize !== null && ammo.ammoDisplaySize) {
       this.setDisplaySize(ammo.ammoDisplaySize[0], ammo.ammoDisplaySize[1]);
       if (this.body) {
-        (this.body as Phaser.Physics.Arcade.Body).setSize(this.width, this.height);
+        (this.body as Phaser.Physics.Arcade.Body).setSize(
+          this.width,
+          this.height,
+        );
       }
     }
   }

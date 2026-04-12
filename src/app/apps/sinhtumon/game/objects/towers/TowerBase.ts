@@ -102,7 +102,10 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
     const [w, h] = getTowerDisplaySize(this.towerType, this.level);
     this.setDisplaySize(w, h);
     if (this.body) {
-      (this.body as Phaser.Physics.Arcade.Body).setSize(this.width, this.height);
+      (this.body as Phaser.Physics.Arcade.Body).setSize(
+        this.width,
+        this.height,
+      );
     }
 
     this.setInteractive();

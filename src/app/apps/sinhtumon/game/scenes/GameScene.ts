@@ -134,10 +134,7 @@ export class GameScene extends Phaser.Scene {
 
     this.input.on('pointermove', (ptr: Phaser.Input.Pointer) => {
       if (this.isBuying && this.tempTower) {
-        this.tempTower.setPosition(
-          ptr.x,
-          ptr.y,
-        );
+        this.tempTower.setPosition(ptr.x, ptr.y);
       }
     });
 
@@ -252,13 +249,7 @@ export class GameScene extends Phaser.Scene {
     const PAD = this.mapService.mapConfig.GAME_BOARD_PADDING_TOP;
     const cx = square.posX * CW + CW / 2;
     const cy = square.posY * CH + CH / 2 + PAD; // EXACT cell center
-    const tower = this.createTower(
-      cx,
-      cy,
-      this.selectedTowerType,
-      1,
-      false,
-    );
+    const tower = this.createTower(cx, cy, this.selectedTowerType, 1, false);
     this.stateService.savedData!.towers.push(tower);
     this.cancelBuy();
   }
@@ -354,13 +345,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.stateService.setGold((g) => g - cost);
-    const tower = this.createTower(
-      cx,
-      cy,
-      this.selectedTowerType,
-      1,
-      false,
-    );
+    const tower = this.createTower(cx, cy, this.selectedTowerType, 1, false);
     this.stateService.savedData!.towers.push(tower);
     this.cancelBuy();
   }
