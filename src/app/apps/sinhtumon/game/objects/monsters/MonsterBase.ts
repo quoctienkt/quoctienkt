@@ -7,9 +7,12 @@ import {
   createAnimSafe,
   buildAnimKey,
   drawHealthBar,
+  getScaledDisplaySize,
 } from '../../utils/spriteHelper';
+import { SpriteFrameRegistry } from '../../config/framers';
 import * as C from '../../constants';
 import type { StatusEffect } from '../../types';
+import { FXHelper } from '../../utils/FXHelper';
 
 export interface MonsterContext {
   monsterType: string;
@@ -48,6 +51,7 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
   direction: string = '';
   lastPosX: number = 0;
   lastPosY: number = 0;
+  private stepCounter = 0;
 
   private onReachEndpoint: (monster: MonsterBase) => void;
 
@@ -59,7 +63,7 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
         ctx.mapService.mapConfig.CELL_WIDTH / 2,
       ctx.row * ctx.mapService.mapConfig.CELL_HEIGHT +
         ctx.mapService.mapConfig.GAME_BOARD_PADDING_TOP,
-      cfg.spriteKey,
+      cfg.spriteBaseKey,
     );
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -99,13 +103,17 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
     }
     // Status effects
     this.tickStatusEffects(delta);
+    
+    // 2.5D Depth sorting
+    this.setDepth(Math.floor(this.y));
+
     // Draw HP bar via shared Graphics
-    const cfg = getMonsterConfig(this.monsterType);
+    const { w: displayWidth } = getScaledDisplaySize(this.monsterType);
     drawHealthBar(
       graphics,
       this.x,
       this.y,
-      cfg.displayWidth ?? 32,
+      displayWidth,
       this.health,
       this.maxHealth,
       this.isBoss,
@@ -213,9 +221,18 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
       gold,
     });
 
-    // Death flash
-    this.setAlpha(0.6);
-    this.setDisplaySize(30, 38);
+    // Premium scale out + alpha fade tween
+    this.scene.tweens.add({
+      targets: this,
+      scaleX: 0,
+      scaleY: 0,
+      alpha: 0,
+      duration: 400,
+    });
+
+    // Floating gold and shockwave FX
+    FXHelper.shockwave(this.scene, this.x, this.y, 28, 0xffffff);
+    FXHelper.goldFloat(this.scene, this.x, this.y, gold);
 
     // Play explosion effect
     const explosion = this.scene.add.sprite(this.x, this.y, 'onDead');
@@ -234,7 +251,7 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
     explosion.play('anim_onDead');
     explosion.on('animationcomplete', () => explosion.destroy());
 
-    this.scene.time.delayedCall(1500, () => {
+    this.scene.time.delayedCall(1000, () => {
       if (this.scene) this.destroy();
     });
   }
@@ -320,6 +337,12 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
     this.setPosition(posX, posY);
 
     if (this.getMoveType() === C.MONSTER_MOVE_TYPE_GROUND) {
+      this.stepCounter++;
+      if (this.stepCounter % 15 === 0) {
+        const { h } = getScaledDisplaySize(this.monsterType);
+        FXHelper.dustBurst(this.scene, this.x, this.y + h / 2 - 4);
+      }
+
       const dx = this.x - this.lastPosX;
       const dy = this.y - this.lastPosY;
       let dir: string | null = null;
@@ -338,39 +361,62 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
       }
       if (dir && this.direction !== dir) {
         this.direction = dir;
-        const key = buildAnimKey(this.monsterType, dir);
-        if (this.scene.anims.exists(key)) this.anims.play(key, true);
+        this.playAction(C.MONSTER_ACTION_WALK, this.direction);
       }
+
     }
   }
 
   /**
-   * Register animations from monstersConfig and set initial stats.
+   * Helper to play animation and switch texture if needed.
+   */
+  protected playAction(action: string, direction?: string): void {
+    const cfg = getMonsterConfig(this.monsterType);
+    const animKey = direction
+      ? `${cfg.spriteBaseKey}_${action}_${direction}`
+      : `${cfg.spriteBaseKey}_${action}`;
+
+    if (this.scene.anims.exists(animKey)) {
+      if (this.texture.key !== animKey) {
+        this.setTexture(animKey);
+      }
+      this.anims.play(animKey, true);
+    } else {
+      // Fallback: If no animation exists (missing asset), don't crash.
+      // We could set a placeholder texture here if needed.
+      if (this.scene.textures.exists(animKey)) {
+        this.setTexture(animKey);
+        this.setFrame(0);
+      }
+    }
+
+  }
+
+  /**
+   * Register animations from MonsterConfig and set initial stats.
    * Call this from prepareSpriteAsset() in every subclass.
    */
   protected setupAnimations(): void {
     const cfg = getMonsterConfig(this.monsterType);
+    const fd = SpriteFrameRegistry[this.monsterType];
+    if (!fd) return;
+
     const fps = cfg.isFlying ? 18 : 10;
 
-    const dirMap: [keyof typeof cfg.walkFrames, string][] = [
-      ['right', C.MONSTER_MOVE_DIRECTION_TO_RIGHT],
-      ['left', C.MONSTER_MOVE_DIRECTION_TO_LEFT],
-      ['up', C.MONSTER_MOVE_DIRECTION_TO_TOP],
-      ['down', C.MONSTER_MOVE_DIRECTION_TO_BOTTOM],
-      ['fly', C.MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT],
-    ];
-    for (const [k, dir] of dirMap) {
-      const frames = cfg.walkFrames[k];
-      if (frames) {
-        createAnimSafe(this.scene, {
-          key: buildAnimKey(this.monsterType, dir),
-          textureKey: cfg.spriteKey,
-          startFrame: frames[0],
-          endFrame: frames[1],
-          frameRate: fps,
-          repeat: -1,
-        });
-      }
+    // Create animations for each action defined in config
+    for (const actionDef of cfg.actions) {
+      const animKey = actionDef.direction
+        ? `${cfg.spriteBaseKey}_${actionDef.action}_${actionDef.direction}`
+        : `${cfg.spriteBaseKey}_${actionDef.action}`;
+
+      createAnimSafe(this.scene, {
+        key: animKey,
+        textureKey: animKey,
+        startFrame: 0,
+        endFrame: actionDef.frameCount - 1,
+        frameRate: fps,
+        repeat: -1,
+      });
     }
 
     // Stats from config
@@ -383,19 +429,25 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
     this.regenPerSec = cfg.regenPerSec ?? 0;
     this.isBoss = cfg.isBoss ?? false;
 
-    if (cfg.displayWidth && cfg.displayHeight)
-      this.setDisplaySize(cfg.displayWidth, cfg.displayHeight);
-    if (cfg.hitCircleRadius !== undefined) {
-      this.setCircle(
-        cfg.hitCircleRadius,
-        cfg.hitCircleOffsetX ?? 0,
-        cfg.hitCircleOffsetY ?? 0,
-      );
-    }
+    // Display size from registry
+    const { w, h } = getScaledDisplaySize(this.monsterType);
+    this.setDisplaySize(w, h);
 
-    const initKey = buildAnimKey(this.monsterType, this.direction);
-    if (this.scene.anims.exists(initKey)) this.anims.play(initKey, true);
+    // Physics circle = half the shorter content dimension (unscaled)
+    // Arcade Physics scales the circle automatically with the sprite scale.
+    const unscaledW = fd.contentRect.w;
+    const unscaledH = fd.contentRect.h;
+    const radius = Math.round(Math.min(unscaledW, unscaledH) * 0.4);
+    this.setCircle(
+      radius,
+      (unscaledW - radius * 2) / 2,
+      (unscaledH - radius * 2) / 2,
+    );
+
+    // Initial animation
+    this.playAction(C.MONSTER_ACTION_WALK, this.direction);
   }
+
 
   private initDirection(): void {
     this.direction =

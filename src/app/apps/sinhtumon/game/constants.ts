@@ -9,6 +9,20 @@ export const MONSTER_BAT = 'Monster_Bat';
 export const MONSTER_DRAGON = 'Monster_Dragon';
 export const BOSS_GOLEM = 'Boss_Golem';
 export const BOSS_DEMON = 'Boss_Demon';
+export const MONSTER_LARVA = 'Monster_Larva';
+export const MONSTER_SKELETON = 'Monster_Skeleton';
+export const MONSTER_ICE_ELEMENTAL = 'Monster_IceElemental';
+export const MONSTER_WOLF = 'Monster_Wolf';
+export const MONSTER_VULTURE = 'Monster_Vulture';
+export const BOSS_BEHOLDER = 'Boss_Beholder';
+
+// ─── Monster Actions ──────────────────────────────────────────────────────────
+export const MONSTER_ACTION_WALK = 'walk';
+export const MONSTER_ACTION_ATTACK = 'attack';
+export const MONSTER_ACTION_SKILL = 'skill';
+export const MONSTER_ACTION_IDLE = 'idle';
+export const MONSTER_ACTION_DEATH = 'death';
+
 
 // ─── Tower Types ──────────────────────────────────────────────────────────────
 export const TOWER_FROST = 'Tower_Frost';

@@ -29,14 +29,37 @@ export interface TowerLevelConfig {
   dotDuration?: number[];
 }
 
-// ─── Monster Configs ──────────────────────────────────────────────────────────
-export interface MonsterWalkFrames {
-  right?: [number, number];
-  left?: [number, number];
-  up?: [number, number];
-  down?: [number, number];
-  fly?: [number, number]; // single-direction for flying monsters
+/**
+ * The actual monster body rect within ONE frame cell.
+ * Defines where the real pixels are inside the 64x64 or 128x128 slot.
+ */
+export interface ContentRect {
+  x: number; // left padding to skip
+  y: number; // top padding to skip
+  w: number; // actual monster body width
+  h: number; // actual monster body height
 }
+
+/**
+ * Definition for one animation strip (e.g. "walk_right")
+ */
+export interface MonsterActionDef {
+  action: string; // 'walk', 'attack', 'skill', 'idle', 'death'
+  direction?: string; // 'TO_RIGHT', 'TO_LEFT', etc. (optional for generic actions)
+  frameCount: number; // number of frames in the horizontal strip
+  frameWidth: number; // width of each frame
+  frameHeight: number; // height of each frame
+}
+
+/**
+ * Framing and scaling data for a monster.
+ */
+export interface SpriteFrameData {
+  contentRect: ContentRect;
+  displayScale: number;
+}
+
+// ─── Monster Configs ──────────────────────────────────────────────────────────
 
 export interface MonsterConfig {
   goldOnDead: number;
@@ -45,21 +68,16 @@ export interface MonsterConfig {
   isBoss?: boolean;
   isFlying?: boolean;
   regenPerSec?: number; // HP regeneration per second (mummy)
-  spriteKey: string;
-  assetPath: string;
-  frameWidth: number;
-  frameHeight: number;
-  displayWidth?: number;
-  displayHeight?: number;
-  hitCircleRadius?: number;
-  hitCircleOffsetX?: number;
-  hitCircleOffsetY?: number;
-  walkFrames: MonsterWalkFrames;
-  deathFrames?: [number, number];
+  spriteBaseKey: string; // The base folder name, e.g. 'Monster_Orc'
+  actions: MonsterActionDef[]; // List of available animation strips
   baseSpeed: number;
   baseHp: number;
   hpScalePerWave: number;
+  attackRange?: number; // For attack animation trigger
+  attackCooldown?: number;
 }
+
+
 
 // ─── Hero Configs ──────────────────────────────────────────────────────────────
 export interface HeroSkillDef {

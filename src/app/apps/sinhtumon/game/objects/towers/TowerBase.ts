@@ -16,6 +16,7 @@ import {
 } from '../../config';
 import type { TargetPriority } from '../../types';
 import * as C from '../../constants';
+import { FXHelper } from '../../utils/FXHelper';
 
 export interface TowerCallbacks {
   isBuying: () => boolean;
@@ -77,6 +78,7 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
   range: number;
   priority: TargetPriority;
   target: MonsterBase | null = null;
+  glowGraphic: Phaser.GameObjects.Graphics | null = null;
 
   // Fortify buff
   isFortified = false;
@@ -101,6 +103,7 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
     // Use the ts config sizes precisely and ensure physics bounding box matches the scaled size
     const [w, h] = getTowerDisplaySize(this.towerType, this.level);
     this.setDisplaySize(w, h);
+    this.setOrigin(0.5, 0.75);
     if (this.body) {
       (this.body as Phaser.Physics.Arcade.Body).setSize(
         this.width,
@@ -129,7 +132,37 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
       getTowerAttackRange(this.towerType, this.level) +
       ctx.mapService.mapConfig.CELL_WIDTH;
 
+    if (!this.isSampleTower) {
+      const glowColors: Record<string, number> = {
+        [C.TOWER_FROST]: 0x88ddff,
+        [C.TOWER_ARCHER]: 0xffaa44,
+        [C.TOWER_CANNON]: 0x888888,
+        [C.TOWER_LIGHTNING]: 0xffff00,
+        [C.TOWER_POISON]: 0x44ff44,
+      };
+      const color = glowColors[this.towerType] ?? 0xffd700;
+      this.glowGraphic = scene.add.graphics();
+      this.glowGraphic.fillStyle(color, 0.15);
+      this.glowGraphic.fillCircle(this.x, this.y, 22);
+      this.glowGraphic.setDepth(2);
+      scene.tweens.add({
+        targets: this.glowGraphic,
+        alpha: { from: 0.1, to: 0.35 },
+        duration: 1500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+    }
+
     if (ctx.bindEvents !== false) this.bindEvents();
+  }
+
+  destroy(fromScene?: boolean): void {
+    if (this.glowGraphic) {
+      this.glowGraphic.destroy();
+    }
+    super.destroy(fromScene);
   }
 
   /** Override to apply special on-hit effect (AoE, chain, DoT, slow, stun…). */
@@ -196,6 +229,16 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
       loop: false,
     });
 
+    // Recoil animation nudge
+    const origY = this.y;
+    this.scene.tweens.add({
+      targets: this,
+      y: origY - 3,
+      duration: 60,
+      yoyo: true,
+      ease: 'Quad.Out'
+    });
+
     const bullet = this.createBullet();
     bullet.target = target;
     target.aimed.push(bullet);
@@ -222,7 +265,8 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
   private bindEvents(): void {
     if (this.isSampleTower) {
       this.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-        if (this.stateService.savedData!.gold >= this.getUpgradeCost()) {
+        const purchaseCost = getTowerUpgradeCost(this.towerType, 1);
+        if (this.stateService.savedData!.gold >= purchaseCost) {
           const existing = this.cb.getTempTower();
           existing?.destroy();
           this.cb.setIsBuying(false);
@@ -293,84 +337,160 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
   private showAttackRange(): void {
     this.cb.getRangeImage()?.destroy();
     const r = getTowerAttackRange(this.towerType, this.level);
-    const img = this.scene.physics.add.image(this.x, this.y, 'tower_range');
-    img.setDisplaySize(r * 2, r * 2);
-    img.setAlpha(0.35);
-    img.setDepth(3);
-    img.setTint(0xfff000);
-    this.cb.setRangeImage(img);
+    const g = this.scene.add.graphics().setDepth(3);
+    this.cb.setRangeImage(g);
+
+    this.scene.tweens.addCounter({
+      from: 0,
+      to: 360,
+      duration: 10000,
+      repeat: -1,
+      onUpdate: (tween) => {
+        if (!g.active) return;
+        g.clear();
+        g.lineStyle(1.5, 0xffd700, 0.45);
+        const startRad = Phaser.Math.DegToRad(tween.getValue() ?? 0);
+        for (let i = 0; i < 16; i++) {
+          const a1 = startRad + (i * Math.PI * 2) / 16;
+          const a2 = a1 + Math.PI / 24;
+          g.beginPath();
+          g.arc(this.x, this.y, r, a1, a2);
+          g.strokePath();
+        }
+      }
+    });
   }
 
   private showUpgradeAction(): void {
     this.cb.getUpgradeImage()?.destroy();
     const maxLevel = 5;
-    const img = this.scene.physics.add.image(
-      this.x + this.mapService.mapConfig.CELL_WIDTH / 2,
-      this.y - this.mapService.mapConfig.CELL_HEIGHT / 2,
-      'upgrade',
-    );
-    if (this.level >= maxLevel) img.setAlpha(0.4);
-    img.setInteractive();
-    img.setDisplaySize(25, 25);
-    img.setDepth(4);
-    this.cb.setUpgradeImage(img);
+    const isMax = this.level >= maxLevel;
 
-    img.on('pointerdown', () => {
-      if (
-        this.stateService.savedData!.gold < this.getUpgradeCost() ||
-        this.level >= maxLevel
-      )
-        return;
-      this.stateService.setGold((g) => g - this.getUpgradeCost());
-      const towers = this.stateService.savedData!.towers;
-      towers.splice(towers.indexOf(this), 1);
-      const upgraded = this.cb.createTower(
-        this.x,
-        this.y,
-        this.towerType,
-        this.level + 1,
-      );
-      towers.push(upgraded);
-      this.cb.getDetailText()?.destroy();
-      this.cb.getRangeImage()?.destroy();
-      this.cb.getUpgradeImage()?.destroy();
-      this.cb.getSellImage()?.destroy();
-      this.cb.setIsTowerClicked(false);
-      this.destroy();
+    const W = 70;
+    const H = 22;
+    const rx = this.x + this.mapService.mapConfig.CELL_WIDTH / 2 + 10;
+    const ry = this.y - this.mapService.mapConfig.CELL_HEIGHT / 2;
+
+    const container = this.scene.add.container(rx, ry).setDepth(4).setScale(0);
+    this.cb.setUpgradeImage(container);
+
+    const btnBg = this.scene.add.graphics();
+    btnBg.fillStyle(isMax ? 0x444444 : 0x112244, 0.9);
+    btnBg.fillRoundedRect(-W/2, -H/2, W, H, 6);
+    btnBg.lineStyle(1.5, isMax ? 0x888888 : 0x4af7a0, 0.8);
+    btnBg.strokeRoundedRect(-W/2, -H/2, W, H, 6);
+    container.add(btnBg);
+
+    const text = this.scene.add.text(0, 0, isMax ? 'MAX' : '⬆ UPGRADE', {
+      fontSize: '8px',
+      color: isMax ? '#888888' : '#ffffff',
+      fontFamily: '"Roboto", sans-serif',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    container.add(text);
+
+    const hit = this.scene.add.rectangle(0, 0, W, H, 0x000000, 0.001).setInteractive();
+    container.add(hit);
+
+    this.scene.tweens.add({
+      targets: container,
+      scale: 1,
+      duration: 180,
+      ease: 'Back.Out'
     });
-    img.on('pointerover', () => {
-      this.cb.getDetailText()?.destroy();
-      this.cb.setDetailText(
-        this.scene.add.text(
-          this.mapService.mapConfig.CELL_WIDTH *
-            this.mapService.mapConfig.map[0].length +
-            5,
-          520,
-          `Upgrade: ${this.getUpgradeCost()} 🪙`,
-          {
-            fontSize: '13px',
-            color: '#ffd700',
-            fontFamily: 'Roboto, sans-serif',
-          },
-        ),
-      );
-    });
-    img.on('pointerout', () => this.cb.getDetailText()?.destroy());
+
+    if (!isMax) {
+      hit.on('pointerdown', () => {
+        if (this.stateService.savedData!.gold < this.getUpgradeCost()) return;
+        this.stateService.setGold((g) => g - this.getUpgradeCost());
+        const towers = this.stateService.savedData!.towers;
+        towers.splice(towers.indexOf(this), 1);
+        const upgraded = this.cb.createTower(
+          this.x,
+          this.y,
+          this.towerType,
+          this.level + 1,
+        );
+        towers.push(upgraded);
+        this.cb.getDetailText()?.destroy();
+        this.cb.getRangeImage()?.destroy();
+        this.cb.getUpgradeImage()?.destroy();
+        this.cb.getSellImage()?.destroy();
+        this.cb.setIsTowerClicked(false);
+        this.destroy();
+      });
+
+      hit.on('pointerover', () => {
+        btnBg.clear();
+        btnBg.fillStyle(0x1a3366, 0.95);
+        btnBg.fillRoundedRect(-W/2, -H/2, W, H, 6);
+        btnBg.lineStyle(1.5, 0x00ff88, 1);
+        btnBg.strokeRoundedRect(-W/2, -H/2, W, H, 6);
+        
+        this.cb.getDetailText()?.destroy();
+        this.cb.setDetailText(
+          this.scene.add.text(
+            this.mapService.mapConfig.CELL_WIDTH *
+              this.mapService.mapConfig.map[0].length +
+              5,
+            520,
+            `Upgrade: ${this.getUpgradeCost()} 🪙`,
+            {
+              fontSize: '13px',
+              color: '#ffd700',
+              fontFamily: 'Roboto, sans-serif',
+            },
+          ),
+        );
+      });
+
+      hit.on('pointerout', () => {
+        btnBg.clear();
+        btnBg.fillStyle(0x112244, 0.9);
+        btnBg.fillRoundedRect(-W/2, -H/2, W, H, 6);
+        btnBg.lineStyle(1.5, 0x4af7a0, 0.8);
+        btnBg.strokeRoundedRect(-W/2, -H/2, W, H, 6);
+        this.cb.getDetailText()?.destroy();
+      });
+    }
   }
 
   private showSellAction(): void {
-    const img = this.scene.physics.add.sprite(
-      this.x + this.mapService.mapConfig.CELL_WIDTH / 2,
-      this.y + this.mapService.mapConfig.CELL_HEIGHT / 2,
-      'sell',
-    );
-    img.setDepth(4);
-    img.play('rotate');
-    img.setInteractive();
-    img.setDisplaySize(25, 25);
-    this.cb.setSellImage(img);
+    this.cb.getSellImage()?.destroy();
+    const W = 70;
+    const H = 22;
+    const rx = this.x + this.mapService.mapConfig.CELL_WIDTH / 2 + 10;
+    const ry = this.y + this.mapService.mapConfig.CELL_HEIGHT / 2;
 
-    img.on('pointerdown', () => {
+    const container = this.scene.add.container(rx, ry).setDepth(4).setScale(0);
+    this.cb.setSellImage(container);
+
+    const btnBg = this.scene.add.graphics();
+    btnBg.fillStyle(0x331100, 0.9);
+    btnBg.fillRoundedRect(-W/2, -H/2, W, H, 6);
+    btnBg.lineStyle(1.5, 0xff5533, 0.8);
+    btnBg.strokeRoundedRect(-W/2, -H/2, W, H, 6);
+    container.add(btnBg);
+
+    const text = this.scene.add.text(0, 0, '💰 SELL', {
+      fontSize: '8px',
+      color: '#ffffff',
+      fontFamily: '"Roboto", sans-serif',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    container.add(text);
+
+    const hit = this.scene.add.rectangle(0, 0, W, H, 0x000000, 0.001).setInteractive();
+    container.add(hit);
+
+    this.scene.tweens.add({
+      targets: container,
+      scale: 1,
+      duration: 180,
+      ease: 'Back.Out'
+    });
+
+    hit.on('pointerdown', () => {
       const price = getTowerSellPrice(this.towerType, this.level);
       this.stateService.setGold((g) => g + price);
       const towers = this.stateService.savedData!.towers;
@@ -389,7 +509,14 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
       this.eventBus.emit(C.EVT_TOWER_DESELECTED, {});
       this.destroy();
     });
-    img.on('pointerover', () => {
+
+    hit.on('pointerover', () => {
+      btnBg.clear();
+      btnBg.fillStyle(0x551100, 0.95);
+      btnBg.fillRoundedRect(-W/2, -H/2, W, H, 6);
+      btnBg.lineStyle(1.5, 0xff8833, 1);
+      btnBg.strokeRoundedRect(-W/2, -H/2, W, H, 6);
+
       this.cb.getDetailText()?.destroy();
       this.cb.setDetailText(
         this.scene.add.text(
@@ -406,7 +533,15 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
         ),
       );
     });
-    img.on('pointerout', () => this.cb.getDetailText()?.destroy());
+
+    hit.on('pointerout', () => {
+      btnBg.clear();
+      btnBg.fillStyle(0x331100, 0.9);
+      btnBg.fillRoundedRect(-W/2, -H/2, W, H, 6);
+      btnBg.lineStyle(1.5, 0xff5533, 0.8);
+      btnBg.strokeRoundedRect(-W/2, -H/2, W, H, 6);
+      this.cb.getDetailText()?.destroy();
+    });
   }
 
   getUpgradeCost(): number {

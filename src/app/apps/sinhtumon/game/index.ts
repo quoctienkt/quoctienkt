@@ -7,14 +7,16 @@ import { HUDScene } from './scenes/HUDScene';
 import { GameOverScene } from './scenes/GameOverScene';
 
 export function createGame(canvas: HTMLCanvasElement): Phaser.Game {
-  const GAME_WIDTH = 520 + 150; // map + sidebar
-  const GAME_HEIGHT = 60 + 520 + 80;
+  const GAME_WIDTH = 520 + 200; // map + sidebar (wider sidebar)
+  const GAME_HEIGHT = 60 + 520 + 100; // taller area
 
   const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.CANVAS,
     canvas,
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
+    backgroundColor: '#0a0e1a',
+    antialias: true,
     physics: { default: 'arcade' },
     scene: [
       BootScene, // 1. Preloads all assets, registers EventBus

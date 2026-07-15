@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import { EventBus } from '../services/EventBus';
 import { WaveService } from '../services/WaveService';
 import * as C from '../constants';
+import { FXHelper } from '../utils/FXHelper';
 
 /**
  * HUDScene — runs in parallel on top of GameScene.
@@ -22,9 +23,13 @@ export class HUDScene extends Phaser.Scene {
   private countdownText!: Phaser.GameObjects.Text;
   private infoPanel!: Phaser.GameObjects.Container;
   private sendWaveBtn!: Phaser.GameObjects.Text;
+  
+  private waveProgress!: Phaser.GameObjects.Graphics;
+  private displayedGold = 0;
 
   private skillCooldowns: Record<string, number> = {};
   private skillBars: Record<string, Phaser.GameObjects.Graphics> = {};
+  private skillBarPositions: Record<string, { x: number; y: number }> = {};
 
   constructor() {
     super({ key: C.SCENE_HUD });
@@ -38,37 +43,48 @@ export class HUDScene extends Phaser.Scene {
     const W = this.cameras.main.width;
     this.eventBus = this.game.registry.get('eventBus') as EventBus;
 
-    // ─── Top bar ──────────────────────────────────────────────────────────
-    this.add.rectangle(0, 0, W, 38, 0x0a0a0a, 0.88).setOrigin(0);
-    this.add.text(8, 4, '🪙', { fontSize: '20px' });
-    this.goldText = this.add.text(32, 8, '0', {
-      fontSize: '16px',
+    // ─── Top bar Glassmorphism ──────────────────────────────────────────
+    const bar = this.add.graphics();
+    bar.fillStyle(0x0a1424, 0.85);
+    bar.fillRoundedRect(6, 4, W - 12, 32, 6);
+    bar.lineStyle(1.5, 0x4af7a0, 0.25);
+    bar.strokeRoundedRect(6, 4, W - 12, 32, 6);
+
+    this.waveProgress = this.add.graphics().setDepth(1);
+
+    this.add.text(14, 8, '🪙', { fontSize: '18px' });
+    this.goldText = this.add.text(38, 12, '0', {
+      fontSize: '14px',
       color: '#ffd700',
       fontFamily: 'Roboto, sans-serif',
+      fontStyle: 'bold',
     });
-    this.add.text(130, 4, '❤️', { fontSize: '20px' });
-    this.lifeText = this.add.text(154, 8, '20', {
-      fontSize: '16px',
+    this.add.text(120, 8, '❤️', { fontSize: '18px' });
+    this.lifeText = this.add.text(144, 12, '20', {
+      fontSize: '14px',
       color: '#ff6666',
       fontFamily: 'Roboto, sans-serif',
+      fontStyle: 'bold',
     });
-    this.waveText = this.add.text(250, 8, 'Wave 0 / 20', {
-      fontSize: '14px',
+    this.waveText = this.add.text(230, 12, 'Wave 0 / 20', {
+      fontSize: '13px',
       color: '#88ddff',
       fontFamily: 'Roboto, sans-serif',
+      fontStyle: 'bold',
     });
-    this.countdownText = this.add.text(400, 8, '', {
-      fontSize: '13px',
+    this.countdownText = this.add.text(360, 12, '', {
+      fontSize: '12px',
       color: '#aaaaaa',
       fontFamily: 'Roboto, sans-serif',
     });
 
     // Send wave early button
     this.sendWaveBtn = this.add
-      .text(500, 8, '⏩ SEND WAVE', {
-        fontSize: '13px',
+      .text(W - 130, 12, '⏩ SEND WAVE', {
+        fontSize: '12px',
         color: '#88ff88',
         fontFamily: 'Roboto, sans-serif',
+        fontStyle: 'bold',
       })
       .setInteractive();
     this.sendWaveBtn.on('pointerover', () =>
@@ -83,43 +99,108 @@ export class HUDScene extends Phaser.Scene {
 
     // ─── Skill bar (bottom right) ─────────────────────────────────────────
     const skillDefs: any[] = [
-      // Hidden by user request
-      // { id: C.SKILL_RAIN_OF_FIRE, label: '🔥', cooldown: 45000, x: W - 130 },
-      // { id: C.SKILL_FORTIFY, label: '🛡', cooldown: 60000, x: W - 85 },
-      // { id: C.SKILL_HERO_RALLY, label: '🏃', cooldown: 15000, x: W - 40 },
+      { id: C.SKILL_RAIN_OF_FIRE, label: '🔥', cooldown: 45000, x: W - 130 },
+      { id: C.SKILL_FORTIFY, label: '🛡', cooldown: 60000, x: W - 85 },
+      { id: C.SKILL_HERO_RALLY, label: '🏃', cooldown: 15000, x: W - 40 },
     ];
     const bH = this.cameras.main.height;
     for (const s of skillDefs) {
       const g = this.add.graphics();
       this.skillBars[s.id] = g;
       this.skillCooldowns[s.id] = 0;
-      this.add
-        .rectangle(s.x, bH - 35, 36, 36, 0x111111, 0.85)
-        .setStrokeStyle(1, 0x888888);
-      this.add
-        .text(s.x, bH - 35, s.label, { fontSize: '22px' })
+      this.skillBarPositions[s.id] = { x: s.x, y: bH - 35 };
+
+      // Glassmorphism button back
+      const btnBg = this.add.graphics();
+      btnBg.fillStyle(0x0a1424, 0.8);
+      btnBg.fillRoundedRect(s.x - 18, bH - 53, 36, 36, 6);
+      btnBg.lineStyle(1.5, 0x888888, 0.4);
+      btnBg.strokeRoundedRect(s.x - 18, bH - 53, 36, 36, 6);
+
+      const label = this.add
+        .text(s.x, bH - 35, s.label, { fontSize: '20px' })
         .setOrigin(0.5)
-        .setInteractive()
-        .on('pointerdown', () => {
-          if (this.skillCooldowns[s.id] <= 0) {
-            this.eventBus.emit(C.EVT_SKILL_CAST, { skillId: s.id });
-            this.skillCooldowns[s.id] = s.cooldown;
-          }
-        });
+        .setInteractive();
+
+      label.on('pointerover', () => {
+        btnBg.clear();
+        btnBg.fillStyle(0x1a2e4a, 0.9);
+        btnBg.fillRoundedRect(s.x - 18, bH - 53, 36, 36, 6);
+        btnBg.lineStyle(1.5, 0x4af7a0, 0.8);
+        btnBg.strokeRoundedRect(s.x - 18, bH - 53, 36, 36, 6);
+      });
+
+      label.on('pointerout', () => {
+        btnBg.clear();
+        btnBg.fillStyle(0x0a1424, 0.8);
+        btnBg.fillRoundedRect(s.x - 18, bH - 53, 36, 36, 6);
+        btnBg.lineStyle(1.5, 0x888888, 0.4);
+        btnBg.strokeRoundedRect(s.x - 18, bH - 53, 36, 36, 6);
+      });
+
+      label.on('pointerdown', () => {
+        if (this.skillCooldowns[s.id] <= 0) {
+          this.eventBus.emit(C.EVT_SKILL_CAST, { skillId: s.id });
+          this.skillCooldowns[s.id] = s.cooldown;
+        }
+      });
+      
+      // Draw graphic overlay on top of text
+      g.setDepth(2);
     }
 
     // ─── Info panel (bottom left) ─────────────────────────────────────────
-    this.infoPanel = this.add.container(4, bH - 80);
-    this.add
-      .rectangle(4 + 140, bH - 50, 280, 60, 0x111111, 0.8)
-      .setStrokeStyle(1, 0x444444);
+    this.infoPanel = this.add.container(-300, bH - 80).setDepth(3);
+    const ipBg = this.add.graphics();
+    ipBg.fillStyle(0x0a1424, 0.85);
+    ipBg.fillRoundedRect(0, 0, 280, 64, 6);
+    ipBg.lineStyle(1.5, 0x4af7a0, 0.25);
+    ipBg.strokeRoundedRect(0, 0, 280, 64, 6);
+    this.infoPanel.add(ipBg);
 
     // ─── EventBus bindings ────────────────────────────────────────────────
-    const updateGold = ({ gold }: any) => this.goldText.setText(`${gold}`);
-    const updateLife = ({ life }: any) => this.lifeText.setText(`${life}`);
-    const updateWave = ({ wave, total }: any) =>
+    const updateGold = ({ gold }: any) => {
+      this.tweens.addCounter({
+        from: this.displayedGold,
+        to: gold,
+        duration: 350,
+        ease: 'Quad.Out',
+        onUpdate: (tw) => this.goldText.setText(`${Math.floor(tw.getValue() ?? 0)}`),
+      });
+      this.displayedGold = gold;
+    };
+
+    const updateLife = ({ life }: any) => {
+      this.lifeText.setText(`${life}`);
+      this.cameras.main.flash(120, 255, 50, 50, false);
+      this.tweens.add({
+        targets: this.lifeText,
+        scaleX: 1.3,
+        scaleY: 1.3,
+        duration: 80,
+        yoyo: true,
+      });
+    };
+
+    const updateWave = ({ wave, total }: any) => {
       this.waveText.setText(`Wave ${wave} / ${total}`);
-    const clearInfo = () => this.infoPanel.removeAll(true);
+      const ratio = total > 0 ? wave / total : 0;
+      this.waveProgress.clear();
+      this.waveProgress.fillGradientStyle(0x4af7a0, 0x4af7a0, 0x00ff88, 0x00ff88, 1);
+      this.waveProgress.fillRect(6, 36, (W - 12) * ratio, 3);
+    };
+
+    const clearInfo = () => {
+      this.tweens.add({
+        targets: this.infoPanel,
+        x: -300,
+        duration: 180,
+        ease: 'Quad.In',
+        onComplete: () => {
+          this.clearInfoPanel();
+        }
+      });
+    };
 
     this.eventBus.on(C.EVT_GOLD_CHANGED, updateGold, this);
     this.eventBus.on(C.EVT_LIFE_CHANGED, updateLife, this);
@@ -148,12 +229,24 @@ export class HUDScene extends Phaser.Scene {
       const sec = Math.ceil(this.waveService.nextWaveCountdown / 1000);
       this.countdownText.setText(sec > 0 ? `Next wave: ${sec}s` : '');
     }
-    // Skill cooldown overlays
+    // Skill cooldown overlays (render pie arcs)
     for (const [id, g] of Object.entries(this.skillBars)) {
       g.clear();
       if (this.skillCooldowns[id] > 0) {
         this.skillCooldowns[id] = Math.max(0, this.skillCooldowns[id] - delta);
-        // gray overlay not shown here (icons are emoji) — could add pie overlay
+        const pos = this.skillBarPositions[id];
+        if (pos) {
+          const maxCooldown = id === C.SKILL_RAIN_OF_FIRE ? 45000 : id === C.SKILL_FORTIFY ? 60000 : 15000;
+          const ratio = this.skillCooldowns[id] / maxCooldown;
+          
+          g.fillStyle(0x000000, 0.65);
+          g.beginPath();
+          g.moveTo(pos.x, pos.y);
+          g.arc(pos.x, pos.y, 18, -Math.PI / 2, -Math.PI / 2 + ratio * Math.PI * 2, false);
+          g.lineTo(pos.x, pos.y);
+          g.closePath();
+          g.fillPath();
+        }
       }
     }
   }
@@ -167,36 +260,54 @@ export class HUDScene extends Phaser.Scene {
     armor,
     isBoss,
   }: any): void {
-    this.infoPanel.removeAll(true);
+    this.clearInfoPanel();
+
     const lines = [
       `${monsterType.replace('Monster_', '').replace('Boss_', '⚠ ')}  ${isBoss ? '[BOSS]' : ''}`,
       `HP: ${hp}/${maxHp}  Spd: ${speed}  Gold: ${gold}  Armor: ${Math.round(armor * 100)}%`,
     ];
     lines.forEach((txt, i) => {
       this.infoPanel.add(
-        this.add.text(0, i * 18, txt, {
+        this.add.text(12, 10 + i * 20, txt, {
           fontSize: i === 0 ? '13px' : '11px',
           color: isBoss ? '#ff8888' : '#ffffaa',
           fontFamily: 'Roboto, sans-serif',
+          fontStyle: i === 0 ? 'bold' : 'normal',
         }),
       );
+    });
+
+    this.tweens.add({
+      targets: this.infoPanel,
+      x: 8,
+      duration: 200,
+      ease: 'Back.Out',
     });
   }
 
   private showTowerInfo({ towerType, level, range, priority }: any): void {
-    this.infoPanel.removeAll(true);
+    this.clearInfoPanel();
+
     const lines = [
       `${towerType.replace('Tower_', '')}  Lv ${level}`,
       `Range: ${range}  Priority: ${priority}`,
     ];
     lines.forEach((txt, i) => {
       this.infoPanel.add(
-        this.add.text(0, i * 18, txt, {
+        this.add.text(12, 10 + i * 20, txt, {
           fontSize: '12px',
           color: '#aaddff',
           fontFamily: 'Roboto, sans-serif',
+          fontStyle: i === 0 ? 'bold' : 'normal',
         }),
       );
+    });
+
+    this.tweens.add({
+      targets: this.infoPanel,
+      x: 8,
+      duration: 200,
+      ease: 'Back.Out',
     });
   }
 
@@ -206,5 +317,12 @@ export class HUDScene extends Phaser.Scene {
 
   private onGameWin(): void {
     this.scene.start(C.SCENE_GAME_OVER, { victory: true });
+  }
+
+  private clearInfoPanel(): void {
+    if (!this.infoPanel || !this.infoPanel.list) return;
+    for (let i = this.infoPanel.list.length - 1; i >= 1; i--) {
+      this.infoPanel.list[i].destroy();
+    }
   }
 }

@@ -28,8 +28,13 @@ export default function Page() {
   }, []);
 
   return (
-    <section className="app_sinhtumon justify-center flex items-center min-h-screen">
-      <canvas id="myCustomCanvas" />
+    <section className="app_sinhtumon justify-center flex items-center min-h-screen bg-[#050711] p-2 sm:p-4">
+      <div 
+        className="relative flex justify-center items-center w-full aspect-[720/680] rounded-xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.85)] border border-slate-800/80"
+        style={{ maxWidth: 'min(720px, calc(92vh * 720 / 680))' }}
+      >
+        <canvas id="myCustomCanvas" className="w-full h-full object-contain block bg-[#0a0e1a]" />
+      </div>
     </section>
   );
 }
