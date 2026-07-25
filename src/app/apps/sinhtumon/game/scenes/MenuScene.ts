@@ -58,7 +58,7 @@ export class MenuScene extends Phaser.Scene {
       duration: 8000,
       yoyo: true,
       repeat: -1,
-      ease: 'Sine.easeInOut'
+      ease: 'Sine.easeInOut',
     });
     this.tweens.add({
       targets: fgTrees,
@@ -66,7 +66,7 @@ export class MenuScene extends Phaser.Scene {
       duration: 6000,
       yoyo: true,
       repeat: -1,
-      ease: 'Sine.easeInOut'
+      ease: 'Sine.easeInOut',
     });
 
     // Animated particles (embers)
@@ -120,9 +120,9 @@ export class MenuScene extends Phaser.Scene {
           callback: () => {
             title.setTint(colors[colorIdx]);
             colorIdx = (colorIdx + 1) % colors.length;
-          }
+          },
         });
-      }
+      },
     });
 
     const subtitle = this.add
@@ -141,7 +141,7 @@ export class MenuScene extends Phaser.Scene {
       alpha: 0.9,
       delay: 300,
       duration: 800,
-      ease: 'Back.Out'
+      ease: 'Back.Out',
     });
 
     // Buttons
@@ -169,7 +169,7 @@ export class MenuScene extends Phaser.Scene {
     const bg = this.add
       .rectangle(x, y, 240, 52, 0x1a0800, 0.85)
       .setInteractive();
-    
+
     // Add glow ring
     const glow = this.add.rectangle(x, y, 248, 60).setDepth(-2);
     glow.setFillStyle(0x00000000, 0);
@@ -196,7 +196,7 @@ export class MenuScene extends Phaser.Scene {
       scale: 1,
       duration: 800,
       ease: 'Back.Out',
-      delay: 500
+      delay: 500,
     });
 
     bg.on('pointerover', () => {
@@ -213,14 +213,14 @@ export class MenuScene extends Phaser.Scene {
         scaleY: 1.08,
         duration: 500,
         yoyo: true,
-        repeat: -1
+        repeat: -1,
       });
 
       this.tweens.add({
         targets: [bg, border, txt],
         scale: 1.04,
         duration: 150,
-        ease: 'Quad.Out'
+        ease: 'Quad.Out',
       });
     });
 
@@ -238,7 +238,7 @@ export class MenuScene extends Phaser.Scene {
         targets: [bg, border, txt],
         scale: 1,
         duration: 150,
-        ease: 'Quad.Out'
+        ease: 'Quad.Out',
       });
     });
 

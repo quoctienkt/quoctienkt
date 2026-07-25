@@ -23,7 +23,6 @@ export const MONSTER_ACTION_SKILL = 'skill';
 export const MONSTER_ACTION_IDLE = 'idle';
 export const MONSTER_ACTION_DEATH = 'death';
 
-
 // ─── Tower Types ──────────────────────────────────────────────────────────────
 export const TOWER_FROST = 'Tower_Frost';
 export const TOWER_ARCHER = 'Tower_Archer';

@@ -3,6 +3,8 @@ import { GameStateService } from '../../services/GameStateService';
 import { GameMapServiceBase } from '../../maps/GameMapServiceBase';
 import { EventBus } from '../../services/EventBus';
 import { BulletBase } from '../bullets/BulletBase';
+import { SoundManager } from '../../services/SoundManager';
+
 import { MonsterBase } from '../monsters/MonsterBase';
 import type { Square } from '../Square';
 import {
@@ -151,7 +153,7 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
         duration: 1500,
         yoyo: true,
         repeat: -1,
-        ease: 'Sine.easeInOut'
+        ease: 'Sine.easeInOut',
       });
     }
 
@@ -236,11 +238,13 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
       y: origY - 3,
       duration: 60,
       yoyo: true,
-      ease: 'Quad.Out'
+      ease: 'Quad.Out',
     });
 
     const bullet = this.createBullet();
+    SoundManager.getInstance().playShoot(); // SOUND EFFECT
     bullet.target = target;
+
     target.aimed.push(bullet);
 
     this.scene.physics.add.overlap(
@@ -290,10 +294,6 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
       });
     } else {
       this.on('pointerdown', () => this.handleTowerFocus());
-      this.on('pointermove', () => {
-        if (!this.cb.isBuying() && this.cb.isTowerClicked()) this.showDesc();
-      });
-      this.on('pointerout', () => this.cb.getDetailText()?.destroy());
     }
   }
 
@@ -308,7 +308,6 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
       callback: () => this.cb.setIsTowerClicked(true),
       loop: false,
     });
-    this.showDesc();
     this.showAttackRange();
     this.showUpgradeAction();
     this.showSellAction();
@@ -318,20 +317,10 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
       level: this.level,
       range: getTowerAttackRange(this.towerType, this.level),
       priority: this.priority,
+      upgradeCost: this.getUpgradeCost(),
+      sellPrice: getTowerSellPrice(this.towerType, this.level),
+      isMaxLevel: this.level >= 5,
     });
-  }
-
-  private showDesc(): void {
-    this.cb.getDetailText()?.destroy();
-    const t = this.scene.add.text(
-      this.mapService.mapConfig.CELL_WIDTH *
-        this.mapService.mapConfig.map[0].length +
-        5,
-      520,
-      `Lv ${this.level}  ${this.towerType.replace('Tower_', '')}\nRange: ${getTowerAttackRange(this.towerType, this.level)}\nReload: ${(getTowerAttackReload(this.towerType, this.level) / 1000).toFixed(1)}s\n[${this.priority}]`,
-      { fontSize: '12px', color: '#ffe066', fontFamily: 'Roboto, sans-serif' },
-    );
-    this.cb.setDetailText(t);
   }
 
   private showAttackRange(): void {
@@ -357,7 +346,7 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
           g.arc(this.x, this.y, r, a1, a2);
           g.strokePath();
         }
-      }
+      },
     });
   }
 
@@ -371,32 +360,39 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
     const rx = this.x + this.mapService.mapConfig.CELL_WIDTH / 2 + 10;
     const ry = this.y - this.mapService.mapConfig.CELL_HEIGHT / 2;
 
-    const container = this.scene.add.container(rx, ry).setDepth(4).setScale(0);
+    const container = this.scene.add
+      .container(rx, ry)
+      .setDepth(1000)
+      .setScale(0); // depth 1000
     this.cb.setUpgradeImage(container);
 
     const btnBg = this.scene.add.graphics();
     btnBg.fillStyle(isMax ? 0x444444 : 0x112244, 0.9);
-    btnBg.fillRoundedRect(-W/2, -H/2, W, H, 6);
+    btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
     btnBg.lineStyle(1.5, isMax ? 0x888888 : 0x4af7a0, 0.8);
-    btnBg.strokeRoundedRect(-W/2, -H/2, W, H, 6);
+    btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
     container.add(btnBg);
 
-    const text = this.scene.add.text(0, 0, isMax ? 'MAX' : '⬆ UPGRADE', {
-      fontSize: '8px',
-      color: isMax ? '#888888' : '#ffffff',
-      fontFamily: '"Roboto", sans-serif',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    const text = this.scene.add
+      .text(0, 0, isMax ? 'MAX' : '⬆ UPGRADE', {
+        fontSize: '8px',
+        color: isMax ? '#888888' : '#ffffff',
+        fontFamily: '"Roboto", sans-serif',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
     container.add(text);
 
-    const hit = this.scene.add.rectangle(0, 0, W, H, 0x000000, 0.001).setInteractive();
+    const hit = this.scene.add
+      .rectangle(0, 0, W, H, 0x000000, 0.001)
+      .setInteractive();
     container.add(hit);
 
     this.scene.tweens.add({
       targets: container,
       scale: 1,
       duration: 180,
-      ease: 'Back.Out'
+      ease: 'Back.Out',
     });
 
     if (!isMax) {
@@ -412,7 +408,9 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
           this.level + 1,
         );
         towers.push(upgraded);
-        this.cb.getDetailText()?.destroy();
+
+        SoundManager.getInstance().playUpgrade(); // SOUND EFFECT
+
         this.cb.getRangeImage()?.destroy();
         this.cb.getUpgradeImage()?.destroy();
         this.cb.getSellImage()?.destroy();
@@ -423,34 +421,17 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
       hit.on('pointerover', () => {
         btnBg.clear();
         btnBg.fillStyle(0x1a3366, 0.95);
-        btnBg.fillRoundedRect(-W/2, -H/2, W, H, 6);
+        btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
         btnBg.lineStyle(1.5, 0x00ff88, 1);
-        btnBg.strokeRoundedRect(-W/2, -H/2, W, H, 6);
-        
-        this.cb.getDetailText()?.destroy();
-        this.cb.setDetailText(
-          this.scene.add.text(
-            this.mapService.mapConfig.CELL_WIDTH *
-              this.mapService.mapConfig.map[0].length +
-              5,
-            520,
-            `Upgrade: ${this.getUpgradeCost()} 🪙`,
-            {
-              fontSize: '13px',
-              color: '#ffd700',
-              fontFamily: 'Roboto, sans-serif',
-            },
-          ),
-        );
+        btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
       });
 
       hit.on('pointerout', () => {
         btnBg.clear();
         btnBg.fillStyle(0x112244, 0.9);
-        btnBg.fillRoundedRect(-W/2, -H/2, W, H, 6);
+        btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
         btnBg.lineStyle(1.5, 0x4af7a0, 0.8);
-        btnBg.strokeRoundedRect(-W/2, -H/2, W, H, 6);
-        this.cb.getDetailText()?.destroy();
+        btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
       });
     }
   }
@@ -462,32 +443,39 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
     const rx = this.x + this.mapService.mapConfig.CELL_WIDTH / 2 + 10;
     const ry = this.y + this.mapService.mapConfig.CELL_HEIGHT / 2;
 
-    const container = this.scene.add.container(rx, ry).setDepth(4).setScale(0);
+    const container = this.scene.add
+      .container(rx, ry)
+      .setDepth(1000)
+      .setScale(0); // depth 1000
     this.cb.setSellImage(container);
 
     const btnBg = this.scene.add.graphics();
     btnBg.fillStyle(0x331100, 0.9);
-    btnBg.fillRoundedRect(-W/2, -H/2, W, H, 6);
+    btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
     btnBg.lineStyle(1.5, 0xff5533, 0.8);
-    btnBg.strokeRoundedRect(-W/2, -H/2, W, H, 6);
+    btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
     container.add(btnBg);
 
-    const text = this.scene.add.text(0, 0, '💰 SELL', {
-      fontSize: '8px',
-      color: '#ffffff',
-      fontFamily: '"Roboto", sans-serif',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    const text = this.scene.add
+      .text(0, 0, '💰 SELL', {
+        fontSize: '8px',
+        color: '#ffffff',
+        fontFamily: '"Roboto", sans-serif',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
     container.add(text);
 
-    const hit = this.scene.add.rectangle(0, 0, W, H, 0x000000, 0.001).setInteractive();
+    const hit = this.scene.add
+      .rectangle(0, 0, W, H, 0x000000, 0.001)
+      .setInteractive();
     container.add(hit);
 
     this.scene.tweens.add({
       targets: container,
       scale: 1,
       duration: 180,
-      ease: 'Back.Out'
+      ease: 'Back.Out',
     });
 
     hit.on('pointerdown', () => {
@@ -501,11 +489,13 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
         this.row,
         this.mapService.mapConfig.CELL_AVAILABLE,
       );
+
+      SoundManager.getInstance().playBuy(); // SOUND EFFECT (coin sound)
+
       this.cb.setIsTowerClicked(false);
       this.cb.getRangeImage()?.destroy();
       this.cb.getSellImage()?.destroy();
       this.cb.getUpgradeImage()?.destroy();
-      this.cb.getDetailText()?.destroy();
       this.eventBus.emit(C.EVT_TOWER_DESELECTED, {});
       this.destroy();
     });
@@ -513,34 +503,17 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
     hit.on('pointerover', () => {
       btnBg.clear();
       btnBg.fillStyle(0x551100, 0.95);
-      btnBg.fillRoundedRect(-W/2, -H/2, W, H, 6);
+      btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
       btnBg.lineStyle(1.5, 0xff8833, 1);
-      btnBg.strokeRoundedRect(-W/2, -H/2, W, H, 6);
-
-      this.cb.getDetailText()?.destroy();
-      this.cb.setDetailText(
-        this.scene.add.text(
-          this.mapService.mapConfig.CELL_WIDTH *
-            this.mapService.mapConfig.map[0].length +
-            5,
-          520,
-          `Sell: ${getTowerSellPrice(this.towerType, this.level)} 🪙`,
-          {
-            fontSize: '13px',
-            color: '#44ff44',
-            fontFamily: 'Roboto, sans-serif',
-          },
-        ),
-      );
+      btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
     });
 
     hit.on('pointerout', () => {
       btnBg.clear();
       btnBg.fillStyle(0x331100, 0.9);
-      btnBg.fillRoundedRect(-W/2, -H/2, W, H, 6);
+      btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
       btnBg.lineStyle(1.5, 0xff5533, 0.8);
-      btnBg.strokeRoundedRect(-W/2, -H/2, W, H, 6);
-      this.cb.getDetailText()?.destroy();
+      btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
     });
   }
 

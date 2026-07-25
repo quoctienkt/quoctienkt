@@ -20,6 +20,7 @@ import {
 } from '../config';
 import * as C from '../constants';
 import { FXHelper } from '../utils/FXHelper';
+import { SoundManager } from '../services/SoundManager';
 
 interface GameSceneData {
   mapKey: string;
@@ -52,6 +53,8 @@ export class GameScene extends Phaser.Scene {
   private rangeImage: any = null;
   private detailText: any = null;
   private selectedTowerType: string = C.TOWER_FROST;
+  private selectedBuildTowerType: string | null = null;
+  private buildRangeGraphic: Phaser.GameObjects.Graphics | null = null;
 
   // ─── Graphics ─────────────────────────────────────────────────────────────
   private graphics!: Phaser.GameObjects.Graphics;
@@ -115,7 +118,7 @@ export class GameScene extends Phaser.Scene {
         currentlyOver: Phaser.GameObjects.GameObject[],
       ) => {
         if (currentlyOver && currentlyOver.length > 0) return;
-        
+
         // Close active build menu if click outside
         if (this.activeBuildMenu) {
           this.activeBuildMenu.destroy();
@@ -142,16 +145,20 @@ export class GameScene extends Phaser.Scene {
     this.eventBus.on(C.STATUS_WEB, this.handleSpiderWeb, this);
     this.eventBus.on(C.EVT_SKILL_CAST, this.handleSkillCast, this);
     this.eventBus.on(C.EVT_ALL_WAVES_DONE, this.handleAllWavesDone, this);
-    this.eventBus.on(C.EVT_WAVE_START, ({ wave, total }: { wave: number, total: number }) => {
-      const isBossWave = (wave === 10 || wave === 20); // Golem at 10, Demon at 20
-      if (isBossWave) {
-        FXHelper.waveBanner(this, '⚠ BOSS WAVE!', 0xff3333);
-        FXHelper.screenShake(this, 350, 0.012);
-        this.cameras.main.flash(200, 255, 0, 0, false);
-      } else {
-        FXHelper.waveBanner(this, `Wave ${wave} of ${total}`, 0x4af7a0);
-      }
-    }, this);
+    this.eventBus.on(
+      C.EVT_WAVE_START,
+      ({ wave, total }: { wave: number; total: number }) => {
+        const isBossWave = wave === 10 || wave === 20; // Golem at 10, Demon at 20
+        if (isBossWave) {
+          FXHelper.waveBanner(this, '⚠ BOSS WAVE!', 0xff3333);
+          FXHelper.screenShake(this, 350, 0.012);
+          this.cameras.main.flash(200, 255, 0, 0, false);
+        } else {
+          FXHelper.waveBanner(this, `Wave ${wave} of ${total}`, 0x4af7a0);
+        }
+      },
+      this,
+    );
 
     this.eventBus.on(
       'HUD_SEND_WAVE_EARLY',
@@ -264,7 +271,7 @@ export class GameScene extends Phaser.Scene {
     const cy = square.posY * CH + CH / 2 + PAD; // EXACT cell center
     const tower = this.createTower(cx, cy, this.selectedTowerType, 1, false);
     this.stateService.savedData!.towers.push(tower);
-    
+
     // Tower placement particles & shake
     FXHelper.dustBurst(this, cx, cy);
     this.cameras.main.shake(80, 0.004);
@@ -273,26 +280,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private buildTowerShop(): void {
-    // Left completely empty/clean or draw a simple panel, as shop is now radial
-    const mapCols = this.mapService.mapConfig.map[0].length;
-    const CW = this.mapService.mapConfig.CELL_WIDTH;
-    const sideX = mapCols * CW + 100;
-    
-    // Draw sidebar title
-    this.add.text(sideX, 40, 'BUILD INFO', {
-      fontSize: '14px',
-      color: '#4af7a0',
-      fontStyle: 'bold',
-      fontFamily: '"Cinzel", serif'
-    }).setOrigin(0.5).setDepth(2);
-
-    this.add.text(sideX, 120, 'Click any glowing\ndiamond placeholder\non the map to select\nand build a tower.', {
-      fontSize: '10px',
-      color: '#8899aa',
-      fontFamily: 'Roboto, sans-serif',
-      align: 'center',
-      lineSpacing: 4
-    }).setOrigin(0.5).setDepth(2);
+    // No-op: sidebar has been removed in full screen layout
   }
 
   showBuildMenu(square: Square): void {
@@ -300,99 +288,189 @@ export class GameScene extends Phaser.Scene {
       this.activeBuildMenu.destroy();
       this.activeBuildMenu = null;
     }
+    this.selectedBuildTowerType = null;
+    this.buildRangeGraphic?.destroy();
+    this.buildRangeGraphic = null;
 
     const W = this.cameras.main.width;
     const H = this.cameras.main.height;
-    
+
     const container = this.add.container(square.x, square.y).setDepth(999);
     this.activeBuildMenu = container;
 
     // 1. Full-screen blocker to close menu on click outside
-    const blocker = this.add.rectangle(0, 0, W * 2, H * 2, 0x000000, 0.001)
+    const blocker = this.add
+      .rectangle(0, 0, W * 2, H * 2, 0x000000, 0.001)
       .setInteractive()
       .setDepth(-1);
     blocker.on('pointerdown', () => {
       container.destroy();
+      this.buildRangeGraphic?.destroy();
+      this.buildRangeGraphic = null;
+      this.eventBus.emit(C.EVT_TOWER_DESELECTED, {});
       if (this.activeBuildMenu === container) this.activeBuildMenu = null;
     });
     container.add(blocker);
 
     // 2. Tower buttons in a radial arc over the build slot
     const towers = [
-      { type: C.TOWER_FROST, sym: '❄', cost: 80, color: 0x88ddff },
-      { type: C.TOWER_ARCHER, sym: '🏹', cost: 60, color: 0xffaa44 },
-      { type: C.TOWER_CANNON, sym: '💣', cost: 100, color: 0x888888 },
-      { type: C.TOWER_LIGHTNING, sym: '⚡', cost: 120, color: 0xffff00 },
-      { type: C.TOWER_POISON, sym: '🧪', cost: 90, color: 0x44ff44 }
+      {
+        type: C.TOWER_FROST,
+        sym: '❄',
+        cost: 80,
+        color: 0x88ddff,
+        desc: 'Slows enemies. Freezes at lvl 5.',
+      },
+      {
+        type: C.TOWER_ARCHER,
+        sym: '🏹',
+        cost: 60,
+        color: 0xffaa44,
+        desc: 'Fast single-target damage.',
+      },
+      {
+        type: C.TOWER_CANNON,
+        sym: '💣',
+        cost: 100,
+        color: 0x888888,
+        desc: 'AoE splash damage. Slow reload.',
+      },
+      {
+        type: C.TOWER_LIGHTNING,
+        sym: '⚡',
+        cost: 120,
+        color: 0xffff00,
+        desc: 'Stuns enemies. Chains at lvl 4.',
+      },
+      {
+        type: C.TOWER_POISON,
+        sym: '🧪',
+        cost: 90,
+        color: 0x44ff44,
+        desc: 'Poison DoT + slow effect.',
+      },
     ];
 
     towers.forEach((t, i) => {
-      const angleRad = Phaser.Math.DegToRad(-150 + i * 30);
-      const bx = Math.cos(angleRad) * 48;
-      const by = Math.sin(angleRad) * 48;
+      // Space out cleanly around a circle (radius 60, angle spacing)
+      const angleRad = Phaser.Math.DegToRad(-180 + i * 45);
+      const bx = Math.cos(angleRad) * 60;
+      const by = Math.sin(angleRad) * 60;
 
       const btnContainer = this.add.container(bx, by).setScale(0);
       container.add(btnContainer);
 
       const btnBg = this.add.graphics();
-      btnBg.fillStyle(0x0a1424, 0.9);
-      btnBg.fillCircle(0, 0, 18);
-      btnBg.lineStyle(1.5, t.color, 0.6);
-      btnBg.strokeCircle(0, 0, 18);
+      const redrawBg = (isHighlighted = false) => {
+        btnBg.clear();
+        btnBg.fillStyle(isHighlighted ? 0x1a2e4a : 0x0a1424, 0.9);
+        btnBg.fillCircle(0, 0, 18);
+        btnBg.lineStyle(
+          isHighlighted ? 3.0 : 1.5,
+          isHighlighted ? 0xffd700 : t.color,
+          1,
+        );
+        btnBg.strokeCircle(0, 0, 18);
+      };
+      redrawBg(false);
       btnContainer.add(btnBg);
 
-      const text = this.add.text(0, -3, t.sym, { fontSize: '15px' }).setOrigin(0.5);
+      const text = this.add
+        .text(0, -3, t.sym, { fontSize: '15px' })
+        .setOrigin(0.5);
       btnContainer.add(text);
 
-      const costText = this.add.text(0, 9, `${t.cost}`, {
-        fontSize: '7px',
-        color: '#ffd700',
-        fontFamily: 'Roboto, sans-serif'
-      }).setOrigin(0.5);
+      const costText = this.add
+        .text(0, 9, `${t.cost}`, {
+          fontSize: '7px',
+          color: '#ffd700',
+          fontFamily: 'Roboto, sans-serif',
+        })
+        .setOrigin(0.5);
       btnContainer.add(costText);
 
       // Hit area
       const hit = this.add.circle(0, 0, 18, 0x000000, 0.001).setInteractive();
       btnContainer.add(hit);
 
-      // Tweens
+      // Tweens entry
       this.tweens.add({
         targets: btnContainer,
         scale: 1,
         duration: 200,
         delay: i * 30,
-        ease: 'Back.Out'
-      });
-
-      hit.on('pointerover', () => {
-        this.tweens.add({ targets: btnContainer, scale: 1.15, duration: 100 });
-        btnBg.clear();
-        btnBg.fillStyle(0x1a2e4a, 0.95);
-        btnBg.fillCircle(0, 0, 18);
-        btnBg.lineStyle(2, t.color, 1);
-        btnBg.strokeCircle(0, 0, 18);
-      });
-
-      hit.on('pointerout', () => {
-        this.tweens.add({ targets: btnContainer, scale: 1, duration: 100 });
-        btnBg.clear();
-        btnBg.fillStyle(0x0a1424, 0.9);
-        btnBg.fillCircle(0, 0, 18);
-        btnBg.lineStyle(1.5, t.color, 0.6);
-        btnBg.strokeCircle(0, 0, 18);
+        ease: 'Back.Out',
       });
 
       hit.on('pointerdown', () => {
+        // First click: select and display info
+        if (this.selectedBuildTowerType !== t.type) {
+          this.selectedBuildTowerType = t.type;
+
+          // Reset other buttons' visual scales and highlight states
+          container.list.forEach((child: any) => {
+            if (
+              child &&
+              child.scaleX !== undefined &&
+              child !== btnContainer &&
+              child !== blocker
+            ) {
+              const otherBg = child.list?.[0] as Phaser.GameObjects.Graphics;
+              if (otherBg && typeof otherBg.clear === 'function') {
+                child.setScale(1);
+                // We redraw the background to default line colors
+                const tIndex = container.list.indexOf(child) - 1; // offset by blocker
+                const matchingTower = towers[tIndex];
+                if (matchingTower) {
+                  otherBg.clear();
+                  otherBg.fillStyle(0x0a1424, 0.9);
+                  otherBg.fillCircle(0, 0, 18);
+                  otherBg.lineStyle(1.5, matchingTower.color, 1);
+                  otherBg.strokeCircle(0, 0, 18);
+                }
+              }
+            }
+          });
+
+          this.tweens.add({
+            targets: btnContainer,
+            scale: 1.25,
+            duration: 150,
+          });
+          redrawBg(true);
+
+          // Draw preview range
+          this.buildRangeGraphic?.destroy();
+          const r = getTowerAttackRange(t.type, 1);
+          this.buildRangeGraphic = this.add.graphics().setDepth(3);
+          this.buildRangeGraphic.lineStyle(1.5, 0xffd700, 0.45);
+          this.buildRangeGraphic.strokeCircle(square.x, square.y, r);
+
+          // Emit selected event so HUDScene shows the info
+          this.eventBus.emit(C.EVT_TOWER_SELECTED, {
+            towerType: t.type,
+            level: 1,
+            range: r,
+            cost: t.cost,
+            description: t.desc,
+            isBuyingPreview: true,
+          });
+
+          // Play select tick sound
+          SoundManager.getInstance().playShoot();
+          return;
+        }
+
+        // Second click: buy
         const gold = this.stateService.savedData!.gold;
         if (gold >= t.cost) {
-          // Build tower!
           const success = this.mapService.tryUpdateMap(
             square.posX,
             square.posY,
-            this.mapService.mapConfig.CELL_BLOCKED
+            this.mapService.mapConfig.CELL_BLOCKED,
           );
           if (success) {
-            this.stateService.setGold(g => g - t.cost);
+            this.stateService.setGold((g) => g - t.cost);
             const CW = this.mapService.mapConfig.CELL_WIDTH;
             const CH = this.mapService.mapConfig.CELL_HEIGHT;
             const PAD = this.mapService.mapConfig.GAME_BOARD_PADDING_TOP;
@@ -403,14 +481,23 @@ export class GameScene extends Phaser.Scene {
 
             FXHelper.dustBurst(this, cx, cy);
             this.cameras.main.shake(80, 0.004);
+            SoundManager.getInstance().playBuy(); // SOUND EFFECT
 
             container.destroy();
+            this.buildRangeGraphic?.destroy();
+            this.buildRangeGraphic = null;
+            this.eventBus.emit(C.EVT_TOWER_DESELECTED, {});
             if (this.activeBuildMenu === container) this.activeBuildMenu = null;
             square.destroy();
           }
         } else {
-          // Not enough gold feedback
-          FXHelper.floatingText(this, bx + square.x, by + square.y - 15, 'NO GOLD!', '#ff4444');
+          FXHelper.floatingText(
+            this,
+            bx + square.x,
+            by + square.y - 15,
+            'NO GOLD!',
+            '#ff4444',
+          );
           this.cameras.main.shake(40, 0.002);
         }
       });
@@ -706,14 +793,14 @@ export class GameScene extends Phaser.Scene {
     cloudG.fillStyle(0xffffff, 0.12);
     cloudG.fillEllipse(150, 30, 180, 25);
     cloudG.fillEllipse(450, 25, 220, 30);
-    
+
     this.tweens.add({
       targets: cloudG,
       x: '+=80',
       duration: 18000,
       yoyo: true,
       repeat: -1,
-      ease: 'Sine.easeInOut'
+      ease: 'Sine.easeInOut',
     });
 
     // 3. Bottom ground trim row (depth 1)

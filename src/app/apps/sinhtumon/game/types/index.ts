@@ -77,8 +77,6 @@ export interface MonsterConfig {
   attackCooldown?: number;
 }
 
-
-
 // ─── Hero Configs ──────────────────────────────────────────────────────────────
 export interface HeroSkillDef {
   skillId: string;

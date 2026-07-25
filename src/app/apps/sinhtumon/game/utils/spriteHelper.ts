@@ -45,7 +45,6 @@ export function createAnimSafe(scene: Phaser.Scene, def: AnimDef): void {
   });
 }
 
-
 /**
  * Build the canonical animation key used throughout the codebase.
  * E.g. "Monster_Grunt_MOVETO_TO_RIGHT"
@@ -133,12 +132,12 @@ export function applyFrameTrims(
     // Phaser's setTrim parameters:
     // frame.setTrim(realWidth, realHeight, x, y, width, height)
     frame.setTrim(
-      frame.width,  // realWidth — full frame slot
+      frame.width, // realWidth — full frame slot
       frame.height, // realHeight
-      cr.x,         // x offset of content
-      cr.y,         // y offset
-      cr.w,         // actual content width
-      cr.h,         // actual content height
+      cr.x, // x offset of content
+      cr.y, // y offset
+      cr.w, // actual content width
+      cr.h, // actual content height
     );
   }
 }
@@ -158,4 +157,3 @@ export function getScaledDisplaySize(monsterType: string): {
     h: Math.round(fd.contentRect.h * fd.displayScale),
   };
 }
-

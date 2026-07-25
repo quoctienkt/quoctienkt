@@ -3,6 +3,7 @@ import { EventBus } from '../services/EventBus';
 import { WaveService } from '../services/WaveService';
 import * as C from '../constants';
 import { FXHelper } from '../utils/FXHelper';
+import { SoundManager } from '../services/SoundManager';
 
 /**
  * HUDScene — runs in parallel on top of GameScene.
@@ -23,7 +24,7 @@ export class HUDScene extends Phaser.Scene {
   private countdownText!: Phaser.GameObjects.Text;
   private infoPanel!: Phaser.GameObjects.Container;
   private sendWaveBtn!: Phaser.GameObjects.Text;
-  
+
   private waveProgress!: Phaser.GameObjects.Graphics;
   private displayedGold = 0;
 
@@ -144,7 +145,7 @@ export class HUDScene extends Phaser.Scene {
           this.skillCooldowns[s.id] = s.cooldown;
         }
       });
-      
+
       // Draw graphic overlay on top of text
       g.setDepth(2);
     }
@@ -165,7 +166,8 @@ export class HUDScene extends Phaser.Scene {
         to: gold,
         duration: 350,
         ease: 'Quad.Out',
-        onUpdate: (tw) => this.goldText.setText(`${Math.floor(tw.getValue() ?? 0)}`),
+        onUpdate: (tw) =>
+          this.goldText.setText(`${Math.floor(tw.getValue() ?? 0)}`),
       });
       this.displayedGold = gold;
     };
@@ -186,7 +188,13 @@ export class HUDScene extends Phaser.Scene {
       this.waveText.setText(`Wave ${wave} / ${total}`);
       const ratio = total > 0 ? wave / total : 0;
       this.waveProgress.clear();
-      this.waveProgress.fillGradientStyle(0x4af7a0, 0x4af7a0, 0x00ff88, 0x00ff88, 1);
+      this.waveProgress.fillGradientStyle(
+        0x4af7a0,
+        0x4af7a0,
+        0x00ff88,
+        0x00ff88,
+        1,
+      );
       this.waveProgress.fillRect(6, 36, (W - 12) * ratio, 3);
     };
 
@@ -198,28 +206,38 @@ export class HUDScene extends Phaser.Scene {
         ease: 'Quad.In',
         onComplete: () => {
           this.clearInfoPanel();
-        }
+        },
       });
     };
+
+    const playGameOverSound = () => SoundManager.getInstance().playGameOver();
+    const playVictorySound = () => SoundManager.getInstance().playVictory();
+    const playWaveStartSound = () => SoundManager.getInstance().playWaveStart();
 
     this.eventBus.on(C.EVT_GOLD_CHANGED, updateGold, this);
     this.eventBus.on(C.EVT_LIFE_CHANGED, updateLife, this);
     this.eventBus.on(C.EVT_WAVE_START, updateWave, this);
+    this.eventBus.on(C.EVT_WAVE_START, playWaveStartSound, this);
     this.eventBus.on(C.EVT_MONSTER_SELECTED, this.showMonsterInfo, this);
     this.eventBus.on(C.EVT_TOWER_SELECTED, this.showTowerInfo, this);
     this.eventBus.on(C.EVT_TOWER_DESELECTED, clearInfo, this);
     this.eventBus.on(C.EVT_GAME_OVER, this.onGameOver, this);
+    this.eventBus.on(C.EVT_GAME_OVER, playGameOverSound, this);
     this.eventBus.on(C.EVT_GAME_WIN, this.onGameWin, this);
+    this.eventBus.on(C.EVT_GAME_WIN, playVictorySound, this);
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.eventBus.off(C.EVT_GOLD_CHANGED, updateGold, this);
       this.eventBus.off(C.EVT_LIFE_CHANGED, updateLife, this);
       this.eventBus.off(C.EVT_WAVE_START, updateWave, this);
+      this.eventBus.off(C.EVT_WAVE_START, playWaveStartSound, this);
       this.eventBus.off(C.EVT_MONSTER_SELECTED, this.showMonsterInfo, this);
       this.eventBus.off(C.EVT_TOWER_SELECTED, this.showTowerInfo, this);
       this.eventBus.off(C.EVT_TOWER_DESELECTED, clearInfo, this);
       this.eventBus.off(C.EVT_GAME_OVER, this.onGameOver, this);
+      this.eventBus.off(C.EVT_GAME_OVER, playGameOverSound, this);
       this.eventBus.off(C.EVT_GAME_WIN, this.onGameWin, this);
+      this.eventBus.off(C.EVT_GAME_WIN, playVictorySound, this);
     });
   }
 
@@ -236,13 +254,25 @@ export class HUDScene extends Phaser.Scene {
         this.skillCooldowns[id] = Math.max(0, this.skillCooldowns[id] - delta);
         const pos = this.skillBarPositions[id];
         if (pos) {
-          const maxCooldown = id === C.SKILL_RAIN_OF_FIRE ? 45000 : id === C.SKILL_FORTIFY ? 60000 : 15000;
+          const maxCooldown =
+            id === C.SKILL_RAIN_OF_FIRE
+              ? 45000
+              : id === C.SKILL_FORTIFY
+                ? 60000
+                : 15000;
           const ratio = this.skillCooldowns[id] / maxCooldown;
-          
+
           g.fillStyle(0x000000, 0.65);
           g.beginPath();
           g.moveTo(pos.x, pos.y);
-          g.arc(pos.x, pos.y, 18, -Math.PI / 2, -Math.PI / 2 + ratio * Math.PI * 2, false);
+          g.arc(
+            pos.x,
+            pos.y,
+            18,
+            -Math.PI / 2,
+            -Math.PI / 2 + ratio * Math.PI * 2,
+            false,
+          );
           g.lineTo(pos.x, pos.y);
           g.closePath();
           g.fillPath();
@@ -285,18 +315,40 @@ export class HUDScene extends Phaser.Scene {
     });
   }
 
-  private showTowerInfo({ towerType, level, range, priority }: any): void {
+  private showTowerInfo({
+    towerType,
+    level,
+    range,
+    priority,
+    cost,
+    description,
+    isBuyingPreview,
+    upgradeCost,
+    sellPrice,
+    isMaxLevel,
+  }: any): void {
     this.clearInfoPanel();
 
-    const lines = [
-      `${towerType.replace('Tower_', '')}  Lv ${level}`,
-      `Range: ${range}  Priority: ${priority}`,
-    ];
+    const cleanName = towerType.replace('Tower_', '');
+    let lines = [];
+    if (isBuyingPreview) {
+      lines = [
+        `${cleanName} (Preview) — Buy: ${cost}🪙`,
+        `Range: ${range} | ${description || ''}`,
+      ];
+    } else {
+      const upgradeText = isMaxLevel ? 'MAX' : `${upgradeCost}🪙`;
+      lines = [
+        `${cleanName}  Lv ${level} (Priority: ${priority || 'first'})`,
+        `Range: ${range} | Upgrade: ${upgradeText} | Sell: ${sellPrice}🪙`,
+      ];
+    }
+
     lines.forEach((txt, i) => {
       this.infoPanel.add(
-        this.add.text(12, 10 + i * 20, txt, {
-          fontSize: '12px',
-          color: '#aaddff',
+        this.add.text(12, 10 + i * 22, txt, {
+          fontSize: i === 0 ? '13px' : '11px',
+          color: i === 0 ? '#4af7a0' : '#aaddff',
           fontFamily: 'Roboto, sans-serif',
           fontStyle: i === 0 ? 'bold' : 'normal',
         }),

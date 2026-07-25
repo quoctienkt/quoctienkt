@@ -30,18 +30,23 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     const title = this.add
-      .text(W / 2, victory ? H * 0.28 : -100, victory ? '🏆 VICTORY!' : '💀 DEFEAT', {
-        fontSize: '56px',
-        fontFamily: '"Cinzel", "Georgia", serif',
-        color: victory ? '#ffd700' : '#ff4444',
-        stroke: victory ? '#006600' : '#660000',
-        strokeThickness: 6,
-        shadow: {
-          blur: 30,
-          color: victory ? '#00ff88' : '#ff0000',
-          fill: true,
+      .text(
+        W / 2,
+        victory ? H * 0.28 : -100,
+        victory ? '🏆 VICTORY!' : '💀 DEFEAT',
+        {
+          fontSize: '56px',
+          fontFamily: '"Cinzel", "Georgia", serif',
+          color: victory ? '#ffd700' : '#ff4444',
+          stroke: victory ? '#006600' : '#660000',
+          strokeThickness: 6,
+          shadow: {
+            blur: 30,
+            color: victory ? '#00ff88' : '#ff0000',
+            fill: true,
+          },
         },
-      })
+      )
       .setOrigin(0.5);
 
     if (victory) {
@@ -61,7 +66,7 @@ export class GameOverScene extends Phaser.Scene {
             repeat: -1,
             ease: 'Sine.easeInOut',
           });
-        }
+        },
       });
     } else {
       // Fall down & bounce
@@ -82,7 +87,7 @@ export class GameOverScene extends Phaser.Scene {
             repeat: -1,
             ease: 'Sine.easeInOut',
           });
-        }
+        },
       });
     }
 
@@ -109,7 +114,7 @@ export class GameOverScene extends Phaser.Scene {
       alpha: 1,
       duration: 600,
       ease: 'Quad.Out',
-      delay: victory ? 300 : 800
+      delay: victory ? 300 : 800,
     });
 
     // Buttons
@@ -162,7 +167,7 @@ export class GameOverScene extends Phaser.Scene {
         fontSize: '16px',
         fontFamily: '"Cinzel", serif',
         color: '#ffffff',
-        fontStyle: 'bold'
+        fontStyle: 'bold',
       })
       .setOrigin(0.5);
 
@@ -174,7 +179,7 @@ export class GameOverScene extends Phaser.Scene {
       scale: 1,
       duration: 500,
       ease: 'Back.Out',
-      delay: 500
+      delay: 500,
     });
 
     bg.on('pointerover', () => {
@@ -182,7 +187,7 @@ export class GameOverScene extends Phaser.Scene {
       this.tweens.add({
         targets: [bg, txt],
         scale: 1.05,
-        duration: 100
+        duration: 100,
       });
     });
     bg.on('pointerout', () => {
@@ -190,7 +195,7 @@ export class GameOverScene extends Phaser.Scene {
       this.tweens.add({
         targets: [bg, txt],
         scale: 1,
-        duration: 100
+        duration: 100,
       });
     });
     bg.on('pointerdown', onClick);
@@ -222,7 +227,7 @@ export class GameOverScene extends Phaser.Scene {
 
     const centers = [
       { x: W * 0.25, y: H * 0.4 },
-      { x: W * 0.75, y: H * 0.6 }
+      { x: W * 0.75, y: H * 0.6 },
     ];
 
     for (const c of centers) {
@@ -244,13 +249,15 @@ export class GameOverScene extends Phaser.Scene {
   private enemyMarchSilhouettes(W: number, H: number): void {
     const count = 7;
     for (let i = 0; i < count; i++) {
-      const m = this.add.rectangle(-50, H - 40, 16, 22, 0x050505).setOrigin(0.5);
+      const m = this.add
+        .rectangle(-50, H - 40, 16, 22, 0x050505)
+        .setOrigin(0.5);
       this.tweens.add({
         targets: m,
         x: W + 100,
         delay: i * 900,
         duration: 9000,
-        repeat: -1
+        repeat: -1,
       });
     }
   }

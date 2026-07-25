@@ -15,14 +15,14 @@ export const SpriteFrameRegistry: Record<string, SpriteFrameData> = {
   [C.MONSTER_LARVA]: { contentRect: RECT_64, displayScale: 0.55 },
   [C.MONSTER_HARPY]: { contentRect: RECT_64, displayScale: 0.5 },
   [C.MONSTER_BAT]: { contentRect: RECT_64, displayScale: 0.45 },
-  [C.MONSTER_DRAGON]: { contentRect: RECT_128, displayScale: 0.5 },
-  [C.BOSS_GOLEM]: { contentRect: RECT_128, displayScale: 0.5 },
-  [C.BOSS_DEMON]: { contentRect: RECT_128, displayScale: 0.5 },
+  [C.MONSTER_DRAGON]: { contentRect: RECT_128, displayScale: 0.35 },
+  [C.BOSS_GOLEM]: { contentRect: RECT_128, displayScale: 0.35 },
+  [C.BOSS_DEMON]: { contentRect: RECT_128, displayScale: 0.35 },
 
   // ── New 5 Monsters ─────────────────────────────────────────────
   [C.MONSTER_SKELETON]: { contentRect: RECT_64, displayScale: 0.55 },
   [C.MONSTER_ICE_ELEMENTAL]: { contentRect: RECT_64, displayScale: 0.6 },
   [C.MONSTER_WOLF]: { contentRect: RECT_64, displayScale: 0.5 },
   [C.MONSTER_VULTURE]: { contentRect: RECT_64, displayScale: 0.5 },
-  [C.BOSS_BEHOLDER]: { contentRect: RECT_128, displayScale: 0.5 },
+  [C.BOSS_BEHOLDER]: { contentRect: RECT_128, displayScale: 0.35 },
 };

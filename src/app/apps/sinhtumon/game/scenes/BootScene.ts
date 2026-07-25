@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import { EventBus } from '../services/EventBus';
 import * as C from '../constants';
 import { generateAllProceduralAssets } from '../utils/ProceduralAssetGenerator';
+import { SoundManager } from '../services/SoundManager';
 
 /**
  * BootScene — registers the EventBus in game.registry then preloads all assets.
@@ -57,6 +58,10 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.input.once('pointerdown', () => {
+      SoundManager.getInstance().playShoot();
+    });
+
     this.cameras.main.fade(400, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       this.scene.start(C.SCENE_MENU);

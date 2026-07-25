@@ -19,7 +19,12 @@ export class FXHelper {
     }
   }
 
-  static sparkBurst(scene: Phaser.Scene, x: number, y: number, color: number): void {
+  static sparkBurst(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    color: number,
+  ): void {
     for (let i = 0; i < 8; i++) {
       const angle = Math.random() * Math.PI * 2;
       const dist = 12 + Math.random() * 20;
@@ -35,14 +40,23 @@ export class FXHelper {
     }
   }
 
-  static floatingText(scene: Phaser.Scene, x: number, y: number, text: string, color: string): void {
-    const txt = scene.add.text(x, y - 20, text, {
-      fontSize: '12px',
-      color: color,
-      fontFamily: '"Roboto", sans-serif',
-      stroke: '#000000',
-      strokeThickness: 3,
-    }).setOrigin(0.5).setDepth(9999);
+  static floatingText(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    text: string,
+    color: string,
+  ): void {
+    const txt = scene.add
+      .text(x, y - 20, text, {
+        fontSize: '12px',
+        color: color,
+        fontFamily: '"Roboto", sans-serif',
+        stroke: '#000000',
+        strokeThickness: 3,
+      })
+      .setOrigin(0.5)
+      .setDepth(9999);
 
     scene.tweens.add({
       targets: txt,
@@ -53,14 +67,25 @@ export class FXHelper {
     });
   }
 
-  static goldFloat(scene: Phaser.Scene, x: number, y: number, amount: number): void {
+  static goldFloat(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    amount: number,
+  ): void {
     this.floatingText(scene, x, y, `+${amount}🪙`, '#ffd700');
   }
 
-  static shockwave(scene: Phaser.Scene, x: number, y: number, radius: number, color = 0xffffff): void {
+  static shockwave(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    radius: number,
+    color = 0xffffff,
+  ): void {
     const g = scene.add.graphics().setDepth(999);
     g.lineStyle(2, color, 1);
-    
+
     scene.tweens.addCounter({
       from: 0,
       to: radius,
@@ -77,7 +102,11 @@ export class FXHelper {
     });
   }
 
-  static waveBanner(scene: Phaser.Scene, message: string, accentColor: number): void {
+  static waveBanner(
+    scene: Phaser.Scene,
+    message: string,
+    accentColor: number,
+  ): void {
     const W = scene.cameras.main.width;
     const bannerContainer = scene.add.container(0, -80).setDepth(9999);
 
@@ -88,13 +117,15 @@ export class FXHelper {
     bg.strokeRoundedRect(W / 2 - 160, 0, 320, 48, 8);
     bannerContainer.add(bg);
 
-    const txt = scene.add.text(W / 2, 24, message, {
-      fontSize: '18px',
-      color: '#ffffff',
-      fontFamily: '"Cinzel", serif',
-      stroke: '#000000',
-      strokeThickness: 2,
-    }).setOrigin(0.5);
+    const txt = scene.add
+      .text(W / 2, 24, message, {
+        fontSize: '18px',
+        color: '#ffffff',
+        fontFamily: '"Cinzel", serif',
+        stroke: '#000000',
+        strokeThickness: 2,
+      })
+      .setOrigin(0.5);
     bannerContainer.add(txt);
 
     // Slide down, hold, slide up
@@ -115,11 +146,15 @@ export class FXHelper {
             });
           }
         });
-      }
+      },
     });
   }
 
-  static screenShake(scene: Phaser.Scene, duration = 100, intensity = 0.005): void {
+  static screenShake(
+    scene: Phaser.Scene,
+    duration = 100,
+    intensity = 0.005,
+  ): void {
     scene.cameras.main.shake(duration, intensity);
   }
 }

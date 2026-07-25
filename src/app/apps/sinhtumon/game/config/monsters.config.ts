@@ -230,7 +230,6 @@ export const monstersConfig: Record<string, MonsterConfig> = {
     attackRange: 40,
   },
 
-
   [C.MONSTER_BAT]: {
     goldOnDead: 8,
     moveType: C.MONSTER_MOVE_TYPE_FLY,
@@ -246,7 +245,6 @@ export const monstersConfig: Record<string, MonsterConfig> = {
         frameHeight: 64,
       },
       ...createAttackActions(64, 64),
-
     ],
     baseSpeed: 145,
     baseHp: 40,
@@ -269,7 +267,6 @@ export const monstersConfig: Record<string, MonsterConfig> = {
         frameHeight: 128,
       },
       ...createAttackActions(128, 128),
-
     ],
     baseSpeed: 65,
     baseHp: 450,
@@ -292,7 +289,6 @@ export const monstersConfig: Record<string, MonsterConfig> = {
         frameHeight: 64,
       },
       ...createAttackActions(64, 64),
-
     ],
     baseSpeed: 120,
     baseHp: 70,
@@ -331,7 +327,6 @@ export const monstersConfig: Record<string, MonsterConfig> = {
         frameHeight: 128,
       },
       ...createAttackActions(128, 128),
-
     ],
     baseSpeed: 50,
     baseHp: 4000,

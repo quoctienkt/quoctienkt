@@ -45,15 +45,58 @@ export abstract class GameMapServiceBase {
       });
     }
 
-    this.scene!.add.text(5, 60, 'Entrance', {
-      fontSize: '15px',
-      color: '#ffffff',
-      fontFamily: 'Roboto, sans-serif',
+    const CW = this.mapConfig.CELL_WIDTH;
+    const CH = this.mapConfig.CELL_HEIGHT;
+    const PAD = this.mapConfig.GAME_BOARD_PADDING_TOP;
+
+    // Entrance portal coordinates
+    const startX = this.currentStartPosition[1] * CW + CW / 2;
+    const startY = this.currentStartPosition[0] * CH + CH / 2 + PAD;
+
+    // Exit portal coordinates
+    const endX = this.currentEndPosition[1] * CW + CW / 2;
+    const endY = this.currentEndPosition[0] * CH + CH / 2 + PAD;
+
+    // Pulse Green portal for Entrance
+    const entrancePortal = this.scene!.add.graphics().setDepth(-2);
+    this.scene!.tweens.addCounter({
+      from: 0.35,
+      to: 0.5,
+      duration: 1200,
+      yoyo: true,
+      repeat: -1,
+      onUpdate: (tw) => {
+        if (!entrancePortal.active) return;
+        entrancePortal.clear();
+        const r = CW * (tw.getValue() ?? 0.4);
+        entrancePortal.fillStyle(0x00ff88, 0.15);
+        entrancePortal.fillCircle(startX, startY, r);
+        entrancePortal.lineStyle(2, 0x00ff88, 0.6);
+        entrancePortal.strokeCircle(startX, startY, r);
+        entrancePortal.lineStyle(1.5, 0xffffff, 0.4);
+        entrancePortal.strokeCircle(startX, startY, r * 0.6);
+      },
     });
-    this.scene!.add.text(445, 635, 'Exit', {
-      fontSize: '20px',
-      color: '#ffffff',
-      fontFamily: 'Roboto, sans-serif',
+
+    // Pulse Red portal for Exit
+    const exitPortal = this.scene!.add.graphics().setDepth(-2);
+    this.scene!.tweens.addCounter({
+      from: 0.35,
+      to: 0.5,
+      duration: 1200,
+      yoyo: true,
+      repeat: -1,
+      onUpdate: (tw) => {
+        if (!exitPortal.active) return;
+        exitPortal.clear();
+        const r = CW * (tw.getValue() ?? 0.4);
+        exitPortal.fillStyle(0xff3333, 0.15);
+        exitPortal.fillCircle(endX, endY, r);
+        exitPortal.lineStyle(2, 0xff3333, 0.6);
+        exitPortal.strokeCircle(endX, endY, r);
+        exitPortal.lineStyle(1.5, 0xffffff, 0.4);
+        exitPortal.strokeCircle(endX, endY, r * 0.6);
+      },
     });
 
     // Background — use mapConfig.backgroundKey if available, else fallback

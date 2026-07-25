@@ -74,7 +74,7 @@ export class MapSelectScene extends Phaser.Scene {
       duration: 7000,
       yoyo: true,
       repeat: -1,
-      ease: 'Sine.easeInOut'
+      ease: 'Sine.easeInOut',
     });
 
     this.add
@@ -87,8 +87,8 @@ export class MapSelectScene extends Phaser.Scene {
         shadow: {
           blur: 10,
           color: '#ff8800',
-          fill: true
-        }
+          fill: true,
+        },
       })
       .setOrigin(0.5);
 
@@ -101,7 +101,7 @@ export class MapSelectScene extends Phaser.Scene {
       })
       .setOrigin(0, 0.5)
       .setInteractive();
-    
+
     back.on('pointerover', () => back.setColor('#fff'));
     back.on('pointerout', () => back.setColor('#aaa'));
     back.on('pointerdown', () => this.scene.start(C.SCENE_MENU));
@@ -153,7 +153,7 @@ export class MapSelectScene extends Phaser.Scene {
       map.accentColor,
       0x050510,
       0x050510,
-      0.45
+      0.45,
     );
     thumb.fillRoundedRect(-w / 2 + 6, -h / 2 + 6, w - 12, 85, 6);
     thumb.lineStyle(1, map.accentColor, 0.4);
@@ -238,7 +238,7 @@ export class MapSelectScene extends Phaser.Scene {
       alpha: 1,
       duration: 600,
       ease: 'Back.Out',
-      delay: index * 100
+      delay: index * 100,
     });
 
     // Hover & click events

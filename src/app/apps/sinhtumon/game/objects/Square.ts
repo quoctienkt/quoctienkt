@@ -60,18 +60,18 @@ export class Square extends Phaser.Physics.Arcade.Sprite {
     const W = this.gameMapService.mapConfig.CELL_WIDTH;
     const H = this.gameMapService.mapConfig.CELL_HEIGHT;
     this.glowGraphic.clear();
-    
+
     // Draw semi-transparent diamond
     const pts = [
       { x: this.x, y: this.y - H / 2 + 2 },
       { x: this.x + W / 2 - 2, y: this.y },
       { x: this.x, y: this.y + H / 2 - 2 },
-      { x: this.x - W / 2 + 2, y: this.y }
+      { x: this.x - W / 2 + 2, y: this.y },
     ];
 
     this.glowGraphic.fillStyle(0x4af7a0, alpha * 0.35);
     this.glowGraphic.fillPoints(pts, true);
-    
+
     this.glowGraphic.lineStyle(1.5, 0x4af7a0, alpha);
     this.glowGraphic.strokePoints(pts, true);
   }
@@ -87,7 +87,7 @@ export class Square extends Phaser.Physics.Arcade.Sprite {
       repeat: -1,
       onUpdate: (tween) => {
         this.drawGlow(tween.getValue() ?? 0);
-      }
+      },
     });
   }
 

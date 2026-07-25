@@ -13,6 +13,7 @@ import { SpriteFrameRegistry } from '../../config/framers';
 import * as C from '../../constants';
 import type { StatusEffect } from '../../types';
 import { FXHelper } from '../../utils/FXHelper';
+import { SoundManager } from '../../services/SoundManager';
 
 export interface MonsterContext {
   monsterType: string;
@@ -103,7 +104,7 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
     }
     // Status effects
     this.tickStatusEffects(delta);
-    
+
     // 2.5D Depth sorting
     this.setDepth(Math.floor(this.y));
 
@@ -242,13 +243,14 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
         key: 'anim_onDead',
         frames: this.scene.anims.generateFrameNumbers('onDead', {
           start: 0,
-          end: 11,
+          end: 7, // Fixed crash from 11 to 7
         }),
         frameRate: 15,
         repeat: 0,
       });
     }
     explosion.play('anim_onDead');
+    SoundManager.getInstance().playDead(); // SOUND EFFECT
     explosion.on('animationcomplete', () => explosion.destroy());
 
     this.scene.time.delayedCall(1000, () => {
@@ -363,7 +365,6 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
         this.direction = dir;
         this.playAction(C.MONSTER_ACTION_WALK, this.direction);
       }
-
     }
   }
 
@@ -389,7 +390,6 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
         this.setFrame(0);
       }
     }
-
   }
 
   /**
@@ -447,7 +447,6 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
     // Initial animation
     this.playAction(C.MONSTER_ACTION_WALK, this.direction);
   }
-
 
   private initDirection(): void {
     this.direction =

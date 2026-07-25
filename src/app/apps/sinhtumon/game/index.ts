@@ -7,8 +7,8 @@ import { HUDScene } from './scenes/HUDScene';
 import { GameOverScene } from './scenes/GameOverScene';
 
 export function createGame(canvas: HTMLCanvasElement): Phaser.Game {
-  const GAME_WIDTH = 520 + 200; // map + sidebar (wider sidebar)
-  const GAME_HEIGHT = 60 + 520 + 100; // taller area
+  const GAME_WIDTH = 560; // Just the map board, no sidebar!
+  const GAME_HEIGHT = 60 + 520 + 100; // top bar + board + bottom info bar = 680px
 
   const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.CANVAS,
