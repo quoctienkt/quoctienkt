@@ -1,0 +1,570 @@
+import * as Phaser from 'phaser';
+import { GameStateService } from '../../services/GameStateService';
+import { GameMapServiceBase } from '../../maps/GameMapServiceBase';
+import { EventBus } from '../../services/EventBus';
+import { getMonsterConfig } from '../../config';
+import {
+  createAnimSafe,
+  buildAnimKey,
+  drawHealthBar,
+  getScaledDisplaySize,
+} from '../../utils/spriteHelper';
+import { SpriteFrameRegistry } from '../../config/framers';
+import * as C from '../../constants';
+import type { StatusEffect } from '../../types';
+import { FXHelper } from '../../utils/FXHelper';
+import { SoundManager } from '../../services/SoundManager';
+
+export interface MonsterContext {
+  monsterType: string;
+  col: number;
+  row: number;
+  stateService: GameStateService;
+  mapService: GameMapServiceBase;
+  eventBus: EventBus;
+  onReachEndpoint: (monster: MonsterBase) => void;
+}
+
+export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
+  // ─── Context refs ─────────────────────────────────────────────────────────
+  protected stateService: GameStateService;
+  protected mapService: GameMapServiceBase;
+  protected eventBus: EventBus;
+  readonly monsterType: string;
+
+  // ─── Stats ────────────────────────────────────────────────────────────────
+  speed: number = 0;
+  maxHealth: number = 0;
+  health: number = 0;
+  armor: number = 0; // 0–1 physical damage reduction
+  regenPerSec: number = 0; // HP/sec regeneration (Mummy)
+  isBoss: boolean = false;
+
+  // ─── Status effects ───────────────────────────────────────────────────────
+  statusEffects: StatusEffect[] = [];
+  private currentSpeedMultiplier = 1;
+
+  // ─── Targeting / path tracking ────────────────────────────────────────────
+  aimed: any[] = []; // bullets currently tracking this monster
+  tween: Phaser.Tweens.Tween | null = null;
+  follower: { t: number; vec: Phaser.Math.Vector2 } | null = null;
+  path: Phaser.Curves.Path | null = null;
+  fightingSoldier: any = null;
+  direction: string = '';
+
+  lastPosX: number = 0;
+  lastPosY: number = 0;
+  private stepCounter = 0;
+  private flapTween: Phaser.Tweens.Tween | null = null;
+
+  private onReachEndpoint: (monster: MonsterBase) => void;
+
+  constructor(scene: Phaser.Scene, ctx: MonsterContext) {
+    const cfg = getMonsterConfig(ctx.monsterType);
+    const gridOffX = ctx.mapService.mapConfig.GRID_OFFSET_X ?? 0;
+    const CW = ctx.mapService.mapConfig.CELL_WIDTH;
+    const CH = ctx.mapService.mapConfig.CELL_HEIGHT;
+    const PAD = ctx.mapService.mapConfig.GAME_BOARD_PADDING_TOP;
+
+    // Shift 0.5 cell to the right for the entrance/exit
+    // When spawning at the top (ctx.row < 0), align exactly with the new entrance portal
+    const spawnX = ctx.row < 0 
+      ? gridOffX + ctx.col * CW + CW 
+      : gridOffX + ctx.col * CW + CW / 2;
+    const spawnY = ctx.row < 0
+      ? PAD - 1.5 * CH
+      : ctx.row * CH + PAD;
+
+    super(scene, spawnX, spawnY, cfg.spriteBaseKey);
+    scene.add.existing(this);
+    scene.physics.add.existing(this);
+
+    this.stateService = ctx.stateService;
+    this.mapService = ctx.mapService;
+    this.eventBus = ctx.eventBus;
+    this.monsterType = ctx.monsterType;
+    this.onReachEndpoint = ctx.onReachEndpoint;
+
+    this.setDepth(2);
+    this.setInteractive();
+    this.on('pointerdown', () => this.onPointerDown());
+
+    this.initDirection();
+    this.prepareSpriteAsset();
+    this.initMovingPath();
+  }
+
+  /** Each monster subclass calls setupAnimations() here (or adds custom logic). */
+  protected abstract prepareSpriteAsset(): void;
+
+  // ─── Per-frame tick (called from GameScene.update) ────────────────────────
+
+  tick(delta: number, graphics: Phaser.GameObjects.Graphics): void {
+    // Update world position from path tween
+    if (this.follower && this.path) {
+      this.path.getPoint(this.follower.t, this.follower.vec);
+      this.updatePos(this.follower.vec.x, this.follower.vec.y);
+    }
+    // HP regeneration
+    if (this.regenPerSec > 0 && this.health < this.maxHealth) {
+      this.health = Math.min(
+        this.maxHealth,
+        this.health + (this.regenPerSec * delta) / 1000,
+      );
+    }
+    // Status effects
+    this.tickStatusEffects(delta);
+
+    // 2.5D Depth sorting
+    this.setDepth(Math.floor(this.y));
+
+    // Draw HP bar via shared Graphics
+    const { w: displayWidth } = getScaledDisplaySize(this.monsterType);
+    drawHealthBar(
+      graphics,
+      this.x,
+      this.y,
+      displayWidth,
+      this.health,
+      this.maxHealth,
+      this.isBoss,
+    );
+  }
+
+  // ─── Damage & status ──────────────────────────────────────────────────────
+
+  takeDamage(amount: number, damageType: string): void {
+    let dmg = amount;
+    if (damageType === C.DAMAGE_PHYSICAL && this.armor > 0) {
+      dmg *= 1 - this.armor;
+    }
+    this.health -= dmg;
+    if (this.health <= 0 && this.active) {
+      this.health = 0;
+      this.dead();
+    }
+  }
+
+  applyStatus(effect: StatusEffect): void {
+    const existing = this.statusEffects.find((e) => e.type === effect.type);
+    if (existing) {
+      existing.duration = Math.max(existing.duration, effect.duration);
+      if (
+        effect.speedMultiplier !== undefined &&
+        existing.speedMultiplier !== undefined
+      ) {
+        existing.speedMultiplier = Math.min(
+          existing.speedMultiplier,
+          effect.speedMultiplier,
+        );
+      }
+    } else {
+      this.statusEffects.push({ ...effect });
+    }
+    this.recalcSpeedMultiplier();
+    this.updateStatusTint();
+  }
+
+  private tickStatusEffects(delta: number): void {
+    for (let i = this.statusEffects.length - 1; i >= 0; i--) {
+      const e = this.statusEffects[i];
+      e.duration -= delta;
+      if (e.dotDps) {
+        this.takeDamage((e.dotDps * delta) / 1000, C.DAMAGE_POISON);
+      }
+      if (e.duration <= 0) this.statusEffects.splice(i, 1);
+    }
+    this.recalcSpeedMultiplier();
+    if (this.statusEffects.length === 0) this.clearTint();
+  }
+
+  private recalcSpeedMultiplier(): void {
+    let mult = 1;
+    for (const e of this.statusEffects) {
+      if (e.speedMultiplier !== undefined)
+        mult = Math.min(mult, e.speedMultiplier);
+    }
+    if (mult !== this.currentSpeedMultiplier) {
+      this.currentSpeedMultiplier = mult;
+      if (this.tween) this.tween.timeScale = mult;
+    }
+  }
+
+  private updateStatusTint(): void {
+    if (this.statusEffects.some((e) => e.type === C.STATUS_FREEZE)) {
+      this.setTint(0x88ddff);
+    } else if (this.statusEffects.some((e) => e.type === C.STATUS_SLOW)) {
+      this.setTint(0x88aaff);
+    } else if (this.statusEffects.some((e) => e.type === C.STATUS_POISON_DOT)) {
+      this.setTint(0x88ff88);
+    } else if (this.statusEffects.some((e) => e.type === C.STATUS_STUN)) {
+      this.setTint(0xffff88);
+    }
+  }
+
+  // ─── Death ────────────────────────────────────────────────────────────────
+
+  dead(): void {
+    if (!this.active) return;
+    this.setActive(false);
+
+    const gold = this.getGoldOnDead();
+    this.stateService.setGold((prev) => prev + gold);
+    this.stateService.addScore(gold * 10);
+    this.tween?.stop();
+    this.flapTween?.stop();
+    this.flapTween = null;
+
+    // Remove from state array
+    const monsters = this.stateService.savedData!.monsters;
+    const idx = monsters.indexOf(this);
+    if (idx >= 0) monsters.splice(idx, 1);
+
+    // Destroy all bullets targeting this monster
+    const bullets = this.stateService.savedData!.bullets;
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      if (bullets[i].target === this) {
+        bullets[i].destroy();
+        bullets.splice(i, 1);
+      }
+    }
+
+    this.eventBus.emit(C.EVT_MONSTER_DEAD, {
+      monsterType: this.monsterType,
+      gold,
+    });
+
+    // Premium scale out + alpha fade tween
+    this.scene.tweens.add({
+      targets: this,
+      scaleX: 0,
+      scaleY: 0,
+      alpha: 0,
+      duration: 400,
+    });
+
+    // Floating gold and shockwave FX
+    FXHelper.shockwave(this.scene, this.x, this.y, 28, 0xffffff);
+    FXHelper.goldFloat(this.scene, this.x, this.y, gold);
+
+    // Play explosion effect
+    const explosion = this.scene.add.sprite(this.x, this.y, 'onDead');
+    explosion.setDepth(5);
+    if (this.scene.anims && !this.scene.anims.exists('anim_onDead')) {
+      this.scene.anims.create({
+        key: 'anim_onDead',
+        frames: this.scene.anims.generateFrameNumbers('onDead', {
+          start: 0,
+          end: 7, // Fixed crash from 11 to 7
+        }),
+        frameRate: 15,
+        repeat: 0,
+      });
+    }
+    explosion.play('anim_onDead');
+    SoundManager.getInstance().playDead(); // SOUND EFFECT
+    explosion.on('animationcomplete', () => explosion.destroy());
+
+    this.scene.time.delayedCall(1000, () => {
+      if (this.scene) this.destroy();
+    });
+  }
+
+  /**
+   * Silently removes this monster without triggering the reach-endpoint callback
+   * or dealing damage. Used by the DEV Clear Mobs tool.
+   */
+  killSilently(): void {
+    if (!this.active) return;
+    this.setActive(false);
+    this.setVisible(false);
+
+    // Stop movement tween so onComplete never fires
+    if (this.tween) {
+      this.tween.stop();
+      this.tween = null;
+    }
+    if (this.flapTween) {
+      this.flapTween.stop();
+      this.flapTween = null;
+    }
+    this.follower = null;
+    this.path = null;
+
+    // Remove from state array
+    const monsters = this.stateService.savedData!.monsters;
+    const idx = monsters.indexOf(this);
+    if (idx >= 0) monsters.splice(idx, 1);
+
+    // Destroy tracking bullets
+    const bullets = this.stateService.savedData!.bullets;
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      if (bullets[i].target === this) {
+        bullets[i].destroy();
+        bullets.splice(i, 1);
+      }
+    }
+
+    this.scene.time.delayedCall(50, () => {
+      if (this.scene) this.destroy();
+    });
+  }
+
+  // ─── Path management ──────────────────────────────────────────────────────
+
+  updateMonsterPath(newMonsterPath: [number, number][] | null): void {
+    const {
+      CELL_WIDTH: CW,
+      CELL_HEIGHT: CH,
+      GAME_BOARD_PADDING_TOP: PAD,
+    } = this.mapService.mapConfig;
+    const ox = this.mapService.mapConfig.GRID_OFFSET_X ?? 0;
+
+    if (this.getMoveType() === C.MONSTER_MOVE_TYPE_GROUND) {
+      if (!newMonsterPath) return;
+      this.tween?.stop();
+
+      this.path = new Phaser.Curves.Path(this.x, this.y);
+      let path = [...newMonsterPath];
+
+      // Skip path segments already behind this monster
+      let flag = true;
+      while (flag && path.length > 1) {
+        const p0x = ox + path[0][1] * CW + CW / 2;
+        const p1x = ox + path[1][1] * CW + CW / 2;
+        const p0y = path[0][0] * CH + PAD;
+        const p1y = path[1][0] * CH + PAD;
+        if (
+          (p0x > this.x && this.x > p1x) ||
+          (p0x < this.x && this.x < p1x) ||
+          (p0y > this.y && this.y > p1y) ||
+          (p0y < this.y && this.y < p1y)
+        ) {
+          path.splice(0, 1);
+        } else {
+          flag = false;
+        }
+      }
+
+      path.forEach((i) => {
+        this.path!.lineTo(ox + CW * i[1] + CW / 2, i[0] * CH + CH / 2 + PAD);
+      });
+
+      // Extend path to the Exit Gate (moved 1.5 cells away from the map, shifted 0.5 cell to the right)
+      const [er, ec] = this.mapService.mapConfig.END_POSITION;
+      const numRows = this.mapService.mapConfig.map.length;
+      const gridBot = PAD + numRows * CH;
+      this.path!.lineTo(ox + CW * ec + CW, gridBot + 1.5 * CH);
+
+      const rawDuration = (this.path.getLength() / Math.max(this.speed, 10)) * 1000;
+      const duration = isFinite(rawDuration) ? rawDuration : 30000;
+      this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
+      this.tween = this.scene.tweens.add({
+        targets: this.follower,
+        t: 1,
+        ease: 'Linear',
+        duration,
+        repeat: 0,
+        onComplete: () => this.onReachEndpoint(this),
+      });
+      this.tween.timeScale = this.currentSpeedMultiplier;
+    } else {
+      // Flying — straight line from start to end
+      if (this.tween) return;
+      this.path = new Phaser.Curves.Path(this.x, this.y);
+
+      const [er, ec] = this.mapService.mapConfig.END_POSITION;
+      const numRows = this.mapService.mapConfig.map.length;
+      const gridBot = PAD + numRows * CH;
+      this.path.lineTo(ox + CW * ec + CW, gridBot + 1.5 * CH); // Fly into the Exit Gate
+
+
+      const rawFlyDuration = (this.path.getLength() / Math.max(this.speed, 10)) * 1000;
+      const duration = isFinite(rawFlyDuration) ? rawFlyDuration : 30000;
+      this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
+      this.tween = this.scene.tweens.add({
+        targets: this.follower,
+        t: 1,
+        ease: 'Linear',
+        duration,
+        repeat: 0,
+        onComplete: () => this.onReachEndpoint(this),
+      });
+    }
+  }
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────
+
+  private updatePos(posX: number, posY: number): void {
+    this.lastPosX = this.x;
+    this.lastPosY = this.y;
+
+    this.setPosition(posX, posY);
+
+    if (this.getMoveType() === C.MONSTER_MOVE_TYPE_GROUND) {
+
+      this.stepCounter++;
+      if (this.stepCounter % 15 === 0) {
+        const { h } = getScaledDisplaySize(this.monsterType);
+        FXHelper.dustBurst(this.scene, this.x, this.y + h / 2 - 4);
+      }
+
+      const dx = this.x - this.lastPosX;
+      const dy = this.y - this.lastPosY;
+      let dir: string | null = null;
+      if (Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3) {
+        if (Math.abs(dx) >= Math.abs(dy)) {
+          dir =
+            dx < 0
+              ? C.MONSTER_MOVE_DIRECTION_TO_LEFT
+              : C.MONSTER_MOVE_DIRECTION_TO_RIGHT;
+        } else {
+          dir =
+            dy < 0
+              ? C.MONSTER_MOVE_DIRECTION_TO_TOP
+              : C.MONSTER_MOVE_DIRECTION_TO_BOTTOM;
+        }
+      }
+      if (dir && this.direction !== dir) {
+        this.direction = dir;
+        this.playAction(C.MONSTER_ACTION_WALK, this.direction);
+      }
+    }
+  }
+
+  /**
+   * Helper to play animation and switch texture if needed.
+   */
+  protected playAction(action: string, direction?: string): void {
+    const cfg = getMonsterConfig(this.monsterType);
+    const animKey = direction
+      ? `${cfg.spriteBaseKey}_${action}_${direction}`
+      : `${cfg.spriteBaseKey}_${action}`;
+
+    if (this.scene.anims.exists(animKey)) {
+      if (this.texture.key !== animKey) {
+        this.setTexture(animKey);
+      }
+      this.anims.play(animKey, true);
+    } else {
+      // Fallback: If no animation exists (missing asset), don't crash.
+      // We could set a placeholder texture here if needed.
+      if (this.scene.textures.exists(animKey)) {
+        this.setTexture(animKey);
+        this.setFrame(0);
+      }
+    }
+  }
+
+  /**
+   * Register animations from MonsterConfig and set initial stats.
+   * Call this from prepareSpriteAsset() in every subclass.
+   */
+  protected setupAnimations(): void {
+    const cfg = getMonsterConfig(this.monsterType);
+    const fd = SpriteFrameRegistry[this.monsterType];
+    if (!fd) return;
+
+    const fps = cfg.isFlying ? 18 : 10;
+
+    // Create animations for each action defined in config
+    for (const actionDef of cfg.actions) {
+      const animKey = actionDef.direction
+        ? `${cfg.spriteBaseKey}_${actionDef.action}_${actionDef.direction}`
+        : `${cfg.spriteBaseKey}_${actionDef.action}`;
+
+      createAnimSafe(this.scene, {
+        key: animKey,
+        textureKey: animKey,
+        startFrame: 0,
+        endFrame: actionDef.frameCount - 1,
+        frameRate: fps,
+        repeat: -1,
+      });
+    }
+
+    // Stats from config
+    this.maxHealth =
+      cfg.baseHp +
+      cfg.hpScalePerWave * (this.stateService.savedData?.wave ?? 1);
+    this.health = this.maxHealth;
+    this.speed = cfg.baseSpeed;
+    this.armor = cfg.armor ?? 0;
+    this.regenPerSec = cfg.regenPerSec ?? 0;
+    this.isBoss = cfg.isBoss ?? false;
+
+    // Display size from registry
+    const { w, h } = getScaledDisplaySize(this.monsterType);
+    this.setDisplaySize(w, h);
+
+    // Physics circle = half the shorter content dimension (unscaled)
+    // Arcade Physics scales the circle automatically with the sprite scale.
+    const unscaledW = fd.contentRect.w;
+    const unscaledH = fd.contentRect.h;
+    const radius = Math.round(Math.min(unscaledW, unscaledH) * 0.4);
+    this.setCircle(
+      radius,
+      (unscaledW - radius * 2) / 2,
+      (unscaledH - radius * 2) / 2,
+    );
+
+    // Initial animation
+    this.playAction(C.MONSTER_ACTION_WALK, this.direction);
+
+    // Flying monsters: add wing-flap scaleY animation
+    if (cfg.isFlying) {
+      this.flapTween = this.scene.tweens.add({
+        targets: this,
+        scaleY: (this.scaleY || 1) * 0.85,
+        duration: 200,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
+  }
+
+  private initDirection(): void {
+    this.direction =
+      this.getMoveType() === C.MONSTER_MOVE_TYPE_FLY
+        ? C.MONSTER_MOVE_DIRECTION_TO_BOTTOM_RIGHT
+        : C.MONSTER_MOVE_DIRECTION_TO_BOTTOM;
+  }
+
+  private initMovingPath(): void {
+    if (this.getMoveType() === C.MONSTER_MOVE_TYPE_FLY) {
+      this.updateMonsterPath(null);
+    } else {
+      this.updateMonsterPath(this.mapService.groundMonsterMovingPathDefault);
+    }
+  }
+
+  private onPointerDown(): void {
+    this.eventBus.emit(C.EVT_MONSTER_SELECTED, {
+      monsterType: this.monsterType,
+      hp: Math.round(this.health),
+      maxHp: this.maxHealth,
+      speed: this.speed,
+      gold: this.getGoldOnDead(),
+      armor: this.armor,
+      isBoss: this.isBoss,
+    });
+  }
+
+  // ─── Public accessors ─────────────────────────────────────────────────────
+
+  getGoldOnDead(): number {
+    return getMonsterConfig(this.monsterType).goldOnDead;
+  }
+  getName(): string {
+    return this.monsterType;
+  }
+  getMoveType(): string {
+    return getMonsterConfig(this.monsterType).moveType;
+  }
+
+  /** @deprecated Use tick() instead. Kept for any legacy callers. */
+  setPosWithHealth(posX: number, posY: number): void {
+    this.updatePos(posX, posY);
+  }
+}

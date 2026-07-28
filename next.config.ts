@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  // webpack: (config, { isServer }) => {
+  //   if (isServer) {
+  //     // Phaser is browser-only — exclude from server bundle
+  //     config.externals = [...(config.externals || []), 'phaser'];
+  //   }
+  //   return config;
+  // },
 };
 
 module.exports = nextConfig;

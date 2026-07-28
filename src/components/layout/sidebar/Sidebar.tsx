@@ -54,7 +54,7 @@ export default function Sidebar() {
           width={140}
           height={35}
           priority
-          className="drop-shadow-lg dark:invert max-lg:w-10 max-lg:h-10 max-lg:object-contain"
+          className="drop-shadow-lg dark:invert w-auto max-lg:w-10 max-lg:object-contain"
         />
       </Link>
 

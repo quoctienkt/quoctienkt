@@ -13,9 +13,12 @@
     "predeploy": "npm run build",
     "deploy": "npm run predeploy && gh-pages -d out -b main",
     "lint": "next lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "trim-by-ai": "tsx src/utils/trim-by-ai.ts public/sinhtumon",
+    "trim-by-color": "tsx src/utils/trim-by-color.ts public/sinhtumon"
   },
   "dependencies": {
+    "@imgly/background-removal-node": "^1.4.5",
     "@tailwindcss/postcss": "^4.2.2",
     "@tensorflow/tfjs": "^4.22.0",
     "@types/node": "25.0.0",
@@ -23,9 +26,10 @@
     "@types/react-dom": "^19.0.0",
     "chart.js": "^4.5.0",
     "immer": "^10.0.2",
+    "lucide-react": "latest",
     "next": "latest",
     "next-themes": "^0.2.1",
-    "lucide-react": "latest",
+    "phaser": "^3.90.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-loading-skeleton": "^3.3.1",
@@ -41,6 +45,8 @@
     "postcss": "^8.5.8",
     "prettier": "latest",
     "serve": "^14.2.0",
+    "sharp": "^0.34.5",
+    "tsx": "^4.21.0",
     "typescript": "latest"
   }
 }
