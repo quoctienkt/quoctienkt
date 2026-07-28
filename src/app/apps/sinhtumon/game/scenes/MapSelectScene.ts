@@ -14,34 +14,11 @@ const MAPS: MapInfo[] = [
   {
     key: C.MAP_CROSSROADS,
     name: 'Crossroads',
-    description: 'A classic spiral path.\nGood hunting for new commanders.',
+    description:
+      'A classic spiral path.\nEndless mode — survive as long as you can!',
     difficulty: 2,
     bgKey: 'background1',
     accentColor: 0x4af7a0,
-  },
-  {
-    key: C.MAP_VOLCANO,
-    name: 'Volcano Pass',
-    description: 'Dragons roam here.\nFire-immune enemies abound.',
-    difficulty: 3,
-    bgKey: 'background_volcano',
-    accentColor: 0xff5533,
-  },
-  {
-    key: C.MAP_ICE_VALLEY,
-    name: 'Ice Valley',
-    description: 'Fast creatures surge in swarms.\nFrost towers excel here.',
-    difficulty: 3,
-    bgKey: 'background_ice',
-    accentColor: 0x88ddff,
-  },
-  {
-    key: C.MAP_CURSED_FOREST,
-    name: 'Cursed Forest',
-    description: 'Demons and golems lurk the trees.\nOnly veterans survive.',
-    difficulty: 5,
-    bgKey: 'background_forest',
-    accentColor: 0xaa44ff,
   },
 ];
 
@@ -78,8 +55,8 @@ export class MapSelectScene extends Phaser.Scene {
     });
 
     this.add
-      .text(W / 2, 45, 'SELECT YOUR BATTLEFIELD', {
-        fontSize: '28px',
+      .text(W / 2, 65, 'SELECT YOUR BATTLEFIELD', {
+        fontSize: '22px',
         fontFamily: '"Cinzel", "Georgia", serif',
         color: '#ffd700',
         stroke: '#3a0a00',
@@ -92,29 +69,42 @@ export class MapSelectScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    // Back button
+    // Back button — sits above the title with clear separation
     const back = this.add
-      .text(40, 45, '← Back', {
+      .text(20, 22, '← Back', {
         fontSize: '16px',
-        color: '#aaa',
+        color: '#aaaaaa',
         fontFamily: 'Roboto, sans-serif',
       })
       .setOrigin(0, 0.5)
-      .setInteractive();
+      .setInteractive({ useHandCursor: true })
+      .setDepth(10);
 
-    back.on('pointerover', () => back.setColor('#fff'));
-    back.on('pointerout', () => back.setColor('#aaa'));
+    back.on('pointerover', () => back.setColor('#ffffff'));
+    back.on('pointerout', () => back.setColor('#aaaaaa'));
     back.on('pointerdown', () => this.scene.start(C.SCENE_MENU));
 
-    const CARD_W = 145;
-    const CARD_H = 210;
-    const GAP = 16;
-    const total = MAPS.length;
-    const startX = W / 2 - ((CARD_W + GAP) * total - GAP) / 2 + CARD_W / 2;
+    const CARD_W = 160;
+    const CARD_H = 180;
+    const GAP_X = 24;
+    const GAP_Y = 24;
 
     MAPS.forEach((map, i) => {
-      const cx = startX + i * (CARD_W + GAP);
-      const cy = H / 2 + 25;
+      let cx = W / 2;
+      let cy = H / 2 + 15;
+      if (MAPS.length > 1) {
+        const row = Math.floor(i / 2);
+        const col = i % 2;
+        cx =
+          W / 2 +
+          (col === 0 ? -(CARD_W / 2 + GAP_X / 2) : CARD_W / 2 + GAP_X / 2);
+        cy =
+          H / 2 +
+          (row === 0
+            ? -(CARD_H / 2 + GAP_Y / 2 - 10)
+            : CARD_H / 2 + GAP_Y / 2 + 10) +
+          15;
+      }
       this.createMapCard(cx, cy, CARD_W, CARD_H, map, i);
     });
   }

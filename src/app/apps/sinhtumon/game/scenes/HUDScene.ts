@@ -24,6 +24,7 @@ export class HUDScene extends Phaser.Scene {
   private countdownText!: Phaser.GameObjects.Text;
   private infoPanel!: Phaser.GameObjects.Container;
   private sendWaveBtn!: Phaser.GameObjects.Text;
+  private speedBtn!: Phaser.GameObjects.Text;
 
   private waveProgress!: Phaser.GameObjects.Graphics;
   private displayedGold = 0;
@@ -46,48 +47,76 @@ export class HUDScene extends Phaser.Scene {
 
     // ─── Top bar Glassmorphism ──────────────────────────────────────────
     const bar = this.add.graphics();
-    bar.fillStyle(0x0a1424, 0.85);
-    bar.fillRoundedRect(6, 4, W - 12, 32, 6);
-    bar.lineStyle(1.5, 0x4af7a0, 0.25);
-    bar.strokeRoundedRect(6, 4, W - 12, 32, 6);
+    bar.fillStyle(0x080f22, 0.92);
+    bar.fillRoundedRect(6, 4, W - 12, 38, 6);
+    bar.lineStyle(1.5, 0x4af7a0, 0.4);
+    bar.strokeRoundedRect(6, 4, W - 12, 38, 6);
+    // Gold accent line
+    bar.lineStyle(1, 0xffd700, 0.2);
+    bar.lineBetween(10, 42, W - 10, 42);
 
     this.waveProgress = this.add.graphics().setDepth(1);
 
-    this.add.text(14, 8, '🪙', { fontSize: '18px' });
-    this.goldText = this.add.text(38, 12, '0', {
-      fontSize: '14px',
+    // 1. Gold
+    this.add.text(12, 8, '🪙', { fontSize: '18px' });
+    this.goldText = this.add.text(32, 12, '0', {
+      fontSize: '13px',
       color: '#ffd700',
       fontFamily: 'Roboto, sans-serif',
       fontStyle: 'bold',
     });
-    this.add.text(120, 8, '❤️', { fontSize: '18px' });
-    this.lifeText = this.add.text(144, 12, '20', {
-      fontSize: '14px',
+
+    // 2. Life
+    this.add.text(85, 8, '❤️', { fontSize: '18px' });
+    this.lifeText = this.add.text(105, 12, '20', {
+      fontSize: '13px',
       color: '#ff6666',
       fontFamily: 'Roboto, sans-serif',
       fontStyle: 'bold',
     });
-    this.waveText = this.add.text(230, 12, 'Wave 0 / 20', {
-      fontSize: '13px',
+
+    // 3. Wave
+    this.waveText = this.add.text(155, 12, 'Wave 0 / 20', {
+      fontSize: '12px',
       color: '#88ddff',
       fontFamily: 'Roboto, sans-serif',
       fontStyle: 'bold',
     });
-    this.countdownText = this.add.text(360, 12, '', {
-      fontSize: '12px',
+
+    // 4. Speed Toggle Button (1x / 2x speed)
+    this.speedBtn = this.add.text(250, 12, '⚡ 1x', {
+      fontSize: '11px',
+      color: '#ffcc00',
+      fontFamily: 'Roboto, sans-serif',
+      fontStyle: 'bold',
+    }).setInteractive({ useHandCursor: true });
+    
+    let currentSpeed = 1;
+    this.speedBtn.on('pointerover', () => this.speedBtn.setColor('#ffffff'));
+    this.speedBtn.on('pointerout', () => this.speedBtn.setColor('#ffcc00'));
+    this.speedBtn.on('pointerdown', () => {
+      currentSpeed = currentSpeed === 1 ? 2 : 1;
+      this.speedBtn.setText(`⚡ ${currentSpeed}x`);
+      this.eventBus.emit('HUD_TOGGLE_SPEED', { speed: currentSpeed });
+      SoundManager.getInstance().playUpgrade(); // click sound cue
+    });
+
+    // 5. Next Wave Seconds Countdown
+    this.countdownText = this.add.text(300, 12, '', {
+      fontSize: '11px',
       color: '#aaaaaa',
       fontFamily: 'Roboto, sans-serif',
     });
 
-    // Send wave early button
+    // 6. Send Wave early button
     this.sendWaveBtn = this.add
-      .text(W - 130, 12, '⏩ SEND WAVE', {
-        fontSize: '12px',
+      .text(375, 12, '⏩ WAVE', {
+        fontSize: '11px',
         color: '#88ff88',
         fontFamily: 'Roboto, sans-serif',
         fontStyle: 'bold',
       })
-      .setInteractive();
+      .setInteractive({ useHandCursor: true });
     this.sendWaveBtn.on('pointerover', () =>
       this.sendWaveBtn.setColor('#ffffff'),
     );
@@ -98,11 +127,50 @@ export class HUDScene extends Phaser.Scene {
       this.eventBus.emit('HUD_SEND_WAVE_EARLY', {});
     });
 
+    // 7. Restart Button
+    const restartBtn = this.add.text(450, 12, '🔄 REPLAY', {
+      fontSize: '11px',
+      color: '#ffcc00',
+      fontFamily: 'Roboto, sans-serif',
+      fontStyle: 'bold',
+    }).setInteractive({ useHandCursor: true });
+    
+    restartBtn.on('pointerover', () => restartBtn.setColor('#ffffff'));
+    restartBtn.on('pointerout', () => restartBtn.setColor('#ffcc00'));
+    restartBtn.on('pointerdown', () => {
+      SoundManager.getInstance().playUpgrade();
+      const mainScene = this.scene.get(C.SCENE_GAME) as any;
+      if (mainScene) {
+        this.scene.stop(C.SCENE_HUD);
+        mainScene.scene.restart();
+      }
+    });
+
+    // 8. Exit Button
+    const exitBtn = this.add.text(510, 12, '🚪 EXIT', {
+      fontSize: '11px',
+      color: '#ff5555',
+      fontFamily: 'Roboto, sans-serif',
+      fontStyle: 'bold',
+    }).setInteractive({ useHandCursor: true });
+    
+    exitBtn.on('pointerover', () => exitBtn.setColor('#ffffff'));
+    exitBtn.on('pointerout', () => exitBtn.setColor('#ff5555'));
+    exitBtn.on('pointerdown', () => {
+      SoundManager.getInstance().playGameOver();
+      const mainScene = this.scene.get(C.SCENE_GAME) as any;
+      if (mainScene) {
+        this.scene.stop(C.SCENE_HUD);
+        mainScene.scene.stop();
+        this.scene.start(C.SCENE_MAP_SELECT);
+      }
+    });
+
+
     // ─── Skill bar (bottom right) ─────────────────────────────────────────
     const skillDefs: any[] = [
-      { id: C.SKILL_RAIN_OF_FIRE, label: '🔥', cooldown: 45000, x: W - 130 },
-      { id: C.SKILL_FORTIFY, label: '🛡', cooldown: 60000, x: W - 85 },
-      { id: C.SKILL_HERO_RALLY, label: '🏃', cooldown: 15000, x: W - 40 },
+      { id: C.SKILL_RAIN_OF_FIRE, label: '🔥', cooldown: 45000, x: W - 85 },
+      { id: C.SKILL_FORTIFY, label: '🛡', cooldown: 60000, x: W - 40 },
     ];
     const bH = this.cameras.main.height;
     for (const s of skillDefs) {
@@ -141,10 +209,10 @@ export class HUDScene extends Phaser.Scene {
 
       label.on('pointerdown', () => {
         if (this.skillCooldowns[s.id] <= 0) {
-          this.eventBus.emit(C.EVT_SKILL_CAST, { skillId: s.id });
-          this.skillCooldowns[s.id] = s.cooldown;
+          this.eventBus.emit('HUD_SKILL_SELECT', { skillId: s.id });
         }
       });
+
 
       // Draw graphic overlay on top of text
       g.setDepth(2);
@@ -214,6 +282,17 @@ export class HUDScene extends Phaser.Scene {
     const playVictorySound = () => SoundManager.getInstance().playVictory();
     const playWaveStartSound = () => SoundManager.getInstance().playWaveStart();
 
+    const handleCastSuccess = ({ skillId }: any) => {
+      const maxCooldown =
+        skillId === C.SKILL_RAIN_OF_FIRE
+          ? 45000
+          : skillId === C.SKILL_FORTIFY
+            ? 60000
+            : 15000;
+      this.skillCooldowns[skillId] = maxCooldown;
+      clearInfo();
+    };
+
     this.eventBus.on(C.EVT_GOLD_CHANGED, updateGold, this);
     this.eventBus.on(C.EVT_LIFE_CHANGED, updateLife, this);
     this.eventBus.on(C.EVT_WAVE_START, updateWave, this);
@@ -221,10 +300,11 @@ export class HUDScene extends Phaser.Scene {
     this.eventBus.on(C.EVT_MONSTER_SELECTED, this.showMonsterInfo, this);
     this.eventBus.on(C.EVT_TOWER_SELECTED, this.showTowerInfo, this);
     this.eventBus.on(C.EVT_TOWER_DESELECTED, clearInfo, this);
-    this.eventBus.on(C.EVT_GAME_OVER, this.onGameOver, this);
     this.eventBus.on(C.EVT_GAME_OVER, playGameOverSound, this);
-    this.eventBus.on(C.EVT_GAME_WIN, this.onGameWin, this);
     this.eventBus.on(C.EVT_GAME_WIN, playVictorySound, this);
+    this.eventBus.on('HUD_SKILL_CAST_SUCCESS', handleCastSuccess, this);
+    this.eventBus.on('HUD_SKILL_SELECT', this.showSkillInfo, this);
+    this.eventBus.on('HUD_ADD_LOG', ({ text }: { text: string }) => console.log(`[EventLog] ${text}`), this);
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.eventBus.off(C.EVT_GOLD_CHANGED, updateGold, this);
@@ -234,12 +314,16 @@ export class HUDScene extends Phaser.Scene {
       this.eventBus.off(C.EVT_MONSTER_SELECTED, this.showMonsterInfo, this);
       this.eventBus.off(C.EVT_TOWER_SELECTED, this.showTowerInfo, this);
       this.eventBus.off(C.EVT_TOWER_DESELECTED, clearInfo, this);
-      this.eventBus.off(C.EVT_GAME_OVER, this.onGameOver, this);
       this.eventBus.off(C.EVT_GAME_OVER, playGameOverSound, this);
-      this.eventBus.off(C.EVT_GAME_WIN, this.onGameWin, this);
       this.eventBus.off(C.EVT_GAME_WIN, playVictorySound, this);
+      this.eventBus.off('HUD_SKILL_CAST_SUCCESS', handleCastSuccess, this);
+      this.eventBus.off('HUD_SKILL_SELECT', this.showSkillInfo, this);
+      this.eventBus.removeAllListeners('HUD_ADD_LOG');
     });
+
   }
+
+
 
   update(_time: number, delta: number): void {
     // Countdown
@@ -363,12 +447,40 @@ export class HUDScene extends Phaser.Scene {
     });
   }
 
-  private onGameOver({ victory }: any): void {
-    this.scene.start(C.SCENE_GAME_OVER, { victory });
-  }
 
-  private onGameWin(): void {
-    this.scene.start(C.SCENE_GAME_OVER, { victory: true });
+
+
+  showSkillInfo({ skillId }: any): void {
+    this.clearInfoPanel();
+    let name = '';
+    let desc = '';
+    if (skillId === C.SKILL_RAIN_OF_FIRE) {
+      name = 'Rain of Fire (🔥)';
+      desc = 'Drops meteors from the sky, dealing\n35 fire damage per hit inside the circle.';
+    } else if (skillId === C.SKILL_FORTIFY) {
+      name = 'Reinforcements (🛡)';
+      desc = 'Spawns 3 blocking soldiers to hold\nback enemies at the target location.';
+
+    }
+    
+    const lines = [name, desc];
+    lines.forEach((txt, i) => {
+      this.infoPanel.add(
+        this.add.text(12, 10 + i * 20, txt, {
+          fontSize: i === 0 ? '13px' : '11px',
+          color: i === 0 ? '#ffcc00' : '#ffffff',
+          fontFamily: 'Roboto, sans-serif',
+          fontStyle: i === 0 ? 'bold' : 'normal',
+        })
+      );
+    });
+
+    this.tweens.add({
+      targets: this.infoPanel,
+      x: 8,
+      duration: 200,
+      ease: 'Back.Out',
+    });
   }
 
   private clearInfoPanel(): void {
@@ -377,4 +489,5 @@ export class HUDScene extends Phaser.Scene {
       this.infoPanel.list[i].destroy();
     }
   }
+
 }

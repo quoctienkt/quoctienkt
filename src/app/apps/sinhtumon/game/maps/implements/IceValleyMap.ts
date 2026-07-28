@@ -23,7 +23,7 @@ const MAP: number[][] = [
 const CONFIG: GameMapConfig = {
   mapKey: C.MAP_ICE_VALLEY,
   map: MAP,
-  GAME_BOARD_PADDING_TOP: 80,
+  GAME_BOARD_PADDING_TOP: 50,
   CELL_WIDTH: 40,
   CELL_HEIGHT: 39,
   START_POSITION: [0, 0],

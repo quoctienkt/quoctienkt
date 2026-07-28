@@ -13,33 +13,44 @@ export function generateAllProceduralAssets(scene: Phaser.Scene): void {
 
   // ─── 1. Core Backgrounds & UI ──────────────────────────────────────────────
 
-  // Tactical Defense Grid Background (520x520)
+  // Tactical Defense Grid Background — full canvas size 560x680
   if (!textures.exists('background1')) {
-    const canvas = textures.createCanvas('background1', 520, 520)!;
+    const canvas = textures.createCanvas('background1', 560, 680)!;
     const ctx = canvas.context;
-    ctx.fillStyle = '#090d1a';
-    ctx.fillRect(0, 0, 520, 520);
 
-    // Draw subtle grid lines
-    ctx.strokeStyle = '#141c30';
+    // Rich dark teal-navy gradient
+    const bg = ctx.createLinearGradient(0, 0, 560, 680);
+    bg.addColorStop(0, '#080f1a');
+    bg.addColorStop(0.5, '#061018');
+    bg.addColorStop(1, '#040c14');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, 560, 680);
+
+    // Grid lines - subtle blue tint
+    ctx.strokeStyle = 'rgba(30, 80, 140, 0.35)';
     ctx.lineWidth = 1;
-    for (let x = 0; x <= 520; x += 40) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, 520);
-      ctx.stroke();
+    for (let x = 0; x <= 560; x += 40) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 680); ctx.stroke();
     }
-    for (let y = 0; y <= 520; y += 40) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(520, y);
-      ctx.stroke();
+    for (let y = 0; y <= 680; y += 39) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(560, y); ctx.stroke();
     }
 
-    // Add decorative corner marks
-    ctx.strokeStyle = '#2d3d5a';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(4, 4, 512, 512);
+    // Decorative intersection dots
+    ctx.fillStyle = 'rgba(60, 140, 220, 0.18)';
+    for (let x = 0; x <= 560; x += 40) {
+      for (let y = 0; y <= 680; y += 39) {
+        ctx.beginPath(); ctx.arc(x, y, 1.5, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    // Subtle vignette
+    const vignette = ctx.createRadialGradient(280, 340, 100, 280, 340, 400);
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.45)');
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, 560, 680);
+
     canvas.refresh();
   }
 
@@ -52,31 +63,36 @@ export function generateAllProceduralAssets(scene: Phaser.Scene): void {
   ];
   themes.forEach((t) => {
     if (!textures.exists(t)) {
-      const canvas = textures.createCanvas(t, 520, 520)!;
+      const canvas = textures.createCanvas(t, 560, 680)!;
       const ctx = canvas.context;
-      const gradient = ctx.createLinearGradient(0, 0, 520, 520);
+      const gradient = ctx.createLinearGradient(0, 0, 560, 680);
       if (t === 'background_volcano') {
-        gradient.addColorStop(0, '#1c0a0a');
-        gradient.addColorStop(1, '#0c0505');
+        gradient.addColorStop(0, '#2a0a00');
+        gradient.addColorStop(0.5, '#1a0600');
+        gradient.addColorStop(1, '#0d0300');
       } else if (t === 'background_ice') {
-        gradient.addColorStop(0, '#0a1624');
-        gradient.addColorStop(1, '#050a12');
+        gradient.addColorStop(0, '#0a1e35');
+        gradient.addColorStop(0.5, '#061220');
+        gradient.addColorStop(1, '#030810');
+      } else if (t === 'background_forest') {
+        gradient.addColorStop(0, '#071a0a');
+        gradient.addColorStop(0.5, '#041006');
+        gradient.addColorStop(1, '#020803');
       } else {
-        // forest / menu_bg
-        gradient.addColorStop(0, '#06100f');
-        gradient.addColorStop(1, '#030808');
+        gradient.addColorStop(0, '#08101a');
+        gradient.addColorStop(1, '#040810');
       }
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 520, 520);
+      ctx.fillRect(0, 0, 560, 680);
 
-      // Hex grid effect
-      ctx.strokeStyle = 'rgba(255,255,255,0.015)';
+      // Subtle grid pattern
+      ctx.strokeStyle = 'rgba(255,255,255,0.025)';
       ctx.lineWidth = 1;
-      for (let x = 0; x <= 520; x += 50) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, 520);
-        ctx.stroke();
+      for (let x = 0; x <= 560; x += 40) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 680); ctx.stroke();
+      }
+      for (let y = 0; y <= 680; y += 39) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(560, y); ctx.stroke();
       }
       canvas.refresh();
     }
@@ -412,8 +428,8 @@ export function generateAllProceduralAssets(scene: Phaser.Scene): void {
     ctx.save();
 
     // Compute animated offsets (swaying and bobbing)
-    const bob = Math.sin((frame * Math.PI) / 4) * 2;
-    const sway = Math.cos((frame * Math.PI) / 4) * 1.5;
+    const bob = 0; // Removed bob animation for steady movement
+    const sway = 0; // Removed sway animation for steady movement
 
     const cx = w / 2 + sway;
     const cy = h / 2 + bob;
@@ -431,72 +447,72 @@ export function generateAllProceduralAssets(scene: Phaser.Scene): void {
     let sizeScale = 1;
 
     if (type.includes('Grunt')) {
-      primary = '#4a752c';
-      secondary = '#2a4d13';
+      primary = '#5c9a2e';    // vibrant green
+      secondary = '#2e5c12';
       sizeScale = 0.85;
     } else if (type.includes('Orc')) {
-      primary = '#1c4a16';
-      secondary = '#0f290b';
+      primary = '#1e6b10';    // dark forest green
+      secondary = '#0e3a08';
       sizeScale = 1.05;
     } else if (type.includes('Troll')) {
-      primary = '#5c6f80';
-      secondary = '#303f4d';
+      primary = '#6a7f94';    // steel blue-grey
+      secondary = '#3a4f64';
       sizeScale = 1.2;
     } else if (type.includes('Mummy')) {
-      primary = '#e6d8ad';
-      secondary = '#a8986c';
+      primary = '#d4c47a';    // sandy beige
+      secondary = '#9a8a40';
       sizeScale = 0.95;
     } else if (type.includes('Spider')) {
-      primary = '#4b0082';
-      secondary = '#1a0033';
+      primary = '#7a00cc';    // vivid purple
+      secondary = '#3a0066';
       sizeScale = 0.8;
     } else if (type.includes('Larva')) {
-      primary = '#ff4500';
-      secondary = '#8b0000';
+      primary = '#ff5500';    // vivid orange
+      secondary = '#993300';
       sizeScale = 0.85;
     } else if (type.includes('Skeleton')) {
-      primary = '#f5f5dc';
-      secondary = '#c0c0c0';
+      primary = '#e8e8cc';    // bone white
+      secondary = '#aaaaaa';
       sizeScale = 0.9;
     } else if (type.includes('IceElemental')) {
-      primary = '#88ddff';
-      secondary = '#00aaff';
+      primary = '#55ddff';    // vivid cyan
+      secondary = '#0088cc';
       sizeScale = 1.1;
     } else if (type.includes('Wolf')) {
-      primary = '#808080';
-      secondary = '#404040';
+      primary = '#9a9aaa';    // blue-grey
+      secondary = '#555566';
       sizeScale = 0.95;
     } else if (type.includes('Harpy')) {
-      primary = '#ff69b4';
-      secondary = '#c71585';
+      primary = '#ff44aa';    // hot pink
+      secondary = '#cc0077';
       sizeScale = 0.9;
     } else if (type.includes('Bat')) {
-      primary = '#363636';
-      secondary = '#1c1c1c';
+      primary = '#4a2288';    // deep violet
+      secondary = '#221044';
       sizeScale = 0.75;
     } else if (type.includes('Dragon')) {
-      primary = '#ff0000';
-      secondary = '#8b0000';
+      primary = '#ff2200';    // bright scarlet
+      secondary = '#990000';
       sizeScale = 1.25;
     } else if (type.includes('Vulture')) {
-      primary = '#8b7355';
-      secondary = '#554433';
+      primary = '#aa8855';    // warm tan
+      secondary = '#664422';
       sizeScale = 0.85;
     } else if (type.includes('Golem')) {
-      primary = '#2f4f4f';
-      secondary = '#121e1e';
+      primary = '#3a6666';    // teal stone
+      secondary = '#1a3333';
       isBoss = true;
       sizeScale = 1.5;
     } else if (type.includes('Demon')) {
-      primary = '#a30000';
-      secondary = '#5e0000';
+      primary = '#cc1100';    // vivid crimson
+      secondary = '#660000';
       isBoss = true;
       sizeScale = 1.6;
     } else if (type.includes('Beholder')) {
-      primary = '#bf30a3';
-      secondary = '#6b0f59';
+      primary = '#cc22bb';    // vivid magenta
+      secondary = '#661166';
       isBoss = true;
-      sizeScale = 1.55;
+      sizeScale = 1.2;        // Smaller than before
     }
 
     const r = (w / 4) * sizeScale;
@@ -526,40 +542,84 @@ export function generateAllProceduralAssets(scene: Phaser.Scene): void {
       type.includes('Bat') ||
       type.includes('Dragon') ||
       type.includes('Harpy') ||
-      type.includes('Demon')
+      type.includes('Demon') ||
+      type.includes('Beholder')
     ) {
-      // Flying winged creatures
-      ctx.fillStyle = primary;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fill();
+      if (type.includes('Beholder')) {
+        // Beholder: floating eyeball with animated tentacles
+        const pulseR = r * (0.85 + 0.15 * Math.sin((frame * Math.PI) / 4));
 
-      // Wing flaps
-      ctx.fillStyle = secondary;
-      const wingW = r * 1.5;
-      const wingH = Math.sin((frame * Math.PI) / 3) * r;
-      ctx.beginPath();
-      // left wing
-      ctx.ellipse(
-        cx - r,
-        cy - 2,
-        wingW,
-        Math.abs(wingH),
-        -Math.PI / 6,
-        0,
-        Math.PI * 2,
-      );
-      // right wing
-      ctx.ellipse(
-        cx + r,
-        cy - 2,
-        wingW,
-        Math.abs(wingH),
-        Math.PI / 6,
-        0,
-        Math.PI * 2,
-      );
-      ctx.fill();
+        // Body glow aura
+        const aura = ctx.createRadialGradient(cx, cy, pulseR * 0.3, cx, cy, pulseR * 1.4);
+        aura.addColorStop(0, 'rgba(220, 40, 200, 0.5)');
+        aura.addColorStop(1, 'rgba(100, 0, 100, 0)');
+        ctx.fillStyle = aura;
+        ctx.beginPath();
+        ctx.arc(cx, cy, pulseR * 1.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Tentacles emanating outward (6 of them)
+        ctx.strokeStyle = secondary;
+        ctx.lineWidth = 2;
+        for (let t = 0; t < 6; t++) {
+          const angle = (t / 6) * Math.PI * 2 + (frame * Math.PI) / 24;
+          const len = pulseR * 0.9;
+          const wriggle = Math.sin((frame * Math.PI) / 4 + t) * 5;
+          ctx.beginPath();
+          ctx.moveTo(cx + Math.cos(angle) * pulseR * 0.6, cy + Math.sin(angle) * pulseR * 0.6);
+          ctx.quadraticCurveTo(
+            cx + Math.cos(angle + 0.3) * (pulseR + wriggle),
+            cy + Math.sin(angle + 0.3) * (pulseR + wriggle),
+            cx + Math.cos(angle) * (pulseR + len * 0.5),
+            cy + Math.sin(angle) * (pulseR + len * 0.5),
+          );
+          ctx.stroke();
+        }
+
+        // Main eyeball body
+        ctx.fillStyle = primary;
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = primary;
+        ctx.beginPath();
+        ctx.arc(cx, cy, pulseR, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Iris
+        ctx.fillStyle = '#ffaa00';
+        ctx.beginPath();
+        ctx.arc(cx, cy, pulseR * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pupil (slightly moving with frame)
+        const pupilX = cx + Math.cos((frame * Math.PI) / 12) * pulseR * 0.15;
+        const pupilY = cy + Math.sin((frame * Math.PI) / 12) * pulseR * 0.15;
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(pupilX, pupilY, pulseR * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pupil glint
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.beginPath();
+        ctx.arc(pupilX - pulseR * 0.07, pupilY - pulseR * 0.07, pulseR * 0.07, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Other flying winged creatures (Bat, Dragon, Harpy, Demon)
+        ctx.fillStyle = primary;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Wing flaps
+        ctx.fillStyle = secondary;
+        const wingW = r * 1.5;
+        const wingH = Math.sin((frame * Math.PI) / 3) * r;
+        ctx.beginPath();
+        ctx.ellipse(cx - r, cy - 2, wingW, Math.abs(wingH), -Math.PI / 6, 0, Math.PI * 2);
+        ctx.ellipse(cx + r, cy - 2, wingW, Math.abs(wingH), Math.PI / 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
     } else if (type.includes('Larva')) {
       // Worm segment stack
       ctx.fillStyle = primary;

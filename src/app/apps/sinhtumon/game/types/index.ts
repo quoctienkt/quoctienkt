@@ -156,7 +156,10 @@ export interface GameMapConfig {
   backgroundKey: string;
   displayName: string;
   totalWaves: number;
+  /** Horizontal pixel offset applied to the whole grid for centering. Set by GameMapServiceBase.init(). */
+  GRID_OFFSET_X?: number;
 }
+
 
 // ─── Ammo Data ────────────────────────────────────────────────────────────────
 export interface AmmoData {

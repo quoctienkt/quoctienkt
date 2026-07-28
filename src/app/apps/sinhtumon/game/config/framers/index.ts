@@ -24,5 +24,5 @@ export const SpriteFrameRegistry: Record<string, SpriteFrameData> = {
   [C.MONSTER_ICE_ELEMENTAL]: { contentRect: RECT_64, displayScale: 0.6 },
   [C.MONSTER_WOLF]: { contentRect: RECT_64, displayScale: 0.5 },
   [C.MONSTER_VULTURE]: { contentRect: RECT_64, displayScale: 0.5 },
-  [C.BOSS_BEHOLDER]: { contentRect: RECT_128, displayScale: 0.35 },
+  [C.BOSS_BEHOLDER]: { contentRect: RECT_128, displayScale: 0.28 },
 };

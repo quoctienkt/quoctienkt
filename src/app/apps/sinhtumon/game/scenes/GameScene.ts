@@ -56,6 +56,15 @@ export class GameScene extends Phaser.Scene {
   private selectedBuildTowerType: string | null = null;
   private buildRangeGraphic: Phaser.GameObjects.Graphics | null = null;
 
+  // ─── Gameplay & Skills ────────────────────────────────────────────────────
+  private hasWon = false;
+  private soldiers: any[] = [];
+  private lastCombatTickTime = 0;
+  private activeSkillId: string | null = null;
+  private skillGhost: Phaser.GameObjects.Graphics | null = null;
+  private skillMoveListener: ((ptr: Phaser.Input.Pointer) => void) | null = null;
+  private skillCastListener: ((ptr: Phaser.Input.Pointer) => void) | null = null;
+
   // ─── Graphics ─────────────────────────────────────────────────────────────
   private graphics!: Phaser.GameObjects.Graphics;
 
@@ -63,14 +72,33 @@ export class GameScene extends Phaser.Scene {
     super({ key: C.SCENE_GAME });
   }
 
+
   init(data: GameSceneData): void {
     this.isBuying = false;
     this.isTowerClicked = false;
     this.tempTower = null;
+    this.activeBuildMenu = null;
+    this.upgradeImage = null;
+    this.sellImage = null;
+    this.rangeImage = null;
+    this.detailText = null;
+    this.selectedBuildTowerType = null;
+    this.buildRangeGraphic = null;
+    this.hasWon = false;
+    this.soldiers = [];
+    this.lastCombatTickTime = 0;
+    this.activeSkillId = null;
+    this.skillGhost = null;
+    this.skillMoveListener = null;
+    this.skillCastListener = null;
   }
+
 
   create(data: GameSceneData): void {
     const mapKey = data?.mapKey ?? C.MAP_CROSSROADS;
+    this.registry.set('mapKey', mapKey);
+    // Also store in game-level registry so GameOverScene can access it
+    this.game.registry.set('mapKey', mapKey);
     this.eventBus = this.game.registry.get('eventBus') as EventBus;
     this.stateService = new GameStateService();
     this.stateService.setScene(this);
@@ -84,6 +112,27 @@ export class GameScene extends Phaser.Scene {
       gold: INITIAL_GOLD,
       score: 0,
       mapKey,
+    });
+
+    // Launch HUD overlay first so it can receive initial state events
+    this.scene.launch(C.SCENE_HUD, { waveService: this.waveService });
+
+    this.stateService = new GameStateService();
+    this.stateService.setScene(this);
+    this.stateService.init({
+      towers: [],
+      monsters: [],
+      bullets: [],
+      heroes: [],
+      wave: 0,
+      life: INITIAL_LIVES,
+      gold: INITIAL_GOLD,
+      score: 0,
+      mapKey,
+    });
+    // Re-broadcast after a short delay to ensure HUD create() has fully run
+    this.time.delayedCall(50, () => {
+      this.stateService?.broadcastState();
     });
 
     this.mapService = createMapService(mapKey);
@@ -118,24 +167,8 @@ export class GameScene extends Phaser.Scene {
         currentlyOver: Phaser.GameObjects.GameObject[],
       ) => {
         if (currentlyOver && currentlyOver.length > 0) return;
-
-        // Close active build menu if click outside
-        if (this.activeBuildMenu) {
-          this.activeBuildMenu.destroy();
-          this.activeBuildMenu = null;
-        }
-
-        // Close upgrade/sell overlays
-        if (this.isTowerClicked) this.isTowerClicked = false;
-        this.upgradeImage?.destroy();
-        this.upgradeImage = null;
-        this.sellImage?.destroy();
-        this.sellImage = null;
-        this.rangeImage?.destroy();
-        this.rangeImage = null;
-        this.detailText?.destroy();
-        this.detailText = null;
-        this.eventBus.emit(C.EVT_TOWER_DESELECTED, {});
+        // Cancel any active action when clicking outside
+        this.cancelCurrentAction();
       },
     );
 
@@ -143,16 +176,28 @@ export class GameScene extends Phaser.Scene {
     this.eventBus.on('BOSS_GOLEM_SPLIT', this.handleGolemSplit, this);
     this.eventBus.on('BOSS_DEMON_STOMP', this.handleDemonStomp, this);
     this.eventBus.on(C.STATUS_WEB, this.handleSpiderWeb, this);
-    this.eventBus.on(C.EVT_SKILL_CAST, this.handleSkillCast, this);
+    this.eventBus.on('HUD_SKILL_SELECT', this.handleSkillSelect, this);
     this.eventBus.on(C.EVT_ALL_WAVES_DONE, this.handleAllWavesDone, this);
+    this.eventBus.on(C.EVT_GAME_OVER, ({ victory }: { victory: boolean }) => {
+      this.physics.world.pause();
+      this.tweens.pauseAll();
+      this.time.paused = true;
+      this.scene.stop(C.SCENE_HUD);
+      this.scene.start(C.SCENE_GAME_OVER, { victory });
+    }, this);
+    this.eventBus.on(C.EVT_GAME_WIN, () => {
+      this.physics.world.pause();
+      this.tweens.pauseAll();
+      this.scene.stop(C.SCENE_HUD);
+      this.scene.start(C.SCENE_GAME_OVER, { victory: true });
+    }, this);
+
     this.eventBus.on(
       C.EVT_WAVE_START,
       ({ wave, total }: { wave: number; total: number }) => {
         const isBossWave = wave === 10 || wave === 20; // Golem at 10, Demon at 20
         if (isBossWave) {
           FXHelper.waveBanner(this, '⚠ BOSS WAVE!', 0xff3333);
-          FXHelper.screenShake(this, 350, 0.012);
-          this.cameras.main.flash(200, 255, 0, 0, false);
         } else {
           FXHelper.waveBanner(this, `Wave ${wave} of ${total}`, 0x4af7a0);
         }
@@ -166,14 +211,101 @@ export class GameScene extends Phaser.Scene {
       this,
     );
 
+    this.eventBus.on(
+      'HUD_TOGGLE_SPEED',
+      ({ speed }: { speed: number }) => {
+        this.time.timeScale = speed;
+        this.tweens.timeScale = speed;
+        this.physics.world.timeScale = 1 / speed;
+      },
+      this,
+    );
+
+    // ─── Developer Tool Event Listeners ──────────────────────────────────
+    this.eventBus.on('DEV_SPAWN_MONSTER', ({ type, count }: { type: string; count?: number }) => {
+      if (!this.waveService) return;
+      const actualType = type === C.MONSTER_DRAGON ? C.MONSTER_VULTURE : type;
+      const spawnCount = Math.max(1, count ?? 1);
+      for (let i = 0; i < spawnCount; i++) {
+        this.time.delayedCall(i * 400, () => {
+          try {
+            if (this.waveService) {
+              this.waveService.spawnMonster(actualType);
+            }
+          } catch (err) {
+            console.error('[DevTool] spawnMonster error:', err);
+          }
+        });
+      }
+      this.eventBus.emit('HUD_ADD_LOG', {
+        text: `🛠 [Dev] Spawning ${spawnCount}x ${actualType.replace('Monster_', '').replace('Boss_', '')}`,
+        color: '#ffcc00'
+      });
+    }, this);
+
+    this.eventBus.on('DEV_TRIGGER_DEFEAT', () => {
+      this.stateService.setLife(() => 0);
+    }, this);
+
+    this.eventBus.on('DEV_TRIGGER_VICTORY', () => {
+      this.eventBus.emit(C.EVT_GAME_WIN, {});
+    }, this);
+
+    this.eventBus.on('DEV_ADD_GOLD', ({ amount }: { amount: number }) => {
+      this.stateService.setGold((g) => g + amount);
+    }, this);
+
+    this.eventBus.on('DEV_CLEAR_MONSTERS', () => {
+      const data = this.stateService.savedData!;
+      // killSilently stops tweens so monsters cannot reach the exit and deal damage
+      [...data.monsters].forEach(m => m.killSilently());
+      data.monsters = [];
+      this.eventBus.emit('HUD_ADD_LOG', {
+        text: `🛠 [Dev] Cleared all monsters!`,
+        color: '#ffffff'
+      });
+    }, this);
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.eventBus.off('BOSS_GOLEM_SPLIT', this.handleGolemSplit, this);
+      this.eventBus.off('BOSS_DEMON_STOMP', this.handleDemonStomp, this);
+      this.eventBus.off(C.STATUS_WEB, this.handleSpiderWeb, this);
+      this.eventBus.off('HUD_SKILL_SELECT', this.handleSkillSelect, this);
+      this.eventBus.off(C.EVT_ALL_WAVES_DONE, this.handleAllWavesDone, this);
+      this.eventBus.removeAllListeners(C.EVT_GAME_OVER);
+      this.eventBus.removeAllListeners(C.EVT_GAME_WIN);
+      this.eventBus.removeAllListeners('HUD_SEND_WAVE_EARLY');
+      this.eventBus.removeAllListeners('HUD_TOGGLE_SPEED');
+      this.eventBus.removeAllListeners('DEV_SPAWN_MONSTER');
+      this.eventBus.removeAllListeners('DEV_TRIGGER_DEFEAT');
+      this.eventBus.removeAllListeners('DEV_TRIGGER_VICTORY');
+      this.eventBus.removeAllListeners('DEV_ADD_GOLD');
+      this.eventBus.removeAllListeners('DEV_CLEAR_MONSTERS');
+      
+      this.soldiers.forEach(s => {
+        if (s.sprite) s.sprite.destroy();
+        if (s.healthBar) s.healthBar.destroy();
+      });
+      this.soldiers = [];
+    });
+
+
+
     // Launch HUD overlay
     this.scene.launch(C.SCENE_HUD, { waveService: this.waveService });
 
     // Start wave system
     this.waveService.start();
 
+    // Update HUD waveService reference after it's been set up
+    const hudScene = this.scene.get(C.SCENE_HUD) as any;
+    if (hudScene && hudScene.waveService !== this.waveService) {
+      hudScene.waveService = this.waveService;
+    }
+
     console.log(`[GameScene] Started — map: ${mapKey}`);
   }
+
 
   update(time: number, delta: number): void {
     this.graphics.clear();
@@ -183,12 +315,110 @@ export class GameScene extends Phaser.Scene {
     // Check game over
     if (data.life <= 0) return;
 
+    // Check Victory (Wave 20)
+    if (this.waveService && this.waveService.isLastWave && data.monsters.length === 0 && data.life > 0) {
+      if (!this.hasWon) {
+        this.hasWon = true;
+        this.time.delayedCall(1500, () => {
+          this.eventBus.emit(C.EVT_GAME_WIN, { score: data.score });
+        });
+      }
+    }
+
     this.waveService.update(time, delta);
+
+    // Combat tick logic for soldiers
+    const timeNow = this.time.now;
+    if (!this.lastCombatTickTime) this.lastCombatTickTime = 0;
+    const isCombatTick = timeNow - this.lastCombatTickTime >= 1000;
+    if (isCombatTick) this.lastCombatTickTime = timeNow;
+
+    // Clean up dead soldiers
+    this.soldiers = this.soldiers.filter(s => {
+      if (s.isDead) return false;
+      if (s.health <= 0) {
+        s.isDead = true;
+        s.sprite.destroy();
+        s.healthBar.destroy();
+        return false;
+      }
+      return true;
+    });
+
+    // Update health bars
+    this.soldiers.forEach(s => {
+      s.healthBar.clear();
+      s.healthBar.fillStyle(0x000000, 0.8);
+      s.healthBar.fillRect(s.sprite.x - 12, s.sprite.y - 18, 24, 4);
+      const ratio = Math.max(0, s.health / s.maxHealth);
+      s.healthBar.fillStyle(0x00ff00, 1);
+      s.healthBar.fillRect(s.sprite.x - 12, s.sprite.y - 18, 24 * ratio, 4);
+    });
 
     // Tick monsters
     for (let i = data.monsters.length - 1; i >= 0; i--) {
       const m = data.monsters[i];
-      if (m?.active) m.tick(delta, this.graphics);
+      if (m?.active) {
+        // If monster was fighting a dead soldier, release it
+        if (m.fightingSoldier && m.fightingSoldier.isDead) {
+          m.fightingSoldier = null;
+          m.tween?.resume();
+        }
+
+        // If monster is not fighting and is close to an alive soldier, block it
+        if (!m.fightingSoldier && m.getMoveType() === C.MONSTER_MOVE_TYPE_GROUND) {
+          for (const s of this.soldiers) {
+            if (s.isDead) continue;
+            const dist = Phaser.Math.Distance.Between(m.x, m.y, s.sprite.x, s.sprite.y);
+            if (dist < 20) {
+              m.fightingSoldier = s;
+              m.tween?.pause();
+              break;
+            }
+          }
+        }
+
+        // Combat tick damage
+        if (isCombatTick && m.fightingSoldier) {
+          const dmgToSoldier = m.isBoss ? 30 : 12;
+          m.fightingSoldier.health -= dmgToSoldier;
+          m.takeDamage(15, C.DAMAGE_PHYSICAL);
+          
+          this.tweens.add({
+            targets: m.fightingSoldier.sprite,
+            x: m.fightingSoldier.sprite.x + (m.x > m.fightingSoldier.sprite.x ? 2 : -2),
+            duration: 80,
+            yoyo: true
+          });
+        }
+
+        m.tick(delta, this.graphics);
+      }
+    }
+
+    // Ground monster separation: gently push overlapping monsters apart
+    const groundMonsters = data.monsters.filter(
+      (m) => m?.active && m.getMoveType() === C.MONSTER_MOVE_TYPE_GROUND,
+    );
+    const SEP_RADIUS = 14; // minimum separation distance in pixels
+    for (let i = 0; i < groundMonsters.length; i++) {
+      for (let j = i + 1; j < groundMonsters.length; j++) {
+        const a = groundMonsters[i];
+        const b = groundMonsters[j];
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
+        if (dist < SEP_RADIUS) {
+          const push = (SEP_RADIUS - dist) * 0.5;
+          const ux = dx / dist;
+          const uy = dy / dist;
+          // Move each monster half the overlap away (only X to preserve path Y)
+          a.setX(a.x + ux * push * 0.5);
+          b.setX(b.x - ux * push * 0.5);
+          a.setY(a.y + uy * push * 0.3);
+          b.setY(b.y - uy * push * 0.3);
+        }
+      }
     }
 
     // Move bullets
@@ -267,14 +497,19 @@ export class GameScene extends Phaser.Scene {
     const CW = this.mapService.mapConfig.CELL_WIDTH;
     const CH = this.mapService.mapConfig.CELL_HEIGHT;
     const PAD = this.mapService.mapConfig.GAME_BOARD_PADDING_TOP;
-    const cx = square.posX * CW + CW / 2;
-    const cy = square.posY * CH + CH / 2 + PAD; // EXACT cell center
+    const OX = this.mapService.mapConfig.GRID_OFFSET_X ?? 0;
+    const cx = OX + square.posX * CW + CW / 2;
+    const cy = square.posY * CH + CH / 2 + PAD;
     const tower = this.createTower(cx, cy, this.selectedTowerType, 1, false);
     this.stateService.savedData!.towers.push(tower);
 
-    // Tower placement particles & shake
+    this.eventBus.emit('HUD_ADD_LOG', {
+      text: `🔨 Built: ${this.selectedTowerType.replace('Tower_', '')} Tower!`,
+      color: '#ffd700'
+    });
+
+    // Tower placement particles
     FXHelper.dustBurst(this, cx, cy);
-    this.cameras.main.shake(80, 0.004);
 
     this.cancelBuy();
   }
@@ -474,13 +709,13 @@ export class GameScene extends Phaser.Scene {
             const CW = this.mapService.mapConfig.CELL_WIDTH;
             const CH = this.mapService.mapConfig.CELL_HEIGHT;
             const PAD = this.mapService.mapConfig.GAME_BOARD_PADDING_TOP;
-            const cx = square.posX * CW + CW / 2;
+            const OX = this.mapService.mapConfig.GRID_OFFSET_X ?? 0;
+            const cx = OX + square.posX * CW + CW / 2;
             const cy = square.posY * CH + CH / 2 + PAD;
             const realTower = this.createTower(cx, cy, t.type, 1, false);
             this.stateService.savedData!.towers.push(realTower);
 
             FXHelper.dustBurst(this, cx, cy);
-            this.cameras.main.shake(80, 0.004);
             SoundManager.getInstance().playBuy(); // SOUND EFFECT
 
             container.destroy();
@@ -498,7 +733,6 @@ export class GameScene extends Phaser.Scene {
             'NO GOLD!',
             '#ff4444',
           );
-          this.cameras.main.shake(40, 0.002);
         }
       });
     });
@@ -508,6 +742,50 @@ export class GameScene extends Phaser.Scene {
     this.isBuying = false;
     this.tempTower?.destroy();
     this.tempTower = null;
+  }
+
+  /**
+   * Cancels whatever action is currently active:
+   * - Active build menu (tower shop popup)
+   * - Tower upgrade/sell overlays
+   * - Active skill cast ghost
+   */
+  private cancelCurrentAction(): void {
+    // Cancel skill cast
+    if (this.activeSkillId) {
+      this.cancelActiveSkillCast();
+      this.eventBus.emit(C.EVT_TOWER_DESELECTED, {});
+      return; // skill takes priority — one Escape at a time
+    }
+
+    // Cancel build menu
+    if (this.activeBuildMenu) {
+      this.activeBuildMenu.destroy();
+      this.activeBuildMenu = null;
+      this.buildRangeGraphic?.destroy();
+      this.buildRangeGraphic = null;
+      this.eventBus.emit(C.EVT_TOWER_DESELECTED, {});
+      return;
+    }
+
+    // Cancel tower upgrade/sell overlay
+    if (this.isTowerClicked) {
+      this.isTowerClicked = false;
+      this.upgradeImage?.destroy();
+      this.upgradeImage = null;
+      this.sellImage?.destroy();
+      this.sellImage = null;
+      this.rangeImage?.destroy();
+      this.rangeImage = null;
+      this.detailText?.destroy();
+      this.detailText = null;
+      this.eventBus.emit(C.EVT_TOWER_DESELECTED, {});
+    }
+
+    // Cancel buy state
+    if (this.isBuying) {
+      this.cancelBuy();
+    }
   }
 
   private dealDamage(bullet: BulletBase, monster: MonsterBase): void {
@@ -529,10 +807,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleMonsterReachEnd(monster: MonsterBase): void {
+    if (!monster.active) return;
     this.stateService.setLife((l) => l - 1);
     monster.setActive(false);
     const idx = this.stateService.savedData!.monsters.indexOf(monster);
     if (idx >= 0) this.stateService.savedData!.monsters.splice(idx, 1);
+
     monster.destroy();
   }
 
@@ -598,105 +878,158 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private handleSkillCast({ skillId }: { skillId: string }): void {
-    switch (skillId) {
-      case C.SKILL_RAIN_OF_FIRE:
-        this.activateRainOfFire();
-        break;
-      case C.SKILL_FORTIFY:
-        this.activateFortify();
-        break;
-      case C.SKILL_HERO_RALLY:
-        break; // hero movement
+  private handleSkillSelect({ skillId }: { skillId: string }): void {
+    this.cancelActiveSkillCast();
+    this.activeSkillId = skillId;
+
+    const r = skillId === C.SKILL_RAIN_OF_FIRE ? 60 : 40;
+    const ghost = this.add.graphics().setDepth(100);
+    ghost.lineStyle(2, skillId === C.SKILL_RAIN_OF_FIRE ? 0xff4400 : 0x00ff88, 0.8);
+    ghost.strokeCircle(0, 0, r);
+    ghost.fillStyle(skillId === C.SKILL_RAIN_OF_FIRE ? 0xff4400 : 0x00ff88, 0.15);
+    ghost.fillCircle(0, 0, r);
+    this.skillGhost = ghost;
+
+    const moveSub = (ptr: Phaser.Input.Pointer) => {
+      if (this.skillGhost) this.skillGhost.setPosition(ptr.x, ptr.y);
+    };
+    this.input.on('pointermove', moveSub);
+    this.skillMoveListener = moveSub;
+
+    this.time.delayedCall(50, () => {
+      const castHandler = (ptr: Phaser.Input.Pointer) => {
+        if (this.activeSkillId !== skillId) return;
+        this.executeSkillCast(skillId, ptr.x, ptr.y, r);
+        this.cancelActiveSkillCast();
+        this.eventBus.emit('HUD_SKILL_CAST_SUCCESS', { skillId });
+        this.eventBus.emit(C.EVT_TOWER_DESELECTED, {}); // clear info panel details
+      };
+      this.skillCastListener = castHandler;
+      this.input.once('pointerdown', castHandler);
+    });
+  }
+
+  private cancelActiveSkillCast(): void {
+    this.activeSkillId = null;
+    if (this.skillGhost) {
+      this.skillGhost.destroy();
+      this.skillGhost = null;
+    }
+    if (this.skillMoveListener) {
+      this.input.off('pointermove', this.skillMoveListener);
+      this.skillMoveListener = null;
+    }
+    if (this.skillCastListener) {
+      this.input.off('pointerdown', this.skillCastListener);
+      this.skillCastListener = null;
     }
   }
 
-  private activateRainOfFire(): void {
-    const r = 60;
-    const ghost = this.add.graphics();
-    ghost.fillStyle(0xff4400, 0.3);
-    ghost.fillCircle(0, 0, r);
-    ghost.setDepth(100);
-    const moveSub = (ptr: Phaser.Input.Pointer) =>
-      ghost.setPosition(ptr.x, ptr.y);
-    this.input.on('pointermove', moveSub);
+  private executeSkillCast(skillId: string, x: number, y: number, r: number): void {
+    let skillName = 'Skill';
+    if (skillId === C.SKILL_RAIN_OF_FIRE) skillName = 'Rain of Fire';
+    else if (skillId === C.SKILL_FORTIFY) skillName = 'Reinforcements';
 
-    // Let user click a position, then deal AoE fire damage over 3s
-    this.time.delayedCall(50, () => {
-      this.input.once('pointerdown', (ptr: Phaser.Input.Pointer) => {
-        this.input.off('pointermove', moveSub);
-        ghost.destroy();
-        const g = this.add.graphics();
-        this.tweens.addCounter({
-          from: 0,
-          to: 1,
-          duration: 3000,
-          onUpdate: (tween) => {
-            g.clear();
-            g.fillStyle(0xff4400, 0.3 + Math.random() * 0.2);
-            g.fillCircle(ptr.x, ptr.y, r);
-            // Damage monsters in zone
-            if (Math.random() < 0.3) {
-              for (const m of this.stateService.savedData!.monsters) {
-                if (!m.active) continue;
-                if (Phaser.Math.Distance.Between(ptr.x, ptr.y, m.x, m.y) <= r) {
-                  m.takeDamage(25, C.DAMAGE_FIRE);
-                }
-              }
-            }
-          },
-          onComplete: () => g.destroy(),
-        });
-      });
+    this.eventBus.emit('HUD_ADD_LOG', {
+      text: `🔥 Casted Skill: ${skillName}!`,
+      color: '#ff9900'
     });
-  }
 
-  private activateFortify(): void {
-    // Boost the next tower the player clicks for 10s (+50% attack speed)
-    const ghost = this.add.graphics();
-    ghost.lineStyle(3, 0xffd700, 0.8).strokeCircle(0, 0, 28).setDepth(100);
-    const moveSub = (ptr: Phaser.Input.Pointer) =>
-      ghost.setPosition(ptr.x, ptr.y);
-    this.input.on('pointermove', moveSub);
-
-    this.time.delayedCall(50, () => {
-      this.input.once('pointerdown', (ptr: Phaser.Input.Pointer) => {
-        this.input.off('pointermove', moveSub);
-        ghost.destroy();
-        const towers = this.stateService.savedData!.towers;
-        let closest: TowerBase | null = null;
-        let minDist = 40;
-        for (const t of towers) {
-          const d = Phaser.Math.Distance.Between(t.x, t.y, ptr.x, ptr.y);
-          if (d < minDist) {
-            minDist = d;
-            closest = t;
-          }
-        }
-        if (closest) {
-          closest.isFortified = true;
-          closest.fortifyMultiplier = 1.5;
-          this.time.delayedCall(10000, () => {
-            if (closest?.active) {
-              closest.isFortified = false;
-              closest.fortifyMultiplier = 1;
-            }
-          });
-          // Gold glow indicator
-          const g = this.add.graphics();
-          g.lineStyle(3, 0xffd700, 0.8)
-            .strokeCircle(closest.x, closest.y, 28)
-            .setDepth(10);
+    if (skillId === C.SKILL_RAIN_OF_FIRE) {
+      // Meteors falling from the skies (6 fireballs)
+      for (let i = 0; i < 6; i++) {
+        this.time.delayedCall(i * 200, () => {
+          const dx = x + Phaser.Math.Between(-30, 30);
+          const dy = y + Phaser.Math.Between(-30, 30);
+          
+          // Draw falling meteor rock
+          const meteor = this.add.graphics().setDepth(100);
+          meteor.fillStyle(0xffaa00, 1);
+          meteor.fillCircle(0, 0, 6);
+          meteor.lineStyle(2, 0xff0000, 1);
+          meteor.strokeCircle(0, 0, 6);
+          
+          meteor.setPosition(dx, dy - 250);
+          
           this.tweens.add({
-            targets: g,
-            alpha: 0,
-            duration: 600,
-            onComplete: () => g.destroy(),
+            targets: meteor,
+            x: dx,
+            y: dy,
+            duration: 500,
+            ease: 'Quad.In',
+            onComplete: () => {
+              meteor.destroy();
+              SoundManager.getInstance().playShoot(); // impact explosion noise
+              
+              // Explosion visual flash ring
+              const flash = this.add.graphics().setDepth(10);
+              flash.lineStyle(2, 0xff5500, 1);
+              flash.strokeCircle(dx, dy, 15);
+              this.tweens.add({
+                targets: flash,
+                scaleX: 2.0,
+                scaleY: 2.0,
+                alpha: 0,
+                duration: 250,
+                onComplete: () => flash.destroy()
+              });
+
+              // Deal fire AoE damage
+              const monsters = this.stateService.savedData!.monsters;
+              monsters.forEach(m => {
+                if (m?.active && Phaser.Math.Distance.Between(dx, dy, m.x, m.y) <= 30) {
+                  m.takeDamage(35, C.DAMAGE_FIRE);
+                }
+              });
+            }
           });
-        }
+        });
+      }
+    } else if (skillId === C.SKILL_FORTIFY) {
+      // Spawn 3 soldiers
+      this.spawnSoldiers(x, y);
+      SoundManager.getInstance().playBuy(); // soldier spawn sound cue
+    }
+  }
+
+  private spawnSoldiers(x: number, y: number): void {
+    const offsets = [
+      { dx: -15, dy: 10 },
+      { dx: 15, dy: 10 },
+      { dx: 0, dy: -15 }
+    ];
+    offsets.forEach(off => {
+      const sx = x + off.dx;
+      const sy = y + off.dy;
+
+      const sprite = this.add.sprite(sx, sy, 'Hero_Knight').setDepth(Math.floor(sy));
+      sprite.setFrame(0);
+
+      // Idle bobbing
+      this.tweens.add({
+        targets: sprite,
+        y: sy - 3,
+        duration: 300,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
       });
+
+      const healthBar = this.add.graphics().setDepth(Math.floor(sy) + 1);
+      
+      const soldier = {
+        sprite,
+        health: 120,
+        maxHealth: 120,
+        x: sx,
+        y: sy,
+        healthBar,
+        isDead: false
+      };
+      this.soldiers.push(soldier);
     });
   }
+
 
   private handleAllWavesDone(): void {
     const data = this.stateService.savedData!;
@@ -781,31 +1114,32 @@ export class GameScene extends Phaser.Scene {
 
   private buildEnvironmentLayers(): void {
     const W = this.cameras.main.width;
-    const H = this.cameras.main.height;
 
-    // 1. Sky strip at top (depth -10)
+    // 1. Sky strip at top (depth -10) — rich indigo-to-navy gradient
     const sky = this.add.graphics().setDepth(-10);
-    sky.fillGradientStyle(0x050515, 0x050515, 0x121835, 0x121835, 1);
-    sky.fillRect(0, 0, W, 60);
+    sky.fillGradientStyle(0x0a0f2a, 0x0a0f2a, 0x1a2860, 0x1a2860, 1);
+    sky.fillRect(0, 0, W, 52);
 
-    // 2. Parallax clouds (depth -9)
+    // Subtle star dots in sky
+    sky.fillStyle(0xffffff, 0.5);
+    [[45,8],[120,15],[200,5],[310,18],[400,10],[500,14],[80,22],[250,25],[450,20]].forEach(([sx, sy]) => {
+      sky.fillRect(sx, sy, 1.5, 1.5);
+    });
+
+    // 2. Glowing clouds (depth -9)
     const cloudG = this.add.graphics().setDepth(-9);
-    cloudG.fillStyle(0xffffff, 0.12);
-    cloudG.fillEllipse(150, 30, 180, 25);
-    cloudG.fillEllipse(450, 25, 220, 30);
+    cloudG.fillStyle(0x3a5a8a, 0.25);
+    cloudG.fillEllipse(130, 26, 200, 22);
+    cloudG.fillStyle(0x4a70aa, 0.15);
+    cloudG.fillEllipse(420, 22, 240, 26);
 
     this.tweens.add({
       targets: cloudG,
-      x: '+=80',
-      duration: 18000,
+      x: '+=60',
+      duration: 22000,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut',
     });
-
-    // 3. Bottom ground trim row (depth 1)
-    const groundTrim = this.add.graphics().setDepth(1);
-    groundTrim.fillGradientStyle(0x0e1c12, 0x0e1c12, 0x070c08, 0x070c08, 0.7);
-    groundTrim.fillRect(0, 60 + 520, W, 100);
   }
 }

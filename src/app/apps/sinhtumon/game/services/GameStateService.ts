@@ -19,9 +19,13 @@ export class GameStateService {
 
   init(gameData: SavedData): void {
     this.savedData = gameData;
-    // Notify HUDScene of initial values
-    this.eventBus?.emit(C.EVT_GOLD_CHANGED, { gold: gameData.gold });
-    this.eventBus?.emit(C.EVT_LIFE_CHANGED, { life: gameData.life });
+    // Notify HUDScene of initial values — HUD must already be subscribed
+    this.broadcastState();
+  }
+
+  broadcastState(): void {
+    this.eventBus?.emit(C.EVT_GOLD_CHANGED, { gold: this.savedData!.gold });
+    this.eventBus?.emit(C.EVT_LIFE_CHANGED, { life: this.savedData!.life });
   }
 
   setGold(callback: (prev: number) => number): void {

@@ -86,6 +86,10 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
   isFortified = false;
   fortifyMultiplier = 1;
 
+  private originalY: number = 0;
+  private isRecoiling = false;
+  private isUpgradeConfirmed = false;
+
   constructor(scene: Phaser.Scene, ctx: TowerContext) {
     super(scene, ctx.x, ctx.y, getTowerAssetName(ctx.towerType, ctx.level));
     scene.add.existing(this);
@@ -101,7 +105,9 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
     this.isReady = true;
     this.priority = getTowerDefaultPriority(ctx.towerType);
 
+    this.originalY = ctx.y;
     this.setDepth(3);
+
     // Use the ts config sizes precisely and ensure physics bounding box matches the scaled size
     const [w, h] = getTowerDisplaySize(this.towerType, this.level);
     this.setDisplaySize(w, h);
@@ -231,15 +237,22 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
       loop: false,
     });
 
-    // Recoil animation nudge
-    const origY = this.y;
-    this.scene.tweens.add({
-      targets: this,
-      y: origY - 3,
-      duration: 60,
-      yoyo: true,
-      ease: 'Quad.Out',
-    });
+    // Recoil animation nudge (fixed to avoid drift)
+    if (!this.isRecoiling) {
+      this.isRecoiling = true;
+      this.scene.tweens.add({
+        targets: this,
+        y: this.originalY - 4,
+        duration: 60,
+        yoyo: true,
+        ease: 'Quad.Out',
+        onComplete: () => {
+          this.y = this.originalY;
+          this.isRecoiling = false;
+        }
+      });
+    }
+
 
     const bullet = this.createBullet();
     SoundManager.getInstance().playShoot(); // SOUND EFFECT
@@ -299,6 +312,7 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
 
   handleTowerFocus(): void {
     if (this.cb.isBuying()) return;
+    this.isUpgradeConfirmed = false;
     this.cb.getUpgradeImage()?.destroy();
     this.cb.getSellImage()?.destroy();
     this.cb.getRangeImage()?.destroy();
@@ -396,7 +410,21 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
     });
 
     if (!isMax) {
-      hit.on('pointerdown', () => {
+      hit.on('pointerdown', (ptr: Phaser.Input.Pointer, lx: number, ly: number, event: Phaser.Types.Input.EventData) => {
+        event.stopPropagation(); // prevent scene outside-click handler from firing
+      });
+      hit.on('pointerup', () => {
+        if (!this.isUpgradeConfirmed) {
+          this.isUpgradeConfirmed = true;
+          text.setText('⚠️ CONFIRM');
+          btnBg.clear();
+          btnBg.fillStyle(0xd95d00, 0.95); // Deep orange warning
+          btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
+          btnBg.lineStyle(1.5, 0xffffff, 1);
+          btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
+          return;
+        }
+
         if (this.stateService.savedData!.gold < this.getUpgradeCost()) return;
         this.stateService.setGold((g) => g - this.getUpgradeCost());
         const towers = this.stateService.savedData!.towers;
@@ -409,7 +437,12 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
         );
         towers.push(upgraded);
 
-        SoundManager.getInstance().playUpgrade(); // SOUND EFFECT
+        this.eventBus.emit('HUD_ADD_LOG', {
+          text: `⚡ Upgraded: ${this.towerType.replace('Tower_', '')} to Lv ${this.level + 1}!`,
+          color: '#00ff88'
+        });
+
+        SoundManager.getInstance().playUpgrade();
 
         this.cb.getRangeImage()?.destroy();
         this.cb.getUpgradeImage()?.destroy();
@@ -420,18 +453,32 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
 
       hit.on('pointerover', () => {
         btnBg.clear();
-        btnBg.fillStyle(0x1a3366, 0.95);
-        btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
-        btnBg.lineStyle(1.5, 0x00ff88, 1);
-        btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
+        if (this.isUpgradeConfirmed) {
+          btnBg.fillStyle(0xff6a00, 0.95); // brighter orange on hover
+          btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
+          btnBg.lineStyle(1.5, 0xffffff, 1);
+          btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
+        } else {
+          btnBg.fillStyle(0x1a3366, 0.95);
+          btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
+          btnBg.lineStyle(1.5, 0x00ff88, 1);
+          btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
+        }
       });
 
       hit.on('pointerout', () => {
         btnBg.clear();
-        btnBg.fillStyle(0x112244, 0.9);
-        btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
-        btnBg.lineStyle(1.5, 0x4af7a0, 0.8);
-        btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
+        if (this.isUpgradeConfirmed) {
+          btnBg.fillStyle(0xd95d00, 0.9);
+          btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
+          btnBg.lineStyle(1.5, 0xffffff, 0.8);
+          btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
+        } else {
+          btnBg.fillStyle(0x112244, 0.9);
+          btnBg.fillRoundedRect(-W / 2, -H / 2, W, H, 6);
+          btnBg.lineStyle(1.5, 0x4af7a0, 0.8);
+          btnBg.strokeRoundedRect(-W / 2, -H / 2, W, H, 6);
+        }
       });
     }
   }
@@ -478,7 +525,10 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
       ease: 'Back.Out',
     });
 
-    hit.on('pointerdown', () => {
+    hit.on('pointerdown', (ptr: Phaser.Input.Pointer, lx: number, ly: number, event: Phaser.Types.Input.EventData) => {
+      event.stopPropagation(); // prevent scene outside-click handler from firing
+    });
+    hit.on('pointerup', () => {
       const price = getTowerSellPrice(this.towerType, this.level);
       this.stateService.setGold((g) => g + price);
       const towers = this.stateService.savedData!.towers;
@@ -490,7 +540,12 @@ export abstract class TowerBase extends Phaser.Physics.Arcade.Sprite {
         this.mapService.mapConfig.CELL_AVAILABLE,
       );
 
-      SoundManager.getInstance().playBuy(); // SOUND EFFECT (coin sound)
+      this.eventBus.emit('HUD_ADD_LOG', {
+        text: `💰 Sold: ${this.towerType.replace('Tower_', '')} Tower (+${price}🪙)`,
+        color: '#ffaa66'
+      });
+
+      SoundManager.getInstance().playBuy();
 
       this.cb.setIsTowerClicked(false);
       this.cb.getRangeImage()?.destroy();

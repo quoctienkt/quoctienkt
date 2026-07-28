@@ -10,7 +10,12 @@ export class SoundManager {
   }
 
   private initCtx() {
-    if (!this.ctx && typeof window !== 'undefined') {
+    if (typeof window === 'undefined') return;
+    // If the context was closed (e.g. after game destroy/navigation), recreate it
+    if (this.ctx && this.ctx.state === 'closed') {
+      this.ctx = null;
+    }
+    if (!this.ctx) {
       const AudioCtx =
         window.AudioContext || (window as any).webkitAudioContext;
       if (AudioCtx) {
@@ -18,7 +23,7 @@ export class SoundManager {
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().catch(() => {});
     }
   }
 

@@ -8,6 +8,7 @@ export class GameOverScene extends Phaser.Scene {
 
   init(data: { victory: boolean }): void {
     this.registry.set('victory', data.victory);
+    // mapKey is set in the global game registry by GameScene
   }
 
   create(): void {
@@ -124,9 +125,8 @@ export class GameOverScene extends Phaser.Scene {
       btnY,
       'PLAY AGAIN',
       () => {
-        this.scene.start(C.SCENE_GAME, {
-          mapKey: this.registry.get('mapKey') ?? C.MAP_CROSSROADS,
-        });
+        const mapKey = this.game.registry.get('mapKey') ?? this.registry.get('mapKey') ?? C.MAP_CROSSROADS;
+        this.scene.start(C.SCENE_GAME, { mapKey });
       },
       victory ? 0x114422 : 0x441111,
       victory ? 0x228844 : 0x882222,

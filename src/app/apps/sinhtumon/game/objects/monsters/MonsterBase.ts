@@ -49,18 +49,23 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
   tween: Phaser.Tweens.Tween | null = null;
   follower: { t: number; vec: Phaser.Math.Vector2 } | null = null;
   path: Phaser.Curves.Path | null = null;
+  fightingSoldier: any = null;
   direction: string = '';
+
   lastPosX: number = 0;
   lastPosY: number = 0;
   private stepCounter = 0;
+  private flapTween: Phaser.Tweens.Tween | null = null;
 
   private onReachEndpoint: (monster: MonsterBase) => void;
 
   constructor(scene: Phaser.Scene, ctx: MonsterContext) {
     const cfg = getMonsterConfig(ctx.monsterType);
+    const gridOffX = ctx.mapService.mapConfig.GRID_OFFSET_X ?? 0;
     super(
       scene,
-      ctx.col * ctx.mapService.mapConfig.CELL_WIDTH +
+      gridOffX +
+        ctx.col * ctx.mapService.mapConfig.CELL_WIDTH +
         ctx.mapService.mapConfig.CELL_WIDTH / 2,
       ctx.row * ctx.mapService.mapConfig.CELL_HEIGHT +
         ctx.mapService.mapConfig.GAME_BOARD_PADDING_TOP,
@@ -202,6 +207,8 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
     this.stateService.setGold((prev) => prev + gold);
     this.stateService.addScore(gold * 10);
     this.tween?.stop();
+    this.flapTween?.stop();
+    this.flapTween = null;
 
     // Remove from state array
     const monsters = this.stateService.savedData!.monsters;
@@ -258,6 +265,46 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
+  /**
+   * Silently removes this monster without triggering the reach-endpoint callback
+   * or dealing damage. Used by the DEV Clear Mobs tool.
+   */
+  killSilently(): void {
+    if (!this.active) return;
+    this.setActive(false);
+    this.setVisible(false);
+
+    // Stop movement tween so onComplete never fires
+    if (this.tween) {
+      this.tween.stop();
+      this.tween = null;
+    }
+    if (this.flapTween) {
+      this.flapTween.stop();
+      this.flapTween = null;
+    }
+    this.follower = null;
+    this.path = null;
+
+    // Remove from state array
+    const monsters = this.stateService.savedData!.monsters;
+    const idx = monsters.indexOf(this);
+    if (idx >= 0) monsters.splice(idx, 1);
+
+    // Destroy tracking bullets
+    const bullets = this.stateService.savedData!.bullets;
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      if (bullets[i].target === this) {
+        bullets[i].destroy();
+        bullets.splice(i, 1);
+      }
+    }
+
+    this.scene.time.delayedCall(50, () => {
+      if (this.scene) this.destroy();
+    });
+  }
+
   // ─── Path management ──────────────────────────────────────────────────────
 
   updateMonsterPath(newMonsterPath: [number, number][] | null): void {
@@ -266,6 +313,7 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
       CELL_HEIGHT: CH,
       GAME_BOARD_PADDING_TOP: PAD,
     } = this.mapService.mapConfig;
+    const ox = this.mapService.mapConfig.GRID_OFFSET_X ?? 0;
 
     if (this.getMoveType() === C.MONSTER_MOVE_TYPE_GROUND) {
       if (!newMonsterPath) return;
@@ -277,8 +325,8 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
       // Skip path segments already behind this monster
       let flag = true;
       while (flag && path.length > 1) {
-        const p0x = path[0][1] * CW + CW / 2;
-        const p1x = path[1][1] * CW + CW / 2;
+        const p0x = ox + path[0][1] * CW + CW / 2;
+        const p1x = ox + path[1][1] * CW + CW / 2;
         const p0y = path[0][0] * CH + PAD;
         const p1y = path[1][0] * CH + PAD;
         if (
@@ -294,10 +342,15 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
       }
 
       path.forEach((i) => {
-        this.path!.lineTo(CW * i[1] + CW / 2, i[0] * CH + CH / 2 + PAD);
+        this.path!.lineTo(ox + CW * i[1] + CW / 2, i[0] * CH + CH / 2 + PAD);
       });
 
-      const duration = (this.path.getLength() / this.speed) * 1000;
+      // Extend path to the Exit Gate (one cell height below the final cell)
+      const [er, ec] = this.mapService.mapConfig.END_POSITION;
+      this.path!.lineTo(ox + CW * ec + CW / 2, er * CH + CH + PAD);
+
+      const rawDuration = (this.path.getLength() / Math.max(this.speed, 10)) * 1000;
+      const duration = isFinite(rawDuration) ? rawDuration : 30000;
       this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
       this.tween = this.scene.tweens.add({
         targets: this.follower,
@@ -315,10 +368,12 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
 
       const [sr, sc] = this.mapService.mapConfig.START_POSITION;
       const [er, ec] = this.mapService.mapConfig.END_POSITION;
-      this.path.lineTo(CW * sc + CW / 2, sr * CH + PAD);
-      this.path.lineTo(CW * ec + CW / 2, er * CH + PAD);
+      this.path.lineTo(ox + CW * sc + CW / 2, sr * CH + CH / 2 + PAD);
+      this.path.lineTo(ox + CW * ec + CW / 2, er * CH + CH + PAD); // Fly into the Exit Gate
 
-      const duration = (this.path.getLength() / this.speed) * 1000;
+
+      const rawFlyDuration = (this.path.getLength() / Math.max(this.speed, 10)) * 1000;
+      const duration = isFinite(rawFlyDuration) ? rawFlyDuration : 30000;
       this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
       this.tween = this.scene.tweens.add({
         targets: this.follower,
@@ -336,9 +391,11 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
   private updatePos(posX: number, posY: number): void {
     this.lastPosX = this.x;
     this.lastPosY = this.y;
+
     this.setPosition(posX, posY);
 
     if (this.getMoveType() === C.MONSTER_MOVE_TYPE_GROUND) {
+
       this.stepCounter++;
       if (this.stepCounter % 15 === 0) {
         const { h } = getScaledDisplaySize(this.monsterType);
@@ -446,6 +503,18 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
 
     // Initial animation
     this.playAction(C.MONSTER_ACTION_WALK, this.direction);
+
+    // Flying monsters: add wing-flap scaleY animation
+    if (cfg.isFlying) {
+      this.flapTween = this.scene.tweens.add({
+        targets: this,
+        scaleY: (this.scaleY || 1) * 0.85,
+        duration: 200,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
   }
 
   private initDirection(): void {

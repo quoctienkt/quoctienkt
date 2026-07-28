@@ -22,9 +22,11 @@ export class Square extends Phaser.Physics.Arcade.Sprite {
     isBuying: () => boolean,
     onBuyTower: (square: Square) => void,
   ) {
+    const gridOffX = gameMapService.mapConfig.GRID_OFFSET_X ?? 0;
     super(
       scene,
-      col * gameMapService.mapConfig.CELL_WIDTH +
+      gridOffX +
+        col * gameMapService.mapConfig.CELL_WIDTH +
         gameMapService.mapConfig.CELL_WIDTH / 2,
       row * gameMapService.mapConfig.CELL_HEIGHT +
         gameMapService.mapConfig.CELL_HEIGHT / 2 +
