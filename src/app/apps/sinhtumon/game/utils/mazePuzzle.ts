@@ -8,6 +8,14 @@ export function findWay(
   position: [number, number],
   end: [number, number],
 ): [number, number][] | null {
+  // If the start or end position itself is blocked, no path exists
+  if (
+    matrix[position[0]]?.[position[1]] !== 0 ||
+    matrix[end[0]]?.[end[1]] !== 0
+  ) {
+    return null;
+  }
+
   const queue: [number, number][][] = [];
   const collision: number[][] = matrix.map((row) => [...row]);
 

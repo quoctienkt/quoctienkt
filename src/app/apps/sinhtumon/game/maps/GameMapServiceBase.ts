@@ -224,11 +224,38 @@ export abstract class GameMapServiceBase {
     startPosition: [number, number] | null = null,
     endPosition: [number, number] | null = null,
   ): [number, number][] | null {
-    return findWay(
-      map ?? this.mapConfig.map,
-      startPosition ?? this.currentStartPosition,
-      endPosition ?? this.currentEndPosition,
-    );
+    const currentMap = map ?? this.mapConfig.map;
+    const defaultStart = startPosition ?? this.currentStartPosition;
+    const end = endPosition ?? this.currentEndPosition;
+
+    if (startPosition) {
+      return findWay(currentMap, startPosition, end);
+    }
+
+    const [sr, sc] = defaultStart;
+    
+    // 1. Try the default start cell
+    const path = findWay(currentMap, [sr, sc], end);
+    if (path) return path;
+
+    // 2. If default start cell is blocked, find the nearest open cell on the entry row
+    const cols = currentMap[sr]?.length ?? 0;
+    let bestPath: [number, number][] | null = null;
+    let minDistance = Infinity;
+
+    for (let col = 0; col < cols; col++) {
+      if (currentMap[sr][col] === 0) {
+        const altPath = findWay(currentMap, [sr, col], end);
+        if (altPath) {
+          const dist = Math.abs(col - sc);
+          if (dist < minDistance) {
+            minDistance = dist;
+            bestPath = altPath;
+          }
+        }
+      }
+    }
+    return bestPath;
   }
 
   tryUpdateMap(col: number, row: number, cellState: number): boolean {

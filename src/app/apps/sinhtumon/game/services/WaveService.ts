@@ -60,8 +60,17 @@ export class WaveService {
   }
 
   start(): void {
-    this.spawnNextWave();
-    this.scheduleNextWave();
+    // Start with a 30-second delay for the very first wave to let players build towers
+    const initialDelay = 30000;
+    this.nextWaveCountdown = initialDelay;
+    this.nextWaveTimer = this.scene.time.addEvent({
+      delay: initialDelay,
+      loop: false,
+      callback: () => {
+        this.spawnNextWave();
+        this.scheduleNextWave();
+      },
+    });
   }
 
   sendWaveEarly(): void {

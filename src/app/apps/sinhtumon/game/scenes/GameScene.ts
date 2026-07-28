@@ -472,6 +472,23 @@ export class GameScene extends Phaser.Scene {
 
   // ─── Private helpers ──────────────────────────────────────────────────────
 
+  private isCellOccupiedByMonster(col: number, row: number): boolean {
+    const CW = this.mapService.mapConfig.CELL_WIDTH;
+    const CH = this.mapService.mapConfig.CELL_HEIGHT;
+    const PAD = this.mapService.mapConfig.GAME_BOARD_PADDING_TOP;
+    const OX = this.mapService.mapConfig.GRID_OFFSET_X ?? 0;
+
+    for (const m of this.stateService.savedData!.monsters) {
+      if (!m || !m.active) continue;
+      const mRow = Math.floor((m.y - PAD) / CH);
+      const mCol = Math.floor((m.x - OX) / CW);
+      if (mRow === row && mCol === col) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private buildMapSquares(): void {
     const mapGrid = this.mapService.mapConfig.map;
     for (let row = 0; row < mapGrid.length; row++) {
@@ -524,6 +541,18 @@ export class GameScene extends Phaser.Scene {
   }
 
   showBuildMenu(square: Square): void {
+    if (this.isCellOccupiedByMonster(square.posX, square.posY)) {
+      FXHelper.floatingText(
+        this,
+        square.x,
+        square.y - 25,
+        'OCCUPIED BY MONSTER!',
+        '#ff4444',
+      );
+      SoundManager.getInstance().playShoot();
+      return;
+    }
+
     if (this.activeBuildMenu) {
       this.activeBuildMenu.destroy();
       this.activeBuildMenu = null;
@@ -704,6 +733,18 @@ export class GameScene extends Phaser.Scene {
         // Second click: buy
         const gold = this.stateService.savedData!.gold;
         if (gold >= t.cost) {
+          if (this.isCellOccupiedByMonster(square.posX, square.posY)) {
+            FXHelper.floatingText(
+              this,
+              square.x,
+              square.y - 25,
+              'OCCUPIED BY MONSTER!',
+              '#ff4444',
+            );
+            SoundManager.getInstance().playShoot();
+            return;
+          }
+
           const success = this.mapService.tryUpdateMap(
             square.posX,
             square.posY,
@@ -729,6 +770,15 @@ export class GameScene extends Phaser.Scene {
             this.eventBus.emit(C.EVT_TOWER_DESELECTED, {});
             if (this.activeBuildMenu === container) this.activeBuildMenu = null;
             square.destroy();
+          } else {
+            FXHelper.floatingText(
+              this,
+              square.x,
+              square.y - 25,
+              'BLOCKED PATH!',
+              '#ff4444',
+            );
+            SoundManager.getInstance().playShoot();
           }
         } else {
           FXHelper.floatingText(
