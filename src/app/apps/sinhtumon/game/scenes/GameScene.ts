@@ -95,6 +95,11 @@ export class GameScene extends Phaser.Scene {
 
 
   create(data: GameSceneData): void {
+    // Reset global pause states from previous defeat/game-over screen
+    this.physics.world.resume();
+    this.tweens.resumeAll();
+    this.time.paused = false;
+
     const mapKey = data?.mapKey ?? C.MAP_CROSSROADS;
     this.registry.set('mapKey', mapKey);
     // Also store in game-level registry so GameOverScene can access it

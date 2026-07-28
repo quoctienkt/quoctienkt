@@ -135,14 +135,14 @@ export abstract class GameMapServiceBase {
 
     // ─── Entrance portal ─────────────────────────────────────────────────────
     const startCol = this.currentStartPosition[1];
-    const entranceX = gridX + startCol * CW + CW / 2;
-    const entranceY = PAD - 2;
+    const entranceX = gridX + startCol * CW + CW; // Shifted 0.5 cell to the right (CW/2 + CW/2)
+    const entranceY = PAD - 1.5 * CH; // Moved 1.5 cells away from the map
 
     // ─── Exit portal ─────────────────────────────────────────────────────────
     const endRow = this.currentEndPosition[0];
     const endCol  = this.currentEndPosition[1];
-    const exitX = gridX + endCol * CW + CW / 2;
-    const exitY = endRow * CH + CH + PAD + 2;
+    const exitX = gridX + endCol * CW + CW; // Shifted 0.5 cell to the right
+    const exitY = gridBot + 1.5 * CH; // Moved 1.5 cells away from the map
 
     // Entrance Gate (Green portal)
     const entrancePortal = this.scene!.add.graphics().setDepth(-2);

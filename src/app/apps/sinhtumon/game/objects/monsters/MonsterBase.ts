@@ -62,15 +62,20 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
   constructor(scene: Phaser.Scene, ctx: MonsterContext) {
     const cfg = getMonsterConfig(ctx.monsterType);
     const gridOffX = ctx.mapService.mapConfig.GRID_OFFSET_X ?? 0;
-    super(
-      scene,
-      gridOffX +
-        ctx.col * ctx.mapService.mapConfig.CELL_WIDTH +
-        ctx.mapService.mapConfig.CELL_WIDTH / 2,
-      ctx.row * ctx.mapService.mapConfig.CELL_HEIGHT +
-        ctx.mapService.mapConfig.GAME_BOARD_PADDING_TOP,
-      cfg.spriteBaseKey,
-    );
+    const CW = ctx.mapService.mapConfig.CELL_WIDTH;
+    const CH = ctx.mapService.mapConfig.CELL_HEIGHT;
+    const PAD = ctx.mapService.mapConfig.GAME_BOARD_PADDING_TOP;
+
+    // Shift 0.5 cell to the right for the entrance/exit
+    // When spawning at the top (ctx.row < 0), align exactly with the new entrance portal
+    const spawnX = ctx.row < 0 
+      ? gridOffX + ctx.col * CW + CW 
+      : gridOffX + ctx.col * CW + CW / 2;
+    const spawnY = ctx.row < 0
+      ? PAD - 1.5 * CH
+      : ctx.row * CH + PAD;
+
+    super(scene, spawnX, spawnY, cfg.spriteBaseKey);
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -345,9 +350,11 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
         this.path!.lineTo(ox + CW * i[1] + CW / 2, i[0] * CH + CH / 2 + PAD);
       });
 
-      // Extend path to the Exit Gate (one cell height below the final cell)
+      // Extend path to the Exit Gate (moved 1.5 cells away from the map, shifted 0.5 cell to the right)
       const [er, ec] = this.mapService.mapConfig.END_POSITION;
-      this.path!.lineTo(ox + CW * ec + CW / 2, er * CH + CH + PAD);
+      const numRows = this.mapService.mapConfig.map.length;
+      const gridBot = PAD + numRows * CH;
+      this.path!.lineTo(ox + CW * ec + CW, gridBot + 1.5 * CH);
 
       const rawDuration = (this.path.getLength() / Math.max(this.speed, 10)) * 1000;
       const duration = isFinite(rawDuration) ? rawDuration : 30000;
@@ -366,10 +373,10 @@ export abstract class MonsterBase extends Phaser.Physics.Arcade.Sprite {
       if (this.tween) return;
       this.path = new Phaser.Curves.Path(this.x, this.y);
 
-      const [sr, sc] = this.mapService.mapConfig.START_POSITION;
       const [er, ec] = this.mapService.mapConfig.END_POSITION;
-      this.path.lineTo(ox + CW * sc + CW / 2, sr * CH + CH / 2 + PAD);
-      this.path.lineTo(ox + CW * ec + CW / 2, er * CH + CH + PAD); // Fly into the Exit Gate
+      const numRows = this.mapService.mapConfig.map.length;
+      const gridBot = PAD + numRows * CH;
+      this.path.lineTo(ox + CW * ec + CW, gridBot + 1.5 * CH); // Fly into the Exit Gate
 
 
       const rawFlyDuration = (this.path.getLength() / Math.max(this.speed, 10)) * 1000;
