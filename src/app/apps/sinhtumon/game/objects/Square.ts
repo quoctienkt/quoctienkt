@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
 import { GameStateService } from '../services/GameStateService';
 import { GameMapServiceBase } from '../maps/GameMapServiceBase';
+import * as C from '../constants';
 
 export class Square extends Phaser.Physics.Arcade.Sprite {
   gameStateService: GameStateService;
@@ -43,8 +44,9 @@ export class Square extends Phaser.Physics.Arcade.Sprite {
     this.isBuying = isBuying;
     this.onBuyTower = onBuyTower;
 
-    // Invisible base sprite used for physics overlap & hover
-    this.setAlpha(0.001);
+    // Invisible base sprite used for physics overlap & hover (0.02 alpha ensures hit test works across all browsers)
+    this.setAlpha(0.02);
+    this.setDepth(2);
     this.setDisplaySize(
       gameMapService.mapConfig.CELL_WIDTH,
       gameMapService.mapConfig.CELL_HEIGHT,
@@ -52,9 +54,10 @@ export class Square extends Phaser.Physics.Arcade.Sprite {
 
     // Create the procedural diamond glow overlay
     this.glowGraphic = scene.add.graphics().setDepth(1);
-    this.drawGlow(0.12);
+    const isCrossroads = this.gameMapService.mapConfig.mapKey === C.MAP_CROSSROADS;
+    this.drawGlow(isCrossroads ? 0 : 0.12);
 
-    this.setInteractive();
+    this.setInteractive({ useHandCursor: true });
     this.bindEvents();
   }
 
@@ -111,7 +114,8 @@ export class Square extends Phaser.Physics.Arcade.Sprite {
     });
 
     this.on('pointerout', () => {
-      this.stopPulse(0.12);
+      const isCrossroads = this.gameMapService.mapConfig.mapKey === C.MAP_CROSSROADS;
+      this.stopPulse(isCrossroads ? 0 : 0.12);
     });
   }
 

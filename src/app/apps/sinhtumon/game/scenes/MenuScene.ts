@@ -248,10 +248,19 @@ export class MenuScene extends Phaser.Scene {
   private showHowToPlay(): void {
     const W = this.cameras.main.width;
     const H = this.cameras.main.height;
+
+    // Create an invisible full-screen shield that captures pointer events
+    // and blocks them from reaching the buttons underneath.
+    const shield = this.add
+      .rectangle(W / 2, H / 2, W, H, 0x000000, 0.001)
+      .setDepth(999)
+      .setInteractive();
+
     const panel = this.add
       .rectangle(W / 2, H / 2, 460, 340, 0x110800, 0.97)
       .setStrokeStyle(2, 0xffd700)
-      .setDepth(1000);
+      .setDepth(1000)
+      .setInteractive();
 
     const helpText = [
       '🗺  Select a map to start',
@@ -276,12 +285,28 @@ export class MenuScene extends Phaser.Scene {
       .setDepth(1001);
 
     const close = () => {
+      shield.destroy();
       panel.destroy();
       text.destroy();
     };
 
-    this.time.delayedCall(100, () => {
-      this.input.once('pointerdown', close);
+    // Close and stop propagation on pointer events so background buttons are never triggered
+    shield.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
+      event.stopPropagation();
+    });
+
+    panel.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
+      event.stopPropagation();
+    });
+
+    shield.on('pointerup', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
+      event.stopPropagation();
+      close();
+    });
+
+    panel.on('pointerup', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
+      event.stopPropagation();
+      close();
     });
   }
 

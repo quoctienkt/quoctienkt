@@ -18,16 +18,26 @@ export function generateAllProceduralAssets(scene: Phaser.Scene): void {
     const canvas = textures.createCanvas('background1', 560, 680)!;
     const ctx = canvas.context;
 
-    // Rich dark teal-navy gradient
+    // Grass forest gradient (Crossroads)
     const bg = ctx.createLinearGradient(0, 0, 560, 680);
-    bg.addColorStop(0, '#080f1a');
-    bg.addColorStop(0.5, '#061018');
-    bg.addColorStop(1, '#040c14');
+    bg.addColorStop(0, '#1c3e1e');
+    bg.addColorStop(0.5, '#122b14');
+    bg.addColorStop(1, '#09180a');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, 560, 680);
 
-    // Grid lines - subtle blue tint
-    ctx.strokeStyle = 'rgba(30, 80, 140, 0.35)';
+    // Add tiny grass speckles for texture
+    ctx.fillStyle = 'rgba(40, 95, 45, 0.4)';
+    for (let i = 0; i < 400; i++) {
+      const rx = Math.random() * 560;
+      const ry = Math.random() * 680;
+      const rw = 2 + Math.random() * 3;
+      const rh = 2 + Math.random() * 3;
+      ctx.fillRect(rx, ry, rw, rh);
+    }
+
+    // Grid lines - vivid green-gold tint
+    ctx.strokeStyle = 'rgba(74, 247, 160, 0.22)';
     ctx.lineWidth = 1;
     for (let x = 0; x <= 560; x += 40) {
       ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 680); ctx.stroke();
@@ -36,8 +46,8 @@ export function generateAllProceduralAssets(scene: Phaser.Scene): void {
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(560, y); ctx.stroke();
     }
 
-    // Decorative intersection dots
-    ctx.fillStyle = 'rgba(60, 140, 220, 0.18)';
+    // Decorative intersection dots - emerald glow
+    ctx.fillStyle = 'rgba(74, 247, 160, 0.45)';
     for (let x = 0; x <= 560; x += 40) {
       for (let y = 0; y <= 680; y += 39) {
         ctx.beginPath(); ctx.arc(x, y, 1.5, 0, Math.PI * 2); ctx.fill();
@@ -47,7 +57,7 @@ export function generateAllProceduralAssets(scene: Phaser.Scene): void {
     // Subtle vignette
     const vignette = ctx.createRadialGradient(280, 340, 100, 280, 340, 400);
     vignette.addColorStop(0, 'rgba(0,0,0,0)');
-    vignette.addColorStop(1, 'rgba(0,0,0,0.45)');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.5)');
     ctx.fillStyle = vignette;
     ctx.fillRect(0, 0, 560, 680);
 
@@ -67,26 +77,66 @@ export function generateAllProceduralAssets(scene: Phaser.Scene): void {
       const ctx = canvas.context;
       const gradient = ctx.createLinearGradient(0, 0, 560, 680);
       if (t === 'background_volcano') {
-        gradient.addColorStop(0, '#2a0a00');
-        gradient.addColorStop(0.5, '#1a0600');
-        gradient.addColorStop(1, '#0d0300');
-      } else if (t === 'background_ice') {
-        gradient.addColorStop(0, '#0a1e35');
-        gradient.addColorStop(0.5, '#061220');
-        gradient.addColorStop(1, '#030810');
-      } else if (t === 'background_forest') {
-        gradient.addColorStop(0, '#071a0a');
-        gradient.addColorStop(0.5, '#041006');
-        gradient.addColorStop(1, '#020803');
-      } else {
-        gradient.addColorStop(0, '#08101a');
-        gradient.addColorStop(1, '#040810');
-      }
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 560, 680);
+        gradient.addColorStop(0, '#4a0f00');
+        gradient.addColorStop(0.5, '#2b0700');
+        gradient.addColorStop(1, '#120200');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 560, 680);
 
-      // Subtle grid pattern
-      ctx.strokeStyle = 'rgba(255,255,255,0.025)';
+        // Magma crack lines
+        ctx.strokeStyle = 'rgba(255, 90, 0, 0.25)';
+        ctx.lineWidth = 1.5;
+        for (let i = 0; i < 8; i++) {
+          ctx.beginPath();
+          ctx.moveTo(Math.random() * 560, 0);
+          ctx.lineTo(Math.random() * 560, 680);
+          ctx.stroke();
+        }
+      } else if (t === 'background_ice') {
+        gradient.addColorStop(0, '#103d6b');
+        gradient.addColorStop(0.5, '#0a2342');
+        gradient.addColorStop(1, '#040f1f');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 560, 680);
+
+        // Icy sparkles
+        ctx.fillStyle = 'rgba(200, 240, 255, 0.2)';
+        for (let i = 0; i < 150; i++) {
+          ctx.beginPath();
+          ctx.arc(Math.random() * 560, Math.random() * 680, 1 + Math.random() * 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else if (t === 'background_forest') {
+        gradient.addColorStop(0, '#1c0a35');
+        gradient.addColorStop(0.5, '#0e041f');
+        gradient.addColorStop(1, '#05010d');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 560, 680);
+
+        // Magical fairy lights
+        ctx.fillStyle = 'rgba(212, 136, 255, 0.2)';
+        for (let i = 0; i < 100; i++) {
+          ctx.beginPath();
+          ctx.arc(Math.random() * 560, Math.random() * 680, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else {
+        gradient.addColorStop(0, '#0a1526');
+        gradient.addColorStop(1, '#03070d');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 560, 680);
+      }
+
+      // Theme-specific grid pattern
+      if (t === 'background_volcano') {
+        ctx.strokeStyle = 'rgba(255, 100, 30, 0.22)';
+      } else if (t === 'background_ice') {
+        ctx.strokeStyle = 'rgba(100, 220, 255, 0.28)';
+      } else if (t === 'background_forest') {
+        ctx.strokeStyle = 'rgba(180, 100, 255, 0.24)';
+      } else {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      }
       ctx.lineWidth = 1;
       for (let x = 0; x <= 560; x += 40) {
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 680); ctx.stroke();
@@ -94,6 +144,23 @@ export function generateAllProceduralAssets(scene: Phaser.Scene): void {
       for (let y = 0; y <= 680; y += 39) {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(560, y); ctx.stroke();
       }
+
+      // Add themed intersection dots
+      if (t === 'background_volcano') {
+        ctx.fillStyle = 'rgba(255, 90, 0, 0.4)';
+      } else if (t === 'background_ice') {
+        ctx.fillStyle = 'rgba(100, 220, 255, 0.45)';
+      } else if (t === 'background_forest') {
+        ctx.fillStyle = 'rgba(180, 100, 255, 0.4)';
+      } else {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      }
+      for (let x = 0; x <= 560; x += 40) {
+        for (let y = 0; y <= 680; y += 39) {
+          ctx.beginPath(); ctx.arc(x, y, 1.2, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+
       canvas.refresh();
     }
   });

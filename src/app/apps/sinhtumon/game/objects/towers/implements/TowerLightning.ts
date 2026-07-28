@@ -25,17 +25,17 @@ export class TowerLightning extends TowerBase {
   }
 
   protected specialAbility(target: MonsterBase, bullet: BulletBase): void {
-    // Stun primary target for 600ms
+    // Slow primary target by 40% (speedMultiplier: 0.6) for 1000ms
     target.applyStatus({
-      type: C.STATUS_STUN,
-      duration: 600,
-      speedMultiplier: 0.01,
+      type: C.STATUS_SLOW,
+      duration: 1000,
+      speedMultiplier: 0.6,
     });
 
     // Lightning bolt drawing
     this.drawLightning(this.x, this.y, target.x, target.y);
 
-    // Chain lightning at level 4+
+    // Chain lightning
     const chainCount = bullet.chainCount;
     if (chainCount > 0) {
       const monsters = this.cb.getMonsters();
@@ -56,9 +56,9 @@ export class TowerLightning extends TowerBase {
         chained.add(nearest);
         nearest.takeDamage(bullet.damage * 0.5, bullet.damageType);
         nearest.applyStatus({
-          type: C.STATUS_STUN,
-          duration: 300,
-          speedMultiplier: 0.01,
+          type: C.STATUS_SLOW,
+          duration: 800,
+          speedMultiplier: 0.6,
         });
         this.drawLightning(lastHit.x, lastHit.y, nearest.x, nearest.y);
         lastHit = nearest;

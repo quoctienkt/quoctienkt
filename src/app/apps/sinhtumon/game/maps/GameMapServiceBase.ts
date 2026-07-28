@@ -76,57 +76,52 @@ export abstract class GameMapServiceBase {
     let ambientTop: number, ambientBot: number;
 
     if (mapKey.includes('volcano')) {
-      terrainFill = 0x1a0800; terrainEdge = 0x2e1004;
-      ambientTop = 0x1f0606; ambientBot = 0x0a0101;
+      terrainFill = 0x330a00; terrainEdge = 0x541400;
+      ambientTop = 0x2b0600; ambientBot = 0x120200;
     } else if (mapKey.includes('ice')) {
-      terrainFill = 0x060e18; terrainEdge = 0x0e1e2e;
-      ambientTop = 0x0c1e36; ambientBot = 0x040810;
+      terrainFill = 0x061d36; terrainEdge = 0x0d325c;
+      ambientTop = 0x0a2342; ambientBot = 0x040f1f;
     } else if (mapKey.includes('forest') || mapKey.includes('cursed')) {
-      terrainFill = 0x060e06; terrainEdge = 0x0c1a0c;
-      ambientTop = 0x0b1c12; ambientBot = 0x040a06;
+      terrainFill = 0x120624; terrainEdge = 0x230c45;
+      ambientTop = 0x0e041f; ambientBot = 0x05010d;
     } else {
-      // Crossroads / desert default
-      terrainFill = 0x1a1408; terrainEdge = 0x2a2010;
-      ambientTop = 0x241a0d; ambientBot = 0x0d0905;
+      // Crossroads / grass plains
+      terrainFill = 0x112b14; terrainEdge = 0x1a3e1e;
+      ambientTop = 0x122b14; ambientBot = 0x09180a;
     }
 
     // Store the centering offset so Square / monsters can apply it
     this.mapConfig.GRID_OFFSET_X = gridX;
 
-    // 1. Draw a full-screen ambient gradient backdrop around the map
-    const ambient = this.scene!.add.graphics().setDepth(-5);
-    ambient.fillGradientStyle(ambientTop, ambientTop, ambientBot, ambientBot, 1);
-    ambient.fillRect(0, 0, W, H);
+    // 1. Draw a full-screen ambient backdrop
+    if (this.scene!.textures.exists('rocky_mountain_bg')) {
+      const bg = this.scene!.add.image(W / 2, H / 2, 'rocky_mountain_bg');
+      bg.setDepth(-5);
+      bg.setDisplaySize(W, H);
+      
+      // Add a dark overlay so the game grid stands out
+      const overlay = this.scene!.add.graphics().setDepth(-4.9);
+      overlay.fillStyle(0x000000, 0.45); // 45% black opacity overlay
+      overlay.fillRect(0, 0, W, H);
+    } else {
+      // Fallback to ambient gradient backdrop
+      const ambient = this.scene!.add.graphics().setDepth(-5);
+      ambient.fillGradientStyle(ambientTop, ambientTop, ambientBot, ambientBot, 1);
+      ambient.fillRect(0, 0, W, H);
+    }
 
     // 2. Draw soft drop-shadow behind the floating board
     const shadow = this.scene!.add.graphics().setDepth(-4);
-    shadow.fillStyle(0x000000, 0.4);
+    shadow.fillStyle(0x000000, 0.55);
     shadow.fillRect(gridX + 8, gridTop + 8, gridW, gridH);
 
-    // 3. Draw surrounding border terrain around the board (left and right strips)
+    // 3. Draw soft translucent side vignettes around the board
     const terrain = this.scene!.add.graphics().setDepth(-3.8);
-    terrain.fillStyle(terrainFill, 1);
-    terrain.fillRect(0, gridTop, W, gridH);
-
+    terrain.fillStyle(0x000000, 0.25);
     // Left strip
-    terrain.fillStyle(terrainEdge, 0.8);
     terrain.fillRect(0, gridTop, gridX, gridH);
     // Right strip
     terrain.fillRect(gridX + gridW, gridTop, W - gridX - gridW, gridH);
-
-    // Pebble pattern texture for borders
-    const seed = mapKey.length;
-    terrain.fillStyle(terrainEdge, 0.4);
-    for (let i = 0; i < 24; i++) {
-      // left strip
-      const px = ((i * 17 + seed) % Math.max(1, gridX - 4)) + 2;
-      const py = gridTop + ((i * 31 + seed * 3) % Math.max(1, gridH - 4)) + 2;
-      terrain.fillCircle(px, py, 2);
-      // right strip
-      const rx2 = gridX + gridW + ((i * 23 + seed) % Math.max(1, W - gridX - gridW - 4)) + 2;
-      const ry2 = gridTop + ((i * 41 + seed * 5) % Math.max(1, gridH - 4)) + 2;
-      terrain.fillCircle(rx2, ry2, 2);
-    }
 
     // 4. Draw premium stone frame border around the board
     const border = this.scene!.add.graphics().setDepth(-2.5);
@@ -186,28 +181,31 @@ export abstract class GameMapServiceBase {
       roadBase = 0x1a2030; roadEdge = 0x0e1420; roadHighlight = 0x2a3448;
     }
 
-    for (let row = 0; row < map.length; row++) {
-      for (let col = 0; col < map[row].length; col++) {
-        const x = gridX + col * CW;
-        const y = row * CH + PAD;
-        if (map[row][col] !== AVAILABLE) {
-          // Road base fill
-          pathGraphics.fillStyle(roadBase, 1);
-          pathGraphics.fillRect(x + 1, y + 1, CW - 2, CH - 2);
+    const isCrossroads = this.mapConfig.mapKey === C.MAP_CROSSROADS;
+    if (!isCrossroads) {
+      for (let row = 0; row < map.length; row++) {
+        for (let col = 0; col < map[row].length; col++) {
+          const x = gridX + col * CW;
+          const y = row * CH + PAD;
+          if (map[row][col] !== AVAILABLE) {
+            // Road base fill
+            pathGraphics.fillStyle(roadBase, 1);
+            pathGraphics.fillRect(x + 1, y + 1, CW - 2, CH - 2);
 
-          // Top/left highlight
-          pathGraphics.fillStyle(roadHighlight, 0.4);
-          pathGraphics.fillRect(x + 1, y + 1, CW - 2, 2);
-          pathGraphics.fillRect(x + 1, y + 1, 2, CH - 2);
+            // Top/left highlight
+            pathGraphics.fillStyle(roadHighlight, 0.4);
+            pathGraphics.fillRect(x + 1, y + 1, CW - 2, 2);
+            pathGraphics.fillRect(x + 1, y + 1, 2, CH - 2);
 
-          // Bottom/right shadow
-          pathGraphics.fillStyle(roadEdge, 0.6);
-          pathGraphics.fillRect(x + 1, y + CH - 3, CW - 2, 2);
-          pathGraphics.fillRect(x + CW - 3, y + 1, 2, CH - 2);
+            // Bottom/right shadow
+            pathGraphics.fillStyle(roadEdge, 0.6);
+            pathGraphics.fillRect(x + 1, y + CH - 3, CW - 2, 2);
+            pathGraphics.fillRect(x + CW - 3, y + 1, 2, CH - 2);
 
-          // Center cobblestone pattern (subtle)
-          pathGraphics.fillStyle(roadHighlight, 0.12);
-          pathGraphics.fillRect(x + CW / 2 - 4, y + CH / 2 - 3, 8, 6);
+            // Center cobblestone pattern (subtle)
+            pathGraphics.fillStyle(roadHighlight, 0.12);
+            pathGraphics.fillRect(x + CW / 2 - 4, y + CH / 2 - 3, 8, 6);
+          }
         }
       }
     }
@@ -217,6 +215,52 @@ export abstract class GameMapServiceBase {
     const background = this.scene!.add.image(gridX, gridTop, bgKey).setOrigin(0);
     background.setDepth(-3);
     background.setDisplaySize(gridW, gridH);
+
+    // Draw subtle grid lines on top of the map background texture
+    if (!isCrossroads) {
+      const gridLines = this.scene!.add.graphics().setDepth(-2.9);
+      
+      // Choose line color based on the map theme
+      let gridColor = 0x4af7a0; // default green-gold
+      let gridAlpha = 0.18;
+      if (bgKey.includes('volcano')) {
+        gridColor = 0xff5a00;
+        gridAlpha = 0.22;
+      } else if (bgKey.includes('ice')) {
+        gridColor = 0x64dcff;
+        gridAlpha = 0.25;
+      } else if (bgKey.includes('forest')) {
+        gridColor = 0xb464ff;
+        gridAlpha = 0.22;
+      }
+      
+      gridLines.lineStyle(1, gridColor, gridAlpha);
+      
+      // Vertical grid lines
+      for (let c = 0; c <= numCols; c++) {
+        const lx = gridX + c * CW;
+        gridLines.beginPath();
+        gridLines.moveTo(lx, gridTop);
+        gridLines.lineTo(lx, gridTop + gridH);
+        gridLines.strokePath();
+      }
+      // Horizontal grid lines
+      for (let r = 0; r <= numRows; r++) {
+        const ly = gridTop + r * CH;
+        gridLines.beginPath();
+        gridLines.moveTo(gridX, ly);
+        gridLines.lineTo(gridX + gridW, ly);
+        gridLines.strokePath();
+      }
+
+      // Intersection dots
+      gridLines.fillStyle(gridColor, gridAlpha * 1.5);
+      for (let c = 0; c <= numCols; c++) {
+        for (let r = 0; r <= numRows; r++) {
+          gridLines.fillCircle(gridX + c * CW, gridTop + r * CH, 1.2);
+        }
+      }
+    }
   }
 
   getGroundMonsterMovingPath(

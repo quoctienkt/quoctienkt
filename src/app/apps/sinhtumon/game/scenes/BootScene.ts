@@ -53,11 +53,29 @@ export class BootScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
-    // Generate all assets programmatically in texture cache
-    generateAllProceduralAssets(this);
+    // Preload the rocky mountain background image for use inside the game
+    this.load.image(
+      'rocky_mountain_bg',
+      '/quoctienkt/sinhtumon/rocky_mountain_bg.jpg',
+    );
+
+    // Preload map background textures
+    this.load.image('background1', '/quoctienkt/sinhtumon/ho-tu-than.png');
+    this.load.image(
+      'background_volcano',
+      '/quoctienkt/sinhtumon/map_volcano.jpg',
+    );
+    this.load.image('background_ice', '/quoctienkt/sinhtumon/map_ice.jpg');
+    this.load.image(
+      'background_forest',
+      '/quoctienkt/sinhtumon/map_forest.jpg',
+    );
   }
 
   create(): void {
+    // Generate fallback assets programmatically in texture cache after loading completes
+    generateAllProceduralAssets(this);
+
     this.input.once('pointerdown', () => {
       SoundManager.getInstance().playShoot();
     });
